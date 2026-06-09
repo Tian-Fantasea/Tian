@@ -4,13 +4,44 @@ import json
 import sys
 
 
+def write_version_info(args):
+    (outfile, timestamp, arch, kernel, os_name, cpu_model,
+     cores, mem_mb, sw_version, scala_ver, java_ver,
+     install_path, task_slots, parallelism) = args[:14]
+    data = {
+        "timestamp": timestamp,
+        "architecture": arch,
+        "kernel": kernel,
+        "os": os_name,
+        "cpu_model": cpu_model,
+        "cpu_cores": int(cores),
+        "memory_mb": int(mem_mb),
+        "software": {
+            "name": "Apache Flink",
+            "version": sw_version,
+            "scala_version": scala_ver,
+            "java_version": java_ver,
+            "install_path": install_path,
+            "arm64_native": True,
+            "task_slots": int(task_slots),
+            "parallelism_default": int(parallelism)
+        }
+    }
+    with open(outfile, "w") as f:
+        json.dump(data, f, indent=2)
+
+
 def main():
     if len(sys.argv) < 3:
-        print("Usage: json_helper.py <json_file> <command> [args...]")
+        print("Usage: json_helper.py <json_file> <command> [args...]", file=sys.stderr)
         sys.exit(1)
 
     json_file = sys.argv[1]
     command = sys.argv[2]
+
+    if command == "write_version_info":
+        write_version_info(sys.argv[1:])
+        return
 
     try:
         with open(json_file, "r") as f:

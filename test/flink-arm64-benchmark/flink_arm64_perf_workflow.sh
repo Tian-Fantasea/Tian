@@ -173,42 +173,24 @@ phase2_verify() {
     local arch
     arch="$(uname -m)"
     local kernel
-    kernel="$(uname -r)"
+    kernel="$(uname -r | tr -d '\n\t')"
     local os
-    os="$(cat /etc/os-release 2>/dev/null | grep PRETTY_NAME | cut -d'"' -f2 || uname -s)"
+    os="$(cat /etc/os-release 2>/dev/null | grep PRETTY_NAME | cut -d'"' -f2 | tr -d '\n\t' || uname -s | tr -d '\n\t')"
     local cpu_model
-    cpu_model="$(grep 'model name' /proc/cpuinfo 2>/dev/null | head -1 | cut -d: -f2 | xargs || grep 'CPU part' /proc/cpuinfo 2>/dev/null | head -1 | cut -d: -f2 | xargs || echo 'ARM64 CPU')"
+    cpu_model="$(grep 'model name' /proc/cpuinfo 2>/dev/null | head -1 | cut -d: -f2 | xargs | tr -d '\n\t' || grep 'CPU part' /proc/cpuinfo 2>/dev/null | head -1 | cut -d: -f2 | xargs | tr -d '\n\t' || echo 'ARM64 CPU')"
     local cores
     cores="${NPROC}"
     local mem_mb
     mem_mb="$(echo "${TOTAL_MEM_KB} / 1024" | bc 2>/dev/null || echo 8192)"
     local java_ver
-    java_ver="$(java -version 2>&1 | head -1)"
+    java_ver="$(java -version 2>&1 | head -1 | tr -d '\n\t')"
     local flink_ver
-    flink_ver="$(grep 'flink-version' "${FLINK_HOME}/lib/"*.jar 2>/dev/null | head -1 || echo "${SOFTWARE_VERSION}")"
+    flink_ver="$(grep 'flink-version' "${FLINK_HOME}/lib/"*.jar 2>/dev/null | head -1 | tr -d '\n\t' || echo "${SOFTWARE_VERSION}")"
 
     mkdir -p "${RESULTS_DIR}"
-    cat > "${RESULTS_DIR}/version_info.json" << EOFJSON
-{
-  "timestamp": "${timestamp}",
-  "architecture": "${arch}",
-  "kernel": "${kernel}",
-  "os": "${os}",
-  "cpu_model": "${cpu_model}",
-  "cpu_cores": ${cores},
-  "memory_mb": ${mem_mb},
-  "software": {
-    "name": "Apache Flink",
-    "version": "${SOFTWARE_VERSION}",
-    "scala_version": "2.12",
-    "java_version": "${java_ver}",
-    "install_path": "${FLINK_HOME}",
-    "arm64_native": true,
-    "task_slots": ${cores},
-    "parallelism_default": ${cores}
-  }
-}
-EOFJSON
+    python3 "${SCRIPT_DIR}/scripts/json_helper.py" "${RESULTS_DIR}/version_info.json" write_version_info \
+        "${timestamp}" "${arch}" "${kernel}" "${os}" "${cpu_model}" "${cores}" "${mem_mb}" \
+        "${SOFTWARE_VERSION}" "2.12" "${java_ver}" "${FLINK_HOME}" "${cores}" "${cores}"
 
     log "PHASE2" "Version info saved to ${RESULTS_DIR}/version_info.json"
 
