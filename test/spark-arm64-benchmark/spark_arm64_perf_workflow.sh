@@ -112,7 +112,7 @@ phase1_install() {
     if [[ ! -d "${SPARK_INSTALL_DIR}" ]]; then
         wget -q -O "${spark_tmp}" "${spark_url}"
         tar -xzf "${spark_tmp}" -C "${SCRIPT_DIR}"
-        mv "${SCRIPT_DIR}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP}" "${SPARK_INSTALL_DIR}"
+        mv "${SCRIPT_DIR}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}" "${SPARK_INSTALL_DIR}"
         rm -f "${spark_tmp}"
     fi
     log "Spark extracted to: ${SPARK_INSTALL_DIR}"
