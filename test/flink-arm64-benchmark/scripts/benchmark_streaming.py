@@ -46,7 +46,7 @@ def benchmark_streaming_throughput(flink_home, iterations, results_dir):
     configs = [
         ("single_slot", {"parallelism": 1}),
         ("half_slots", {"parallelism": max(1, int(os.environ.get("NPROC", "4")) // 2)}),
-        ("all_slots", {"parallelism": int(os.environ.get("NPROC", "4")))}),
+        ("all_slots", {"parallelism": int(os.environ.get("NPROC", "4"))}),
     ]
 
     for i in range(iterations):

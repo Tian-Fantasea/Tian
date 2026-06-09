@@ -6,9 +6,38 @@ SOFTWARE_NAME="flink"
 SOFTWARE_VERSION="${SOFTWARE_VERSION:-2.2.1}"
 FLINK_HOME="${SCRIPT_DIR}/flink"
 SHUNIT_PARENT="${SCRIPT_DIR}/flink_arm64_perf_test.sh"
+JSON_HELPER="${SCRIPT_DIR}/scripts/json_helper.py"
 
 MIN_THROUGHPUT_RECORDS=10000
 MAX_LATENCY_MS=5000
+
+json_get() {
+    python3 "${JSON_HELPER}" "$1" get "$2"
+}
+
+json_field_exists() {
+    python3 "${JSON_HELPER}" "$1" field_exists "$2"
+}
+
+json_count_results() {
+    python3 "${JSON_HELPER}" "$1" count_results
+}
+
+json_throughput_ge() {
+    python3 "${JSON_HELPER}" "$1" throughput_ge "$2" "$3" "$4"
+}
+
+json_latency_le() {
+    python3 "${JSON_HELPER}" "$1" latency_le "$2" "$3" "$4"
+}
+
+json_version() {
+    python3 "${JSON_HELPER}" "$1" version
+}
+
+json_contains() {
+    python3 "${JSON_HELPER}" "$1" contains "$2"
+}
 
 oneTimeSetUp() {
     mkdir -p "${RESULTS_DIR}"
@@ -58,7 +87,7 @@ testFlinkVersionMatches() {
         return
     fi
     local ver
-    ver="$(python3 -c "import json; d=json.load(open('${ver_file}')); print(d['software']['version'])")"
+    ver="$(json_version "${ver_file}")"
     assertEquals "Flink version should match" "${SOFTWARE_VERSION}" "${ver}"
 }
 
@@ -128,16 +157,7 @@ testBenchmarkTpcdsThroughputAboveThreshold() {
         return
     fi
     local has_throughput
-    has_throughput="$(python3 -c "
-import json
-d=json.load(open('${bench_file'))
-if 'results' in d and len(d['results']) > 0:
-    r = d['results'][0]
-    tp = r.get('records_per_sec', r.get('throughput', 0))
-    print(1 if tp >= ${MIN_THROUGHPUT_RECORDS} else 0)
-else:
-    print(0)
-" 2>/dev/null || echo 0)"
+    has_throughput="$(json_throughput_ge "${bench_file}" "${MIN_THROUGHPUT_RECORDS}" records_per_sec throughput)"
     assertTrue "TPC-DS throughput should be >= ${MIN_THROUGHPUT_RECORDS} records/sec" \
         "[ ${has_throughput} -eq 1 ]"
 }
@@ -154,16 +174,7 @@ testBenchmarkStreamingLatencyBelowThreshold() {
         return
     fi
     local latency_ok
-    latency_ok="$(python3 -c "
-import json
-d=json.load(open('${bench_file}')
-if 'results' in d and len(d['results']) > 0:
-    r = d['results'][0]
-    lat = r.get('avg_latency_ms', r.get('latency_ms', 99999))
-    print(1 if lat <= ${MAX_LATENCY_MS} else 0)
-else:
-    print(1)
-" 2>/dev/null || echo 1)"
+    latency_ok="$(json_latency_le "${bench_file}" "${MAX_LATENCY_MS}" avg_latency_ms latency_ms)"
     assertTrue "Streaming avg latency should be <= ${MAX_LATENCY_MS}ms" \
         "[ ${latency_ok} -eq 1 ]"
 }
@@ -180,7 +191,7 @@ testBenchmarkMicroAllOperationsCompleted() {
         return
     fi
     local ops_count
-    ops_count="$(python3 -c "import json; d=json.load(open('${bench_file}')); print(len(d.get('results', [])))" 2>/dev/null || echo 0)"
+    ops_count="$(json_count_results "${bench_file}")"
     assertTrue "Should have results for all micro operations (count: ${ops_count})" \
         "[ ${ops_count} -gt 0 ]"
 }
