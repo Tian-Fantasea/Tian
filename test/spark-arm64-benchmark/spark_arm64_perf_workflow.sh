@@ -100,8 +100,9 @@ phase1_install() {
 
     # --- 1.4 Install Python packages ---
     log "Installing Python dependencies..."
-    pip3 install --upgrade pip setuptools
-    pip3 install numpy pandas scipy matplotlib pyarrow
+    python3 -m venv "${SCRIPT_DIR}/venv"
+    "${SCRIPT_DIR}/venv/bin/pip" install --upgrade pip setuptools
+    "${SCRIPT_DIR}/venv/bin/pip" install numpy pandas scipy matplotlib pyarrow
 
     # --- 1.5 Download and install Apache Spark ---
     log "Downloading Apache Spark ${SPARK_VERSION} for ARM64..."
