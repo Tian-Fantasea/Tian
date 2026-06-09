@@ -74,22 +74,56 @@ REPOEOF
     export PATH="${JAVA_HOME}/bin:${PATH}"
     log "PHASE1" "Java version: $(java -version 2>&1 | head -1)"
 
-    log "PHASE1" "Installing Python dependencies..."
-    python3 -m pip install --quiet numpy pandas scipy matplotlib pyarrow || {
+    log "PHASE1" "Installing Python dependencies via venv..."
+    if [ ! -d "${SCRIPT_DIR}/venv" ]; then
         python3 -m venv "${SCRIPT_DIR}/venv"
-        "${SCRIPT_DIR}/venv/bin/pip" install --quiet numpy pandas scipy matplotlib pyarrow
-    }
+    fi
+    "${SCRIPT_DIR}/venv/bin/pip" install --quiet numpy pandas scipy matplotlib pyarrow
+    export PATH="${SCRIPT_DIR}/venv/bin:${PATH}"
 
     log "PHASE1" "Downloading Apache Flink ${SOFTWARE_VERSION} for ARM64..."
     if [ ! -d "${FLINK_HOME}" ]; then
         local tgz="/tmp/flink-${SOFTWARE_VERSION}.tgz"
+        local flink_filename="flink-${SOFTWARE_VERSION}-bin-scala_2.12.tgz"
+        local mirrors=(
+            "https://archive.apache.org/dist/flink/flink-${SOFTWARE_VERSION}/${flink_filename}"
+            "https://mirrors.aliyun.com/apache/flink/flink-${SOFTWARE_VERSION}/${flink_filename}"
+            "https://mirrors.tuna.tsinghua.edu.cn/apache/flink/flink-${SOFTWARE_VERSION}/${flink_filename}"
+            "https://mirrors.huaweicloud.com/apache/flink/flink-${SOFTWARE_VERSION}/${flink_filename}"
+            "https://repo.huaweicloud.com/apache/flink/flink-${SOFTWARE_VERSION}/${flink_filename}"
+        )
+        local downloaded=0
         rm -f "${tgz}"
-        wget -q -O "${tgz}" "${FLINK_DOWNLOAD_URL}" || curl -L -o "${tgz}" "${FLINK_DOWNLOAD_URL}"
-        file "${tgz}" | grep -q "gzip" || {
-            log "ERROR" "Download failed, file is not gzip. Trying mirror..."
+        for mirror_url in "${mirrors[@]}"; do
+            log "PHASE1" "Trying: ${mirror_url}"
+            wget --timeout=60 --tries=2 -q -O "${tgz}" "${mirror_url}" 2>/dev/null && {
+                file "${tgz}" | grep -q "gzip" && {
+                    downloaded=1
+                    log "PHASE1" "Download succeeded from: ${mirror_url}"
+                    break
+                }
+            }
             rm -f "${tgz}"
-            wget -q -O "${tgz}" "https://mirrors.aliyun.com/apache/flink/flink-${SOFTWARE_VERSION}/flink-${SOFTWARE_VERSION}-bin-scala_2.12.tgz"
-        }
+        done
+        if [ "${downloaded}" -eq 0 ]; then
+            for mirror_url in "${mirrors[@]}"; do
+                log "PHASE1" "Retrying with curl: ${mirror_url}"
+                curl --connect-timeout 60 --max-time 600 -L -o "${tgz}" "${mirror_url}" 2>/dev/null && {
+                    file "${tgz}" | grep -q "gzip" && {
+                        downloaded=1
+                        log "PHASE1" "Download succeeded (curl) from: ${mirror_url}"
+                        break
+                    }
+                }
+                rm -f "${tgz}"
+            done
+        fi
+        if [ "${downloaded}" -eq 0 ]; then
+            log "ERROR" "All mirrors failed. Please download manually:"
+            log "ERROR" "  wget -O /tmp/${flink_filename} <any_mirror_url>"
+            log "ERROR" "  Then re-run this script."
+            return 1
+        fi
         log "PHASE1" "Extracting Flink..."
         tar -xzf "${tgz}" -C "${SCRIPT_DIR}"
         mv "${SCRIPT_DIR}/flink-${SOFTWARE_VERSION}" "${FLINK_HOME}"
