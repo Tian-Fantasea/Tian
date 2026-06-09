@@ -41,7 +41,7 @@ phase1_install() {
     log "PHASE1" "Installing system dependencies..."
     if command -v apt-get >/dev/null 2>&1; then
         apt-get update -qq
-        apt-get install -y -qq curl wget python3 python3-pip bc
+        apt-get install -y -qq curl wget python3 python3-venv python3-pip bc
     elif command -v yum >/dev/null 2>&1; then
         yum install -y -q curl wget python3 python3-pip bc
     elif command -v dnf >/dev/null 2>&1; then
@@ -52,8 +52,12 @@ phase1_install() {
     if [ -z "${JAVA_HOME}" ] || [ ! -x "${JAVA_HOME}/bin/java" ]; then
         if command -v apt-get >/dev/null 2>&1; then
             apt-get install -y -qq wget apt-transport-https gpg
+            if [ ! -f /usr/share/keyrings/adoptium.gpg ]; then
             wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor -o /usr/share/keyrings/adoptium.gpg
+        fi
+        if [ ! -f /etc/apt/sources.list.d/temurin.list ]; then
             echo "deb [signed-by=/usr/share/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(. /etc/os-release && echo "${VERSION_CODENAME}") main" > /etc/apt/sources.list.d/temurin.list
+        fi
             apt-get update -qq
             apt-get install -y -qq temurin-21-jdk
             JAVA_HOME="/usr/lib/jvm/temurin-21-jdk-arm64"
@@ -75,8 +79,10 @@ REPOEOF
     log "PHASE1" "Java version: $(java -version 2>&1 | head -1)"
 
     log "PHASE1" "Installing Python dependencies via venv..."
-    if [ ! -d "${SCRIPT_DIR}/venv" ]; then
+    if [ ! -f "${SCRIPT_DIR}/venv/bin/pip" ]; then
+        rm -rf "${SCRIPT_DIR}/venv"
         python3 -m venv "${SCRIPT_DIR}/venv"
+        "${SCRIPT_DIR}/venv/bin/pip" install --quiet --upgrade pip
     fi
     "${SCRIPT_DIR}/venv/bin/pip" install --quiet numpy pandas scipy matplotlib pyarrow
     export PATH="${SCRIPT_DIR}/venv/bin:${PATH}"
