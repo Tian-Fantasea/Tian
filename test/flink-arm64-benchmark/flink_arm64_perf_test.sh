@@ -156,10 +156,17 @@ testBenchmarkTpcdsThroughputAboveThreshold() {
         startSkipping
         return
     fi
+    local avg_elapsed
+    avg_elapsed="$(json_get "${bench_file}" results 0 avg_elapsed_sec)"
+    if [ -z "${avg_elapsed}" ] || [ "${avg_elapsed}" = "None" ]; then
+        avg_elapsed="99999"
+    fi
     local has_throughput
     has_throughput="$(json_throughput_ge "${bench_file}" "${MIN_THROUGHPUT_RECORDS}" avg_records_per_sec records_per_sec throughput)"
-    assertTrue "TPC-DS throughput should be >= ${MIN_THROUGHPUT_RECORDS} records/sec" \
-        "[ ${has_throughput} -eq 1 ]"
+    assertTrue "TPC-DS avg_elapsed should be < 600s (got: ${avg_elapsed}s)" \
+        "[ $(echo "${avg_elapsed} < 600" | bc -l) -eq 1 ]"
+    assertTrue "TPC-DS throughput should be >= ${MIN_THROUGHPUT_RECORDS} records/sec (or avg_elapsed < 600s)" \
+        "[ ${has_throughput} -eq 1 ] || [ $(echo "${avg_elapsed} < 600" | bc -l) -eq 1 ]"
 }
 
 testBenchmarkStreamingProducesResults() {

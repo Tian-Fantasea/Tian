@@ -76,7 +76,23 @@ def benchmark_tpcds(flink_home, scale, iterations, results_dir):
             records = 0
             try:
                 lines = stdout.strip().split("\n")
-                records = len([l for l in lines if l.strip() and not l.startswith("+") and not l.startswith("|")])
+                border_count = 0
+                past_header = False
+                for l in lines:
+                    l_stripped = l.strip()
+                    if l_stripped.startswith("+") and "-" in l_stripped:
+                        border_count += 1
+                        if border_count == 2:
+                            past_header = True
+                        if border_count >= 3:
+                            past_header = False
+                    elif l_stripped.startswith("|") and past_header:
+                        records += 1
+                if records == 0:
+                    import re
+                    m = re.search(r"(\d+)\s+rows?\s+returned", stdout)
+                    if m:
+                        records = int(m.group(1))
             except Exception:
                 pass
             results.append({
