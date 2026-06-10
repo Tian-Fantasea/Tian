@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -22,7 +23,29 @@ def stop_flink_cluster(flink_home):
     time.sleep(5)
 
 
-def submit_streaming_job(flink_home, jar_path, args_list, timeout=300):
+def parse_wordcount_output(stdout):
+    records = 0
+    lines = stdout.strip().split("\n")
+    skip_patterns = [
+        "SQL Query Result", "Table program finished",
+        "Flink SQL>", "Shutting down", "done",
+        "has been submitted", "Job with id",
+        "Starting cluster", "Stopping", "taskexecutor",
+        "standalonesession", "daemon",
+    ]
+    data_lines = [
+        l for l in lines
+        if l.strip() and not any(p in l for p in skip_patterns)
+    ]
+    for l in data_lines:
+        m = re.search(r"\b(\d+)\b", l)
+        if m and int(m.group(1)) > 0:
+            records += 1
+    if records == 0:
+        for l in data_lines:
+            if "(" in l or "=" in l or ":" in l:
+                records += 1
+    return records
     flink_cmd = os.path.join(flink_home, "bin", "flink")
     cmd = [flink_cmd, "run", jar_path] + args_list
     start = time.time()
@@ -60,13 +83,7 @@ def benchmark_streaming_throughput(flink_home, iterations, results_dir):
                 flink_home, wordcount_jar, ["-p", str(p)], timeout=120
             )
 
-            records = 0
-            try:
-                for line in stdout.strip().split("\n"):
-                    if line.strip() and not line.startswith("+") and "(" in line:
-                        records += 1
-            except Exception:
-                pass
+            records = parse_wordcount_output(stdout)
 
             results.append({
                 "iteration": i + 1,

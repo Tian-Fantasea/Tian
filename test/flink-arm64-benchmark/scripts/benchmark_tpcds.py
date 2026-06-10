@@ -3,10 +3,54 @@
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import time
 from datetime import datetime
+
+
+def parse_sql_client_output(stdout):
+    lines = stdout.strip().split("\n")
+    border_count = 0
+    past_header = False
+    border_records = 0
+    for l in lines:
+        ls = l.strip()
+        if ls.startswith("+") and "-" in ls:
+            border_count += 1
+            if border_count == 2:
+                past_header = True
+            elif border_count >= 3:
+                past_header = False
+        elif ls.startswith("|") and past_header:
+            border_records += 1
+
+    if border_records > 0:
+        return border_records
+
+    skip_patterns = [
+        "SQL Query Result", "Table program finished",
+        "Flink SQL>", "Shutting down", "done",
+        "has been submitted", "Job with id",
+        "Page:", "Updated:", "Press",
+    ]
+    data_lines = [
+        l for l in lines
+        if l.strip() and not any(p in l for p in skip_patterns)
+    ]
+    if len(data_lines) > 1:
+        return len(data_lines) - 1
+
+    m = re.search(r"(\d+)\s+rows?\s+returned", stdout)
+    if m:
+        return int(m.group(1))
+
+    m = re.search(r"Page:\s+\w+\s+of\s+(\d+)", stdout)
+    if m:
+        return int(m.group(1)) * 20
+
+    return len(data_lines)
 
 
 def run_flink_sql(flink_home, sql, job_name):
@@ -74,28 +118,7 @@ def benchmark_tpcds(flink_home, scale, iterations, results_dir):
             full_sql = all_sql + q_sql + ";"
             rc, stdout, stderr = run_flink_sql(flink_home, full_sql, f"tpcds_{q_name}")
             q_elapsed = time.time() - q_start
-            records = 0
-            try:
-                lines = stdout.strip().split("\n")
-                border_count = 0
-                past_header = False
-                for l in lines:
-                    ls = l.strip()
-                    if ls.startswith("+") and "-" in ls:
-                        border_count += 1
-                        if border_count == 2:
-                            past_header = True
-                        elif border_count >= 3:
-                            past_header = False
-                    elif ls.startswith("|") and past_header:
-                        records += 1
-                if records == 0:
-                    import re
-                    m = re.search(r"(\d+)\s+rows?\s+returned", stdout)
-                    if m:
-                        records = int(m.group(1))
-            except Exception:
-                pass
+            records = parse_sql_client_output(stdout)
             results.append({
                 "iteration": i + 1,
                 "query": q_name,

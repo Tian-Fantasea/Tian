@@ -56,7 +56,7 @@ def run_sql_job(flink_home, sql, timeout=300):
         )
         stdout, stderr = proc.communicate(input=full_input.encode(), timeout=timeout)
         elapsed = time.time() - start
-        return proc.returncode, elapsed, stdout.decode(), stderr.decode()
+        return proc.returncode, elapsed, stdout.decode(errors="replace"), stderr.decode(errors="replace")
     except subprocess.TimeoutExpired:
         proc.kill()
         return -1, time.time() - start, "", "Timeout"
@@ -99,10 +99,29 @@ def benchmark_state(flink_home, iterations, results_dir):
             rc, elapsed, stdout, stderr = run_sql_job(flink_home, test["sql"], timeout=300)
             checkpoint_size = 0
             try:
-                ckpt_dir = os.path.join(flink_home, "checkpoints")
-                if os.path.exists(ckpt_dir):
-                    for f in os.listdir(ckpt_dir):
-                        checkpoint_size += os.path.getsize(os.path.join(ckpt_dir, f))
+                ckpt_dirs = [
+                    os.path.join(flink_home, "checkpoints"),
+                    "/tmp/flink-checkpoints",
+                    os.path.join(flink_home, "flink-standalonesession", "checkpoints"),
+                ]
+                ckpt_dir_conf = None
+                conf_file = os.path.join(flink_home, "conf", "flink-conf.yaml")
+                if os.path.exists(conf_file):
+                    with open(conf_file, "r") as f:
+                        for line in f:
+                            if "state.checkpoints.dir" in line:
+                                ckpt_dir_conf = line.split(":")[1].strip().strip("'\"")
+                                if ckpt_dir_conf.startswith("file:"):
+                                    ckpt_dir_conf = ckpt_dir_conf[5:]
+                if ckpt_dir_conf:
+                    ckpt_dirs.append(ckpt_dir_conf)
+                for ckpt_dir in ckpt_dirs:
+                    if os.path.exists(ckpt_dir):
+                        for root, dirs, files in os.walk(ckpt_dir):
+                            for fn in files:
+                                checkpoint_size += os.path.getsize(os.path.join(root, fn))
+                        if checkpoint_size > 0:
+                            break
             except Exception:
                 pass
 

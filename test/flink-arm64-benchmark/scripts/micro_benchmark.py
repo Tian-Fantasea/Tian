@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 import subprocess
 import time
 from datetime import datetime
@@ -40,10 +41,32 @@ def run_sql_job(flink_home, sql, timeout=300):
         )
         stdout, stderr = proc.communicate(input=full_input.encode(), timeout=timeout)
         elapsed = time.time() - start
-        return proc.returncode, elapsed, stdout.decode(), stderr.decode()
+        return proc.returncode, elapsed, stdout.decode(errors="replace"), stderr.decode(errors="replace")
     except subprocess.TimeoutExpired:
         proc.kill()
         return -1, time.time() - start, "", "Timeout"
+
+
+def parse_micro_output(stdout):
+    rows = 0
+    lines = stdout.strip().split("\n")
+    for line in lines:
+        ls = line.strip()
+        if ls.startswith("+I[") or ls.startswith("+I(") or ls.startswith("-D[") or ls.startswith("-U[") or ls.startswith("+U["):
+            rows += 1
+    if rows == 0:
+        skip_patterns = [
+            "SQL Query Result", "Table program finished",
+            "Flink SQL>", "Shutting down", "done",
+            "has been submitted", "Job with id",
+            "Page:", "Updated:", "Press",
+        ]
+        data_lines = [
+            l for l in lines
+            if l.strip() and not any(p in l for p in skip_patterns)
+        ]
+        rows = max(0, len(data_lines) - 1)
+    return rows
 
 
 def benchmark_micro(flink_home, iterations, results_dir):
@@ -81,17 +104,7 @@ def benchmark_micro(flink_home, iterations, results_dir):
         for test in micro_tests:
             print(f"[MICRO] Running {test['name']}...")
             rc, elapsed, stdout, stderr = run_sql_job(flink_home, test["sql"], timeout=300)
-            rows = 0
-            try:
-                for line in stdout.strip().split("\n"):
-                    if line.strip() and "INSERT" in line:
-                        parts = line.split()
-                        for p in parts:
-                            if ":" in p and p.split(":")[0].isdigit():
-                                rows = int(p.split(":")[0])
-                                break
-            except Exception:
-                pass
+            rows = parse_micro_output(stdout)
 
             results.append({
                 "iteration": i + 1,
