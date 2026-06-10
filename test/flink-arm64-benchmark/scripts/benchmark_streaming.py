@@ -46,6 +46,9 @@ def parse_wordcount_output(stdout):
             if "(" in l or "=" in l or ":" in l:
                 records += 1
     return records
+
+
+def submit_streaming_job(flink_home, jar_path, args_list, timeout=300):
     flink_cmd = os.path.join(flink_home, "bin", "flink")
     cmd = [flink_cmd, "run", jar_path] + args_list
     start = time.time()
@@ -53,7 +56,7 @@ def parse_wordcount_output(stdout):
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
         stdout, stderr = proc.communicate(timeout=timeout)
         elapsed = time.time() - start
-        return proc.returncode, elapsed, stdout.decode(), stderr.decode()
+        return proc.returncode, elapsed, stdout.decode(errors="replace"), stderr.decode(errors="replace")
     except subprocess.TimeoutExpired:
         proc.kill()
         elapsed = time.time() - start
