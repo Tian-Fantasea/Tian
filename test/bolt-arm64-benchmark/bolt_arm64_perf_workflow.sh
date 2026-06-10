@@ -46,7 +46,24 @@ phase1_install() {
     fi
 
     log "PHASE1" "Installing Go ${GO_VERSION} for ARM64..."
-    if ! command -v go >/dev/null 2>&1; then
+    local need_install=0
+    if command -v go >/dev/null 2>&1; then
+        local current_ver
+        current_ver="$(go version | grep -oP 'go\K[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)"
+        local required_minor
+        required_minor="$(echo "${GO_VERSION}" | cut -d. -f2)"
+        local current_minor
+        current_minor="$(echo "${current_ver}" | cut -d. -f2)"
+        if [ "${current_minor}" -lt "${required_minor}" ]; then
+            log "PHASE1" "Go ${current_ver} installed but ${GO_VERSION} required, upgrading..."
+            need_install=1
+        else
+            log "PHASE1" "Go ${current_ver} already installed, sufficient"
+        fi
+    else
+        need_install=1
+    fi
+    if [ "${need_install}" -eq 1 ]; then
         local go_tgz="/tmp/go${GO_VERSION}.linux-arm64.tar.gz"
         local go_mirrors=(
             "https://go.dev/dl/go${GO_VERSION}.linux-arm64.tar.gz"
@@ -88,6 +105,7 @@ phase1_install() {
         export PATH="/usr/local/go/bin:${PATH}"
         echo 'export PATH=/usr/local/go/bin:$PATH' >> /etc/profile.d/go.sh
     fi
+    export PATH="/usr/local/go/bin:${PATH}"
     log "PHASE1" "Go version: $(go version | head -1)"
 
     log "PHASE1" "Installing Python dependencies via venv..."
