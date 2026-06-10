@@ -4,18 +4,28 @@ import json
 import sys
 
 
-def write_version_info(args):
-    (outfile, timestamp, arch, kernel, os_name, cpu_model,
+def safe_int(val):
+    try:
+        return int(val)
+    except ValueError:
+        try:
+            return int(val, 16)
+        except ValueError:
+            return 0
+
+
+def write_version_info(outfile, data_args):
+    (timestamp, arch, kernel, os_name, cpu_model,
      cores, mem_mb, sw_version, scala_ver, java_ver,
-     install_path, task_slots, parallelism) = args[:14]
+     install_path, task_slots, parallelism) = data_args[:13]
     data = {
         "timestamp": timestamp,
         "architecture": arch,
         "kernel": kernel,
         "os": os_name,
         "cpu_model": cpu_model,
-        "cpu_cores": int(cores),
-        "memory_mb": int(mem_mb),
+        "cpu_cores": safe_int(cores),
+        "memory_mb": safe_int(mem_mb),
         "software": {
             "name": "Apache Flink",
             "version": sw_version,
@@ -23,8 +33,8 @@ def write_version_info(args):
             "java_version": java_ver,
             "install_path": install_path,
             "arm64_native": True,
-            "task_slots": int(task_slots),
-            "parallelism_default": int(parallelism)
+            "task_slots": safe_int(task_slots),
+            "parallelism_default": safe_int(parallelism)
         }
     }
     with open(outfile, "w") as f:
@@ -40,7 +50,7 @@ def main():
     command = sys.argv[2]
 
     if command == "write_version_info":
-        write_version_info(sys.argv[1:])
+        write_version_info(json_file, sys.argv[3:])
         return
 
     try:
