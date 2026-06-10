@@ -52,14 +52,14 @@ phase1_install() {
     if [ -z "${JAVA_HOME}" ] || [ ! -x "${JAVA_HOME}/bin/java" ]; then
         if command -v apt-get >/dev/null 2>&1; then
             apt-get install -y -qq wget apt-transport-https gpg
-            if [ ! -f /usr/share/keyrings/adoptium.gpg ]; then
+local temurin_list="/etc/apt/sources.list.d/temurin.list"
+        local adoptium_list="/etc/apt/sources.list.d/adoptium.list"
+        if [ ! -f "${temurin_list}" ] && [ ! -f "${adoptium_list}" ]; then
             wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor -o /usr/share/keyrings/adoptium.gpg
+            echo "deb [signed-by=/usr/share/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(. /etc/os-release && echo "${VERSION_CODENAME}") main" > "${temurin_list}"
         fi
-        if [ ! -f /etc/apt/sources.list.d/temurin.list ]; then
-            echo "deb [signed-by=/usr/share/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(. /etc/os-release && echo "${VERSION_CODENAME}") main" > /etc/apt/sources.list.d/temurin.list
-        fi
-            apt-get update -qq
-            apt-get install -y -qq temurin-21-jdk
+        apt-get update -qq 2>/dev/null
+        apt-get install -y -qq temurin-21-jdk
             JAVA_HOME="/usr/lib/jvm/temurin-21-jdk-arm64"
         elif command -v yum >/dev/null 2>&1 || command -v dnf >/dev/null 2>&1; then
             rpm --import https://packages.adoptium.net/artifactory/api/gpg/key/public
@@ -88,7 +88,8 @@ REPOEOF
     export PATH="${SCRIPT_DIR}/venv/bin:${PATH}"
 
     log "PHASE1" "Downloading Apache Flink ${SOFTWARE_VERSION} for ARM64..."
-    if [ ! -d "${FLINK_HOME}" ]; then
+    if [ ! -d "${FLINK_HOME}" ] || [ ! -f "${FLINK_HOME}/bin/start-cluster.sh" ]; then
+        rm -rf "${FLINK_HOME}"
         local tgz="/tmp/flink-${SOFTWARE_VERSION}.tgz"
         local flink_filename="flink-${SOFTWARE_VERSION}-bin-scala_2.12.tgz"
         local mirrors=(
@@ -132,8 +133,22 @@ REPOEOF
         fi
         log "PHASE1" "Extracting Flink..."
         tar -xzf "${tgz}" -C "${SCRIPT_DIR}"
-        mv "${SCRIPT_DIR}/flink-${SOFTWARE_VERSION}" "${FLINK_HOME}"
+        local extracted_dir
+        extracted_dir="$(find "${SCRIPT_DIR}" -maxdepth 1 -name 'flink-*' -type d | head -1)"
+        if [ -z "${extracted_dir}" ]; then
+            log "ERROR" "Flink extraction failed - no flink directory found"
+            return 1
+        fi
+        if [ "${extracted_dir}" != "${FLINK_HOME}" ]; then
+            mv "${extracted_dir}" "${FLINK_HOME}"
+        fi
+        if [ ! -f "${FLINK_HOME}/bin/start-cluster.sh" ]; then
+            log "ERROR" "Flink installation incomplete: start-cluster.sh not found"
+            return 1
+        fi
         rm -f "${tgz}"
+    else
+        log "PHASE1" "Flink already installed at ${FLINK_HOME}"
     fi
 
     log "PHASE1" "Configuring Flink for ARM64..."
