@@ -133,10 +133,11 @@ GOMOD
 
     log "PHASE1" "Downloading bbolt module..."
     cd "${BOLT_HOME}/src/benchmark"
-    GOTOOLCHAIN=local go mod download 2>/dev/null || {
-        log "PHASE1" "go mod download failed, trying go get..."
-        GOTOOLCHAIN=local go get go.etcd.io/bbolt@v1.4.3
-    }
+    GOTOOLCHAIN=local go mod tidy
+    if [ ! -f "go.sum" ]; then
+        log "ERROR" "go.sum not generated, go mod tidy failed"
+        return 1
+    fi
 
     for bench_src in "${SCRIPT_DIR}/scripts"/*.go; do
         local bench_name
