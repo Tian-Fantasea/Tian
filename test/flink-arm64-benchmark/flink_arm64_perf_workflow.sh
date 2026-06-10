@@ -210,7 +210,7 @@ phase2_verify() {
     log "PHASE2" "Version info saved to ${RESULTS_DIR}/version_info.json"
 
     "${FLINK_HOME}/bin/stop-cluster.sh"
-    sleep 5
+    sleep 2
     log "PHASE2" "Phase 2 complete"
 }
 
@@ -249,23 +249,15 @@ run_benchmark_state() {
 
 phase3_run_benchmarks() {
     log "PHASE3" "Running performance benchmarks"
-    local phases="${PHASES}"
-    local has_3=false
-    for p in $(echo "${phases}" | tr ',' ' '); do
-        case "${p}" in
-            3)  has_3=true ;;
-            3a) run_benchmark_tpcds ;;
-            3b) run_benchmark_streaming ;;
-            3c) run_benchmark_micro ;;
-            3d) run_benchmark_state ;;
-        esac
-    done
-    if [ "${has_3}" = true ]; then
-        run_benchmark_tpcds
-        run_benchmark_streaming
-        run_benchmark_micro
-        run_benchmark_state
-    fi
+    "${FLINK_HOME}/bin/start-cluster.sh"
+    sleep 10
+    run_benchmark_tpcds
+    run_benchmark_streaming
+    run_benchmark_micro
+    run_benchmark_state
+    "${FLINK_HOME}/bin/stop-cluster.sh"
+    sleep 2
+    log "PHASE3" "All benchmarks complete"
 }
 
 phase4_results() {
