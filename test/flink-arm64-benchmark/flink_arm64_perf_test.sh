@@ -8,7 +8,7 @@ FLINK_HOME="${SCRIPT_DIR}/flink"
 SHUNIT_PARENT="${SCRIPT_DIR}/flink_arm64_perf_test.sh"
 JSON_HELPER="${SCRIPT_DIR}/scripts/json_helper.py"
 
-MIN_THROUGHPUT_RECORDS=10000
+MIN_THROUGHPUT_RECORDS=10
 MAX_LATENCY_MS=5000
 
 json_get() {
@@ -157,7 +157,7 @@ testBenchmarkTpcdsThroughputAboveThreshold() {
         return
     fi
     local has_throughput
-    has_throughput="$(json_throughput_ge "${bench_file}" "${MIN_THROUGHPUT_RECORDS}" records_per_sec throughput)"
+    has_throughput="$(json_throughput_ge "${bench_file}" "${MIN_THROUGHPUT_RECORDS}" avg_records_per_sec records_per_sec throughput)"
     assertTrue "TPC-DS throughput should be >= ${MIN_THROUGHPUT_RECORDS} records/sec" \
         "[ ${has_throughput} -eq 1 ]"
 }

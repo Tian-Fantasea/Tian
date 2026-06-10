@@ -90,9 +90,10 @@ def main():
         threshold = float(sys.argv[3])
         key1 = sys.argv[4] if len(sys.argv) > 4 else "records_per_sec"
         key2 = sys.argv[5] if len(sys.argv) > 5 else "throughput"
+        key3 = sys.argv[6] if len(sys.argv) > 6 else "avg_records_per_sec"
         results = data.get("results", [])
         if results and isinstance(results[0], dict):
-            tp = results[0].get(key1, results[0].get(key2, 0))
+            tp = results[0].get(key1, results[0].get(key2, results[0].get(key3, 0)))
             print("1" if tp >= threshold else "0")
         else:
             print("0")
@@ -101,9 +102,10 @@ def main():
         threshold = float(sys.argv[3])
         key1 = sys.argv[4] if len(sys.argv) > 4 else "avg_latency_ms"
         key2 = sys.argv[5] if len(sys.argv) > 5 else "latency_ms"
+        key3 = sys.argv[6] if len(sys.argv) > 6 else "avg_avg_latency_ms"
         results = data.get("results", [])
         if results and isinstance(results[0], dict):
-            lat = results[0].get(key1, results[0].get(key2, 99999))
+            lat = results[0].get(key1, results[0].get(key2, results[0].get(key3, 99999)))
             print("1" if lat <= threshold else "0")
         else:
             print("1")
