@@ -22,10 +22,11 @@ def run_flink_sql(flink_home, sql, job_name):
         )
         full_sql = f"SET 'table.exec.state.ttl' = '3600000';\n{sql}\nQUIT;\n"
         stdout, stderr = proc.communicate(input=full_sql.encode(), timeout=600)
-        return proc.returncode, stdout.decode(), stderr.decode()
+        return proc.returncode, stdout.decode(errors="replace"), stderr.decode(errors="replace")
     except subprocess.TimeoutExpired:
         proc.kill()
-        return -1, "", "Timeout"
+        proc.wait()
+        return -1, "", "Timeout after 600s"
 
 
 def generate_tpcds_queries(scale):
@@ -79,14 +80,14 @@ def benchmark_tpcds(flink_home, scale, iterations, results_dir):
                 border_count = 0
                 past_header = False
                 for l in lines:
-                    l_stripped = l.strip()
-                    if l_stripped.startswith("+") and "-" in l_stripped:
+                    ls = l.strip()
+                    if ls.startswith("+") and "-" in ls:
                         border_count += 1
                         if border_count == 2:
                             past_header = True
-                        if border_count >= 3:
+                        elif border_count >= 3:
                             past_header = False
-                    elif l_stripped.startswith("|") and past_header:
+                    elif ls.startswith("|") and past_header:
                         records += 1
                 if records == 0:
                     import re
@@ -102,8 +103,10 @@ def benchmark_tpcds(flink_home, scale, iterations, results_dir):
                 "records_output": records,
                 "records_per_sec": round(records / q_elapsed, 1) if q_elapsed > 0 and records > 0 else 0,
                 "success": rc == 0,
+                "returncode": rc,
+                "error_snippet": stderr[:200] if rc != 0 else "",
             })
-            print(f"[TPCDS] {q_name}: {q_elapsed:.3f}s, {records} records")
+            print(f"[TPCDS] {q_name}: {q_elapsed:.3f}s, {records} records, rc={rc}")
 
         subprocess.run([stop_cluster], env={**os.environ, "FLINK_HOME": flink_home}, capture_output=True)
         time.sleep(5)

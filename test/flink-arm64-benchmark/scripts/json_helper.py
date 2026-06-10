@@ -86,6 +86,17 @@ def main():
         results = data.get("results", [])
         print(len(results))
 
+    elif command == "count_raw_results":
+        raw = data.get("raw_results", [])
+        if not raw:
+            raw = data.get("results", [])
+        print(len(raw))
+
+    elif command == "success_count":
+        raw = data.get("raw_results", data.get("results", []))
+        count = sum(1 for r in raw if isinstance(r, dict) and r.get("success", False))
+        print(count)
+
     elif command == "throughput_ge":
         threshold = float(sys.argv[3])
         key1 = sys.argv[4] if len(sys.argv) > 4 else "records_per_sec"
