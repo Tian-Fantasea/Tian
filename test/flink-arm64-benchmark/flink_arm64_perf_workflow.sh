@@ -133,10 +133,10 @@ REPOEOF
         fi
         log "PHASE1" "Extracting Flink..."
         tar -xzf "${tgz}" -C "${SCRIPT_DIR}"
-        local extracted_dir
-        extracted_dir="$(find "${SCRIPT_DIR}" -maxdepth 1 -name 'flink-*' -type d | head -1)"
-        if [ -z "${extracted_dir}" ]; then
-            log "ERROR" "Flink extraction failed - no flink directory found"
+        local extracted_dir="${SCRIPT_DIR}/flink-${SOFTWARE_VERSION}"
+        if [ ! -d "${extracted_dir}" ]; then
+            log "ERROR" "Flink extraction failed - ${extracted_dir} not found"
+            ls "${SCRIPT_DIR}/"
             return 1
         fi
         if [ "${extracted_dir}" != "${FLINK_HOME}" ]; then
