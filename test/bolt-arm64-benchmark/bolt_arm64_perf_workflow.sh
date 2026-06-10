@@ -9,7 +9,7 @@ DATA_SCALE="${DATA_SCALE:-1}"
 DATA_SIZE="${DATA_SIZE:-100000}"
 ITERATIONS="${ITERATIONS:-3}"
 PHASES="${PHASES:-1,2,3,4}"
-GO_VERSION="${GO_VERSION:-1.22.7}"
+GO_VERSION="${GO_VERSION:-1.23.7}"
 BOLT_HOME="${SCRIPT_DIR}/bolt_home"
 LOG_FILE="${RESULTS_DIR}/workflow.log"
 NPROC="$(nproc 2>/dev/null || echo 4)"
@@ -108,16 +108,16 @@ phase1_install() {
     cat > src/benchmark/go.mod << 'GOMOD'
 module benchmark
 
-go 1.22
+go 1.23
 
 require go.etcd.io/bbolt v1.4.3
 GOMOD
 
     log "PHASE1" "Downloading bbolt module..."
     cd "${BOLT_HOME}/src/benchmark"
-    go mod download 2>/dev/null || {
+    GOTOOLCHAIN=local go mod download 2>/dev/null || {
         log "PHASE1" "go mod download failed, trying go get..."
-        go get go.etcd.io/bbolt@v1.4.3
+        GOTOOLCHAIN=local go get go.etcd.io/bbolt@v1.4.3
     }
 
     for bench_src in "${SCRIPT_DIR}/scripts"/*.go; do
@@ -126,7 +126,7 @@ GOMOD
         log "PHASE1" "Compiling ${bench_name}..."
         cp "${bench_src}" "${BOLT_HOME}/src/benchmark/${bench_name}.go"
         cd "${BOLT_HOME}/src/benchmark"
-        go build -o "${SCRIPT_DIR}/scripts/${bench_name}" "${bench_name}.go"
+        GOTOOLCHAIN=local go build -o "${SCRIPT_DIR}/scripts/${bench_name}" "${bench_name}.go"
     done
     cd "${SCRIPT_DIR}"
 
