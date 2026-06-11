@@ -119,10 +119,10 @@ testBenchmarkYCSBThroughputAboveThreshold() {
     local bench_file="${RESULTS_DIR}/benchmark_ycsb.json"
     if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
     local actual_ycsb
-    actual_ycsb="$(json_get "${bench_file}" overall_throughput ops_per_sec)"
+    actual_ycsb="$(json_get "${bench_file}" summary avg_throughput_ops_per_sec)"
     echo "[DIAG] YCSB overall throughput: ${actual_ycsb} ops/sec (threshold: ${MINIMUM_YCSB_THROUGHPUT})"
     local has_throughput
-    has_throughput="$(json_throughput_ge "${bench_file}" "${MINIMUM_YCSB_THROUGHPUT}" overall_throughput ops_per_sec)"
+    has_throughput="$(json_throughput_ge "${bench_file}" "${MINIMUM_YCSB_THROUGHPUT}" summary avg_throughput_ops_per_sec)"
     assertTrue "YCSB throughput should be >= ${MINIMUM_YCSB_THROUGHPUT} ops/sec, got ${actual_ycsb}" \
         "[ ${has_throughput} -eq 1 ]"
 }
@@ -131,10 +131,10 @@ testBenchmarkYCSBReadLatencyAcceptable() {
     local bench_file="${RESULTS_DIR}/benchmark_ycsb.json"
     if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
     local actual_lat
-    actual_lat="$(json_get "${bench_file}" read_p99_latency ms)"
+    actual_lat="$(json_get "${bench_file}" results 0 p99_read_latency_ms)"
     echo "[DIAG] YCSB read p99 latency: ${actual_lat} ms (threshold: ${MAXIMUM_LATENCY_P99_MS})"
     local has_latency
-    has_latency="$(json_latency_le "${bench_file}" "${MAXIMUM_LATENCY_P99_MS}" read_p99_latency ms)"
+    has_latency="$(json_latency_le "${bench_file}" "${MAXIMUM_LATENCY_P99_MS}" results 0 p99_read_latency_ms)"
     assertTrue "YCSB read p99 latency should be <= ${MAXIMUM_LATENCY_P99_MS} ms, got ${actual_lat}" \
         "[ ${has_latency} -eq 1 ]"
 }
@@ -158,10 +158,10 @@ testBenchmarkThroughputGETAboveThreshold() {
     local bench_file="${RESULTS_DIR}/benchmark_throughput.json"
     if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
     local actual_get
-    actual_get="$(json_get "${bench_file}" throughput_get ops_per_sec)"
+    actual_get="$(json_get "${bench_file}" throughput_get)"
     echo "[DIAG] GET throughput: ${actual_get} ops/sec (threshold: ${MINIMUM_THROUGHPUT_GET})"
     local has_throughput
-    has_throughput="$(json_throughput_ge "${bench_file}" "${MINIMUM_THROUGHPUT_GET}" throughput_get ops_per_sec)"
+    has_throughput="$(json_throughput_ge "${bench_file}" "${MINIMUM_THROUGHPUT_GET}" throughput_get)"
     assertTrue "GET throughput should be >= ${MINIMUM_THROUGHPUT_GET} ops/sec, got ${actual_get}" \
         "[ ${has_throughput} -eq 1 ]"
 }
@@ -170,10 +170,10 @@ testBenchmarkThroughputSETAboveThreshold() {
     local bench_file="${RESULTS_DIR}/benchmark_throughput.json"
     if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
     local actual_set
-    actual_set="$(json_get "${bench_file}" throughput_set ops_per_sec)"
+    actual_set="$(json_get "${bench_file}" throughput_set)"
     echo "[DIAG] SET throughput: ${actual_set} ops/sec (threshold: ${MINIMUM_THROUGHPUT_SET})"
     local has_throughput
-    has_throughput="$(json_throughput_ge "${bench_file}" "${MINIMUM_THROUGHPUT_SET}" throughput_set ops_per_sec)"
+    has_throughput="$(json_throughput_ge "${bench_file}" "${MINIMUM_THROUGHPUT_SET}" throughput_set)"
     assertTrue "SET throughput should be >= ${MINIMUM_THROUGHPUT_SET} ops/sec, got ${actual_set}" \
         "[ ${has_throughput} -eq 1 ]"
 }
