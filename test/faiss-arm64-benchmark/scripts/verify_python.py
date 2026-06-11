@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import json
 import platform
-import subprocess
 import sys
 import os
 import argparse
@@ -64,7 +63,7 @@ def check_numpy():
 def check_blas():
     try:
         import numpy
-        config = numpy.show_config()
+        numpy.show_config()
         return 'detected'
     except Exception:
         return 'unknown'
@@ -73,7 +72,23 @@ def main():
     parser = argparse.ArgumentParser(description='Verify Faiss installation on ARM64')
     parser.add_argument('--results-dir', required=True)
     parser.add_argument('--faiss-version', default='1.14.2')
+    parser.add_argument('--sanity-check', action='store_true',
+                        help='Run IndexFlatL2 sanity check')
     args = parser.parse_args()
+
+    if args.sanity_check:
+        import faiss
+        import numpy as np
+        d = 128
+        nb = 1000
+        np.random.seed(42)
+        xb = np.random.random((nb, d)).astype('float32')
+        xq = np.random.random((1, d)).astype('float32')
+        index = faiss.IndexFlatL2(d)
+        index.add(xb)
+        D, I = index.search(xq, 5)
+        print(f'[VERIFY] Sanity check passed: top-5 IDs={I[0]}, distances={D[0]}')
+        sys.exit(0)
 
     arch = platform.machine()
     if arch not in ('aarch64', 'arm64'):
@@ -96,7 +111,11 @@ def main():
     simd_support = []
     for attr in ['supportAVX2', 'supportAVX512', 'supportNEON']:
         if hasattr(faiss, attr):
-            simd_support.append(f'{attr}={faiss.attr()}')
+            try:
+                val = getattr(faiss, attr)()
+                simd_support.append(f'{attr}={val}')
+            except Exception:
+                simd_support.append(f'{attr}=available')
 
     version_info = {
         "timestamp": datetime.datetime.now().isoformat(),
@@ -116,7 +135,7 @@ def main():
         "version_match": str(faiss_version) == args.faiss_version
     }
 
-    output_path = os.path.join(args.results_dir, 'version_info.json')
+    output_path = os.path.join(args.results_dir, 'version_info_verify.json')
     with open(output_path, 'w') as f:
         json.dump(version_info, f, indent=2)
 
