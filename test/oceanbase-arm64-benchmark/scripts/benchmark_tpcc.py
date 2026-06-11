@@ -94,7 +94,7 @@ def run_tpcc_benchmark(iteration):
 
     props_file = os.path.join(BENCHMARKSQL_HOME, "run", "props.oceanbase")
     if os.path.exists(props_file):
-run_duration = int(os.environ.get("RUN_DURATION", "10"))
+        run_duration = int(os.environ.get("RUN_DURATION", "10"))
         cmd = f"cd {BENCHMARKSQL_HOME}/run && ./runBenchmark.sh props.oceanbase"
         rc, out, err = run_cmd(cmd, timeout=run_duration + 120)
         elapsed = time.time() - start_time
