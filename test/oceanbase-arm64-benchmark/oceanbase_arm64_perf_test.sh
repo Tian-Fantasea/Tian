@@ -13,6 +13,14 @@ OB_USER="${OB_USER:-root@test}"
 OB_PASSWORD="${OB_PASSWORD:-}"
 OB_DB="${OB_DB:-test}"
 
+_mysql_cmd() {
+    if [ -n "${OB_PASSWORD}" ]; then
+        echo "mysql -h${OB_HOST} -P${OB_PORT} -u${OB_USER} -p'${OB_PASSWORD}'"
+    else
+        echo "mysql -h${OB_HOST} -P${OB_PORT} -u${OB_USER}"
+    fi
+}
+
 MINIMUM_TPMC="${MIN_TPMC:-10}"
 MAXIMUM_LATENCY_MS="${MAX_LATENCY_MS:-5000}"
 
@@ -87,7 +95,7 @@ testSoftwareVersionMatches() {
 
 testSoftwareRunsBasicCommand() {
     local result
-    if mysql -h"${OB_HOST}" -P"${OB_PORT}" -u"${OB_USER}" -p"${OB_PASSWORD}" -e "SELECT 1 FROM dual" 2>/dev/null; then
+    if eval "$(_mysql_cmd)" -e "SELECT 1 FROM dual" 2>/dev/null; then
         assertTrue "OceanBase basic query should succeed" "true"
     else
         if command -v obd >/dev/null 2>&1; then
