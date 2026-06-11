@@ -37,13 +37,36 @@ def parse_db_bench_output(output):
             continue
         match = re.match(r"(\w+)\s+:\s+([\d.]+)\s+micros/op\s+([\d.]+)\s+ops/sec;", line)
         if match:
-            bench_name = match.group(1)
+            bench_name = match.group(1).lower()
             micros_per_op = float(match.group(2))
             ops_per_sec = float(match.group(3))
             results[bench_name] = {
                 "micros_per_op": micros_per_op,
                 "ops_per_sec": ops_per_sec,
                 "latency_avg_ms": round(micros_per_op / 1000, 4),
+            }
+            continue
+        match_checksum = re.match(r"(\w+)\s+:\s+([\d.]+)\s+(GB/s|MB/s|KB/s|B/s)\s+\((\d+)\s+bytes\)", line)
+        if match_checksum:
+            bench_name = match_checksum.group(1).lower()
+            throughput = float(match_checksum.group(2))
+            unit = match_checksum.group(3)
+            block_size = int(match_checksum.group(4))
+            if unit == "GB/s":
+                throughput_mb = throughput * 1024
+            elif unit == "MB/s":
+                throughput_mb = throughput
+            elif unit == "KB/s":
+                throughput_mb = throughput / 1024
+            else:
+                throughput_mb = throughput / (1024 * 1024)
+            ops_per_sec = throughput_mb * (1024 * 1024) / block_size if block_size > 0 else 0
+            results[bench_name] = {
+                "ops_per_sec": round(ops_per_sec, 2),
+                "throughput_mb_per_sec": round(throughput_mb, 2),
+                "throughput_unit": unit,
+                "block_size": block_size,
+                "latency_avg_ms": round(block_size / (throughput_mb * 1024 * 1024) * 1000, 4) if throughput_mb > 0 else 0,
             }
     return results
 
@@ -296,10 +319,15 @@ def benchmark_hash_checksum(db_bench, results_dir, iterations):
                 bench_name, 1000000, 4096, 1,
                 timeout=120
             )
+            if rc != 0:
+                print(f"[MICRO-CHECKSUM] {bench_name} iteration {iter_num + 1} returned rc={rc}, stderr preview: {out[:200] if out else '(empty)'}")
 
             parsed = parse_db_bench_output(out)
-            if bench_name in parsed:
-                iter_results.append(parsed[bench_name])
+            matched_name = bench_name.lower()
+            if matched_name in parsed:
+                iter_results.append(parsed[matched_name])
+            else:
+                print(f"[MICRO-CHECKSUM] {bench_name} not found in parsed output, keys: {list(parsed.keys())}")
 
         if iter_results:
             avg_ops = sum(r["ops_per_sec"] for r in iter_results) / len(iter_results)

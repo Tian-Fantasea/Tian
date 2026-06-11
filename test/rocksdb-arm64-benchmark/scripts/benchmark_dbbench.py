@@ -37,7 +37,7 @@ def parse_db_bench_output(output):
             continue
         match = re.match(r"(\w+)\s+:\s+([\d.]+)\s+micros/op\s+([\d.]+)\s+ops/sec;", line)
         if match:
-            bench_name = match.group(1)
+            bench_name = match.group(1).lower()
             micros_per_op = float(match.group(2))
             ops_per_sec = float(match.group(3))
             results[bench_name] = {
@@ -247,23 +247,24 @@ def benchmark_bloom_filters(db_bench, results_dir, num_keys, value_size, threads
             )
             parsed_read = parse_db_bench_output(out_read)
 
-            if "fillrandom" in parsed_fill and "readrandom" in parsed_read:
-                iter_results.append({
-                    "fill_ops_sec": parsed_fill["readrandom"]["ops_per_sec"],
-                    "read_ops_sec": parsed_read["readrandom"]["ops_per_sec"],
-                    "read_lat_ms": parsed_read["readrandom"]["latency_avg_ms"],
-                })
+            fill_ops_val = parsed_fill.get("fillrandom", {}).get("ops_per_sec", 0)
+            read_ops_val = parsed_read.get("readrandom", {}).get("ops_per_sec", 0)
+            read_lat_val = parsed_read.get("readrandom", {}).get("latency_avg_ms", 0)
+            iter_results.append({
+                "fill_ops_sec": fill_ops_val,
+                "read_ops_sec": read_ops_val,
+                "read_lat_ms": read_lat_val,
+            })
 
             shutil.rmtree(db_path, ignore_errors=True)
             shutil.rmtree(wal_path, ignore_errors=True)
 
-        if iter_results:
-            results[filt_name] = {
-                "description": filt_config["description"],
-                "avg_read_ops_sec": round(sum(r["read_ops_sec"] for r in iter_results) / len(iter_results), 2),
-                "avg_read_lat_ms": round(sum(r["read_lat_ms"] for r in iter_results) / len(iter_results), 4),
-                "iterations": len(iter_results),
-            }
+        results[filt_name] = {
+            "description": filt_config["description"],
+            "avg_read_ops_sec": round(sum(r["read_ops_sec"] for r in iter_results) / max(len(iter_results), 1), 2),
+            "avg_read_lat_ms": round(sum(r["read_lat_ms"] for r in iter_results) / max(len(iter_results), 1), 4),
+            "iterations": len(iter_results),
+        }
 
     return results
 

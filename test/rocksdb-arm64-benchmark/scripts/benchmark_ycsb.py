@@ -37,7 +37,7 @@ def parse_db_bench_output(output):
             continue
         match = re.match(r"(\w+)\s+:\s+([\d.]+)\s+micros/op\s+([\d.]+)\s+ops/sec;", line)
         if match:
-            bench_name = match.group(1)
+            bench_name = match.group(1).lower()
             micros_per_op = float(match.group(2))
             ops_per_sec = float(match.group(3))
             results[bench_name] = {
@@ -46,8 +46,8 @@ def parse_db_bench_output(output):
                 "latency_avg_ms": round(micros_per_op / 1000, 4),
             }
         match2 = re.match(r"(\w+)\s+:\s+([\d.]+)\s+ops/sec;", line)
-        if match2 and match2.group(1) not in results:
-            bench_name = match2.group(1)
+        if match2 and match2.group(1).lower() not in results:
+            bench_name = match2.group(1).lower()
             ops_per_sec = float(match2.group(2))
             results[bench_name] = {"ops_per_sec": ops_per_sec}
     return results
