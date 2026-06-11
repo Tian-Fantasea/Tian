@@ -31,8 +31,13 @@ def run_cmd(cmd, timeout=120):
         return -1, "", "Command timed out"
 
 
+def _mysql_base_cmd():
+    pw_opt = f" -p'{OB_PASSWORD}'" if OB_PASSWORD else ""
+    return f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER}{pw_opt}"
+
+
 def check_mysql_connection():
-    cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -e 'SELECT 1' 2>/dev/null"
+    cmd = f"{_mysql_base_cmd()} -e 'SELECT 1' 2>/dev/null"
     rc, _, _ = run_cmd(cmd, timeout=30)
     return rc == 0
 
@@ -41,7 +46,7 @@ def run_micro_operation(op_name, query, iterations=5):
     latencies = []
     for i in range(iterations):
         lat_start = time.time()
-        cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} -e \"{query}\" 2>/dev/null"
+        cmd = f"{_mysql_base_cmd()} -D{OB_DB} -e \"{query}\" 2>/dev/null"
         rc, out, err = run_cmd(cmd, timeout=30)
         lat = (time.time() - lat_start) * 1000
         if rc == 0:
@@ -98,7 +103,7 @@ def main():
     all_results = []
 
     if check_mysql_connection():
-        cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -e 'CREATE DATABASE IF NOT EXISTS {OB_DB}' 2>/dev/null"
+        cmd = f"{_mysql_base_cmd()} -e 'CREATE DATABASE IF NOT EXISTS {OB_DB}' 2>/dev/null"
         run_cmd(cmd, timeout=30)
 
         for op_name, query in operations:

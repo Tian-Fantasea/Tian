@@ -32,8 +32,13 @@ def run_cmd(cmd, timeout=60):
         return -1, "", "Command timed out"
 
 
+def _mysql_base_cmd():
+    pw_opt = f" -p'{OB_PASSWORD}'" if OB_PASSWORD else ""
+    return f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER}{pw_opt}"
+
+
 def check_mysql_connection():
-    cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -e 'SELECT 1' 2>/dev/null"
+    cmd = f"{_mysql_base_cmd()} -e 'SELECT 1' 2>/dev/null"
     rc, _, _ = run_cmd(cmd, timeout=30)
     return rc == 0
 
@@ -59,23 +64,23 @@ def run_ycsb_workload(workload_name, thread_counts):
             for i in range(threads * iterations_per_thread):
                 if workload_name == "workloada":
                     if i % 2 == 0:
-                        cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} -e 'SELECT * FROM ycsb_usertable WHERE ycsb_key=\"key{i}\"' 2>/dev/null"
+                        cmd = f"{_mysql_base_cmd()} -D{OB_DB} -e 'SELECT * FROM ycsb_usertable WHERE ycsb_key=\"key{i}\"' 2>/dev/null"
                         read_ops += 1
                     else:
-                        cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} -e 'INSERT INTO ycsb_usertable (ycsb_key, field0) VALUES (\"key{i}\", \"value{i}\") ON DUPLICATE KEY UPDATE field0=\"value{i}\"' 2>/dev/null"
+                        cmd = f"{_mysql_base_cmd()} -D{OB_DB} -e 'INSERT INTO ycsb_usertable (ycsb_key, field0) VALUES (\"key{i}\", \"value{i}\") ON DUPLICATE KEY UPDATE field0=\"value{i}\"' 2>/dev/null"
                         update_ops += 1
                 elif workload_name == "workloadb":
                     if i % 20 != 0:
-                        cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} -e 'SELECT * FROM ycsb_usertable WHERE ycsb_key=\"key{i}\"' 2>/dev/null"
+                        cmd = f"{_mysql_base_cmd()} -D{OB_DB} -e 'SELECT * FROM ycsb_usertable WHERE ycsb_key=\"key{i}\"' 2>/dev/null"
                         read_ops += 1
                     else:
-                        cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} -e 'INSERT INTO ycsb_usertable (ycsb_key, field0) VALUES (\"key{i}\", \"value{i}\") ON DUPLICATE KEY UPDATE field0=\"value{i}\"' 2>/dev/null"
+                        cmd = f"{_mysql_base_cmd()} -D{OB_DB} -e 'INSERT INTO ycsb_usertable (ycsb_key, field0) VALUES (\"key{i}\", \"value{i}\") ON DUPLICATE KEY UPDATE field0=\"value{i}\"' 2>/dev/null"
                         update_ops += 1
                 elif workload_name == "workloadc":
-                    cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} -e 'SELECT * FROM ycsb_usertable WHERE ycsb_key=\"key{i}\"' 2>/dev/null"
+                    cmd = f"{_mysql_base_cmd()} -D{OB_DB} -e 'SELECT * FROM ycsb_usertable WHERE ycsb_key=\"key{i}\"' 2>/dev/null"
                     read_ops += 1
                 else:
-                    cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} -e 'SELECT * FROM ycsb_usertable WHERE ycsb_key=\"key{i}\"' 2>/dev/null"
+                    cmd = f"{_mysql_base_cmd()} -D{OB_DB} -e 'SELECT * FROM ycsb_usertable WHERE ycsb_key=\"key{i}\"' 2>/dev/null"
                     read_ops += 1
 
                 lat_start = time.time()
@@ -121,9 +126,9 @@ def main():
     print("[YCSB] Starting YCSB benchmark for OceanBase on ARM64")
 
     if check_mysql_connection():
-        cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -e 'CREATE DATABASE IF NOT EXISTS {OB_DB}' 2>/dev/null"
+        cmd = f"{_mysql_base_cmd()} -e 'CREATE DATABASE IF NOT EXISTS {OB_DB}' 2>/dev/null"
         run_cmd(cmd, timeout=30)
-        cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} -e 'CREATE TABLE IF NOT EXISTS ycsb_usertable (ycsb_key VARCHAR(255) PRIMARY KEY, field0 VARCHAR(255), field1 VARCHAR(255))' 2>/dev/null"
+        cmd = f"{_mysql_base_cmd()} -D{OB_DB} -e 'CREATE TABLE IF NOT EXISTS ycsb_usertable (ycsb_key VARCHAR(255) PRIMARY KEY, field0 VARCHAR(255), field1 VARCHAR(255))' 2>/dev/null"
         run_cmd(cmd, timeout=30)
 
     thread_counts = YCSB_THREAD_COUNTS

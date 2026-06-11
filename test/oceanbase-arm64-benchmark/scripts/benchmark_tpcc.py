@@ -37,14 +37,19 @@ def run_cmd(cmd, timeout=300):
         return -1, "", "Command timed out"
 
 
+def _mysql_base_cmd():
+    pw_opt = f" -p'{OB_PASSWORD}'" if OB_PASSWORD else ""
+    return f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER}{pw_opt}"
+
+
 def check_mysql_connection():
-    cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -e 'SELECT 1' 2>/dev/null"
+    cmd = f"{_mysql_base_cmd()} -e 'SELECT 1' 2>/dev/null"
     rc, out, err = run_cmd(cmd, timeout=30)
     return rc == 0
 
 
 def create_tpcc_database():
-    cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -e 'CREATE DATABASE IF NOT EXISTS {OB_DB}' 2>/dev/null"
+    cmd = f"{_mysql_base_cmd()} -e 'CREATE DATABASE IF NOT EXISTS {OB_DB}' 2>/dev/null"
     rc, out, err = run_cmd(cmd, timeout=30)
     if rc != 0:
         print(f"[TPCC] Failed to create database: {err}")
@@ -73,7 +78,7 @@ def run_tpcc_load():
             for sql_file in sorted(os.listdir(sql_dir)):
                 if sql_file.endswith(".sql"):
                     filepath = os.path.join(sql_dir, sql_file)
-                    cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} < {filepath} 2>/dev/null"
+                    cmd = f"{_mysql_base_cmd()} -D{OB_DB} < {filepath} 2>/dev/null"
                     rc, out, err = run_cmd(cmd, timeout=300)
                     if rc != 0:
                         print(f"[TPCC] SQL file {sql_file} failed: {err}")
@@ -163,7 +168,7 @@ def run_synthetic_tpcc(iteration):
             queries_per_batch = max(1, int(ratio / 10))
             query = queries.get(txn_type, queries["new_order"])
             for _ in range(queries_per_batch):
-                cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -e \"{query}\" 2>/dev/null"
+                cmd = f"{_mysql_base_cmd()} -e \"{query}\" 2>/dev/null"
                 rc, _, _ = run_cmd(cmd, timeout=10)
                 if rc == 0:
                     total_txns += 1
