@@ -12,9 +12,9 @@ MAXIMUM_LATENCY_MS=10.0
 
 JSON_HELPER="${SCRIPT_DIR}/scripts/json_helper.py"
 
-json_get() { python3 "${JSON_HELPER}" "$1" get "$2"; }
-json_throughput_ge() { python3 "${JSON_HELPER}" "$1" throughput_ge "$2" "$3" "$4"; }
-json_latency_le() { python3 "${JSON_HELPER}" "$1" latency_le "$2" "$3" "$4"; }
+json_get() { python3 "${JSON_HELPER}" "$1" get "${@:2}"; }
+json_throughput_ge() { python3 "${JSON_HELPER}" "$1" throughput_ge "${@:2}"; }
+json_latency_le() { python3 "${JSON_HELPER}" "$1" latency_le "${@:2}"; }
 json_count_results() { python3 "${JSON_HELPER}" "$1" count_results; }
 json_version() { python3 "${JSON_HELPER}" "$1" version; }
 json_contains() { python3 "${JSON_HELPER}" "$1" contains "$2"; }
