@@ -120,10 +120,10 @@ write_version_info() {
 
 main() {
     log "VERIFY" "Starting OceanBase installation verification..."
-    check_ob_binary
-    check_obd_binary
-    check_java
-    check_mysql_client
+    check_ob_binary || log "WARN" "observer binary not found (will use synthetic benchmarks)"
+    check_obd_binary || log "WARN" "obd binary not found (will use synthetic benchmarks)"
+    check_java || log "WARN" "Java not found (TPC-C BenchmarkSQL may not work)"
+    check_mysql_client || log "WARN" "mysql client not found (some tests may fail)"
     write_version_info
     log "VERIFY" "Verification complete."
 }

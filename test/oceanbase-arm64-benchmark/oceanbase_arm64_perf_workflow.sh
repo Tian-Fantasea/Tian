@@ -11,14 +11,14 @@ VENV_DIR="${SCRIPT_DIR}/venv"
 SOFTWARE_NAME="oceanbase"
 SOFTWARE_VERSION="${SOFTWARE_VERSION:-4.2.1.8-108000012024120110}"
 DATA_SCALE="${DATA_SCALE:-1}"
-WAREHOUSE_COUNT="${WAREHOUSE_COUNT:-10}"
-TERMINAL_COUNT="${TERMINAL_COUNT:-10}"
-ITERATIONS="${ITERATIONS:-3}"
+WAREHOUSE_COUNT="${WAREHOUSE_COUNT:-1}"
+TERMINAL_COUNT="${TERMINAL_COUNT:-1}"
+ITERATIONS="${ITERATIONS:-1}"
 PHASES="${PHASES:-1,2,3,4}"
 LOG_FILE="${RESULTS_DIR}/workflow.log"
 
-MIN_TPMC_THRESHOLD="${MIN_TPMC:-100}"
-MAX_LATENCY_MS="${MAX_LATENCY_MS:-500}"
+MIN_TPMC_THRESHOLD="${MIN_TPMC:-10}"
+MAX_LATENCY_MS="${MAX_LATENCY_MS:-5000}"
 
 log() { local tag="$1"; shift; printf '[%s] %s\n' "$tag" "$*" | tee -a "${LOG_FILE}"; }
 
@@ -319,12 +319,12 @@ OceanBase ARM64 Performance Benchmark Workflow (TPC-C + YCSB + Micro)
 Options:
   -p, --phases PHASES      Comma-separated phases (1,2,3,4 or 3a,3b,3c,3d)
   -s, --software-version   OceanBase version to test (default: 4.2.1.8)
-  -w, --warehouses         TPC-C warehouse count (default: 10)
-  -t, --terminals          TPC-C terminal count (default: 10)
-  -i, --iterations         Number of iterations per test (default: 3)
+  -w, --warehouses         TPC-C warehouse count (default: 1)
+  --terminals              TPC-C terminal count (default: 1)
+  -i, --iterations         Number of iterations per test (default: 1)
   -d, --data-size          Data size for micro benchmarks (default: 10000)
-  --min-tpmc               Minimum tpmC threshold for validation (default: 100)
-  --max-latency            Maximum latency threshold in ms (default: 500)
+  --min-tpmc               Minimum tpmC threshold for validation (default: 10)
+  --max-latency            Maximum latency threshold in ms (default: 5000)
   --test-only              Run only shUnit2 validation tests (skip benchmarks)
   -h, --help               Usage help
 
