@@ -353,12 +353,12 @@ main() {
             -p|--phases)          PHASES="$2"; shift 2 ;;
             -s|--software-version) SOFTWARE_VERSION="$2"; shift 2 ;;
             -w|--warehouses)      WAREHOUSE_COUNT="$2"; shift 2 ;;
-            -t|--terminals)       TERMINAL_COUNT="$2"; shift 2 ;;
+            --terminals)          TERMINAL_COUNT="$2"; shift 2 ;;
             -i|--iterations)      ITERATIONS="$2"; shift 2 ;;
             -d|--data-size)       DATA_SIZE="$2"; shift 2 ;;
             --min-tpmc)           MIN_TPMC_THRESHOLD="$2"; shift 2 ;;
             --max-latency)        MAX_LATENCY_MS="$2"; shift 2 ;;
-            --test-only)          test_only=1; shift ;;
+            -t|--test-only)          test_only=1; shift ;;
             -h|--help)            usage; exit 0 ;;
             *)                    log "ERROR" "Unknown option: $1"; usage; exit 1 ;;
         esac
