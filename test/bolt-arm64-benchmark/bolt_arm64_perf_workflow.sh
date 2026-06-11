@@ -131,6 +131,12 @@ go 1.23
 require go.etcd.io/bbolt v1.4.3
 GOMOD
 
+    for bench_src in "${SCRIPT_DIR}/scripts"/*.go; do
+        local bench_name
+        bench_name="$(basename "${bench_src}" .go)"
+        cp "${bench_src}" "${BOLT_HOME}/src/benchmark/${bench_name}.go"
+    done
+
     log "PHASE1" "Downloading bbolt module..."
     cd "${BOLT_HOME}/src/benchmark"
     GOTOOLCHAIN=local go mod tidy
@@ -143,7 +149,6 @@ GOMOD
         local bench_name
         bench_name="$(basename "${bench_src}" .go)"
         log "PHASE1" "Compiling ${bench_name}..."
-        cp "${bench_src}" "${BOLT_HOME}/src/benchmark/${bench_name}.go"
         cd "${BOLT_HOME}/src/benchmark"
         GOTOOLCHAIN=local go build -o "${SCRIPT_DIR}/scripts/${bench_name}" "${bench_name}.go"
     done
