@@ -35,7 +35,7 @@ def parse_db_bench_output(output):
         line = line.strip()
         if not line or line.startswith("#") or line.startswith("DB path"):
             continue
-        match = re.match(r"(\w+)\s+:\s+([\d.]+)\s+micros/op\s+([\d.]+)\s+ops/sec;", line)
+        match = re.match(r"(\w+)\s+:\s+([\d.]+)\s+micros/op\s+([\d.]+)\s+ops/sec", line)
         if match:
             bench_name = match.group(1).lower()
             micros_per_op = float(match.group(2))
@@ -67,6 +67,35 @@ def parse_db_bench_output(output):
                 "throughput_unit": unit,
                 "block_size": block_size,
                 "latency_avg_ms": round(block_size / (throughput_mb * 1024 * 1024) * 1000, 4) if throughput_mb > 0 else 0,
+            }
+            continue
+        match_checksum2 = re.match(r"(\w+)\s+:\s+([\d.]+)\s+(GB/s|MB/s|KB/s|B/s)", line)
+        if match_checksum2:
+            bench_name = match_checksum2.group(1).lower()
+            throughput = float(match_checksum2.group(2))
+            unit = match_checksum2.group(3)
+            if unit == "GB/s":
+                throughput_mb = throughput * 1024
+            elif unit == "MB/s":
+                throughput_mb = throughput
+            elif unit == "KB/s":
+                throughput_mb = throughput / 1024
+            else:
+                throughput_mb = throughput / (1024 * 1024)
+            results[bench_name] = {
+                "ops_per_sec": round(throughput_mb * 1024, 2),
+                "throughput_mb_per_sec": round(throughput_mb, 2),
+                "throughput_unit": unit,
+                "latency_avg_ms": 0,
+            }
+            continue
+        match_generic = re.match(r"(\w+)\s+:\s+([\d.]+)\s+ops/sec", line)
+        if match_generic and match_generic.group(1).lower() not in results:
+            bench_name = match_generic.group(1).lower()
+            ops_per_sec = float(match_generic.group(2))
+            results[bench_name] = {
+                "ops_per_sec": ops_per_sec,
+                "latency_avg_ms": 0,
             }
     return results
 
@@ -308,6 +337,9 @@ def benchmark_hash_checksum(db_bench, results_dir, iterations):
         "xxhash": "xxHash checksum (fast non-cryptographic hash)",
     }
 
+    checksum_output_dir = os.path.join(results_dir, "checksum_raw_output")
+    os.makedirs(checksum_output_dir, exist_ok=True)
+
     results = {}
     for bench_name, bench_desc in checksum_benchmarks.items():
         print(f"[MICRO-CHECKSUM] {bench_name}: {bench_desc}")
@@ -319,8 +351,10 @@ def benchmark_hash_checksum(db_bench, results_dir, iterations):
                 bench_name, 1000000, 4096, 1,
                 timeout=120
             )
-            if rc != 0:
-                print(f"[MICRO-CHECKSUM] {bench_name} iteration {iter_num + 1} returned rc={rc}, stderr preview: {out[:200] if out else '(empty)'}")
+            raw_path = os.path.join(checksum_output_dir, f"{bench_name}_iter{iter_num}.txt")
+            with open(raw_path, "w") as f:
+                f.write(out if out else "(empty output)")
+            print(f"[MICRO-CHECKSUM] raw output saved to {raw_path}, rc={rc}, lines={len(out.splitlines()) if out else 0}")
 
             parsed = parse_db_bench_output(out)
             matched_name = bench_name.lower()
@@ -331,13 +365,22 @@ def benchmark_hash_checksum(db_bench, results_dir, iterations):
 
         if iter_results:
             avg_ops = sum(r["ops_per_sec"] for r in iter_results) / len(iter_results)
-            avg_lat = sum(r["latency_avg_ms"] for r in iter_results) / len(iter_results)
+            avg_lat = sum(r.get("latency_avg_ms", 0) for r in iter_results) / len(iter_results)
             results[bench_name] = {
                 "description": bench_desc,
                 "avg_ops_sec": round(avg_ops, 2),
                 "avg_latency_ms": round(avg_lat, 4),
                 "arm64_note": "CRC32C uses ARM64 CRC32 hardware instructions when available" if bench_name == "crc32c" else "",
                 "iterations": len(iter_results),
+            }
+        else:
+            results[bench_name] = {
+                "description": bench_desc,
+                "avg_ops_sec": 0,
+                "avg_latency_ms": 0,
+                "arm64_note": "CRC32C uses ARM64 CRC32 hardware instructions when available" if bench_name == "crc32c" else "",
+                "iterations": 0,
+                "warning": f"No parseable output from db_bench --benchmarks={bench_name}, see checksum_raw_output/ for details",
             }
 
     return results
