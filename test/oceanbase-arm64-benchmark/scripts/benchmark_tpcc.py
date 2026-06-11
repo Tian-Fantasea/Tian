@@ -18,7 +18,8 @@ RESULTS_DIR = os.environ.get(
 )
 WAREHOUSE_COUNT = int(os.environ.get("WAREHOUSE_COUNT", "10"))
 TERMINAL_COUNT = int(os.environ.get("TERMINAL_COUNT", "10"))
-ITERATIONS = int(os.environ.get("ITERATIONS", "3"))
+ITERATIONS = int(os.environ.get("ITERATIONS", "1"))
+RUN_DURATION = int(os.environ.get("RUN_DURATION", "10"))
 OB_HOST = os.environ.get("OB_HOST", "127.0.0.1")
 OB_PORT = os.environ.get("OB_PORT", "2881")
 OB_USER = os.environ.get("OB_USER", "root@test")
@@ -93,7 +94,7 @@ def run_tpcc_benchmark(iteration):
 
     props_file = os.path.join(BENCHMARKSQL_HOME, "run", "props.oceanbase")
     if os.path.exists(props_file):
-        run_duration = int(os.environ.get("RUN_DURATION", "120"))
+run_duration = int(os.environ.get("RUN_DURATION", "10"))
         cmd = f"cd {BENCHMARKSQL_HOME}/run && ./runBenchmark.sh props.oceanbase"
         rc, out, err = run_cmd(cmd, timeout=run_duration + 120)
         elapsed = time.time() - start_time

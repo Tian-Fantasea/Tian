@@ -109,7 +109,7 @@ write_version_info() {
     warehouse="${WAREHOUSE_COUNT:-10}"
     terminal="${TERMINAL_COUNT:-10}"
 
-    python3 "${SCRIPT_DIR}/scripts/json_helper.py" \
+    python3 "${SCRIPT_DIR}/json_helper.py" \
         "${RESULTS_DIR}/version_info.json" write_version_info \
         "${timestamp}" "${arch}" "${kernel}" "${os_name}" "${cpu_model}" \
         "${cores}" "${mem_mb}" "${ob_version}" "${obd_ver}" "${java_ver}" \

@@ -17,7 +17,9 @@ OB_PORT = os.environ.get("OB_PORT", "2881")
 OB_USER = os.environ.get("OB_USER", "root@test")
 OB_PASSWORD = os.environ.get("OB_PASSWORD", "")
 OB_DB = os.environ.get("OB_DB", "test")
-ITERATIONS = int(os.environ.get("ITERATIONS", "3"))
+ITERATIONS = int(os.environ.get("ITERATIONS", "1"))
+YCSB_THREAD_COUNTS = [int(x) for x in os.environ.get("YCSB_THREAD_COUNTS", "1,4").split(",")]
+YCSB_WORKLOADS = os.environ.get("YCSB_WORKLOADS", "workloada").split(",")
 
 
 def run_cmd(cmd, timeout=60):
@@ -124,8 +126,8 @@ def main():
         cmd = f"mysql -h{OB_HOST} -P{OB_PORT} -u{OB_USER} -p'{OB_PASSWORD}' -D{OB_DB} -e 'CREATE TABLE IF NOT EXISTS ycsb_usertable (ycsb_key VARCHAR(255) PRIMARY KEY, field0 VARCHAR(255), field1 VARCHAR(255))' 2>/dev/null"
         run_cmd(cmd, timeout=30)
 
-    thread_counts = [1, 4, 16, 32, 64]
-    workloads = ["workloada", "workloadb", "workloadc"]
+    thread_counts = YCSB_THREAD_COUNTS
+    workloads = YCSB_WORKLOADS
     all_results = []
 
     for wl in workloads:

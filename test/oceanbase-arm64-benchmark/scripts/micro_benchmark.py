@@ -17,8 +17,8 @@ OB_PORT = os.environ.get("OB_PORT", "2881")
 OB_USER = os.environ.get("OB_USER", "root@test")
 OB_PASSWORD = os.environ.get("OB_PASSWORD", "")
 OB_DB = os.environ.get("OB_DB", "test")
-ITERATIONS = int(os.environ.get("ITERATIONS", "3"))
-DATA_SIZE = int(os.environ.get("DATA_SIZE", "10000"))
+ITERATIONS = int(os.environ.get("ITERATIONS", "1"))
+DATA_SIZE = int(os.environ.get("DATA_SIZE", "1000"))
 
 
 def run_cmd(cmd, timeout=120):

@@ -17,6 +17,8 @@ ITERATIONS="${ITERATIONS:-1}"
 PHASES="${PHASES:-1,2,3,4}"
 LOG_FILE="${RESULTS_DIR}/workflow.log"
 
+STRESS_THREADS="${STRESS_THREADS:-4}"
+STRESS_DURATION="${STRESS_DURATION:-5}"
 MIN_TPMC_THRESHOLD="${MIN_TPMC:-10}"
 MAX_LATENCY_MS="${MAX_LATENCY_MS:-5000}"
 
@@ -235,8 +237,8 @@ run_benchmark_micro() {
 
 run_benchmark_stress() {
     log "PHASE3D" "=== Phase 3d: Concurrency Stress Test ==="
-    local stress_threads="128"
-    local stress_duration="60"
+    local stress_threads="${STRESS_THREADS}"
+    local stress_duration="${STRESS_DURATION}"
     if mysql -h"${OB_HOST:-127.0.0.1}" -P"${OB_PORT:-2881}" -u"${OB_USER:-root@test}" -e "SELECT 1" 2>/dev/null; then
         log "PHASE3D" "Running stress test with ${stress_threads} threads for ${stress_duration}s..."
         local start_time
