@@ -206,7 +206,7 @@ def main():
     elif command == "write_ceph_conf":
         cmd_write_ceph_conf(filepath, *args)
     elif command == "write_ceph_conf_file":
-        cmd_write_ceph_conf_file(*args)
+        cmd_write_ceph_conf_file(filepath, *args)
     else:
         print(f"Unknown command: {command}")
         sys.exit(1)
