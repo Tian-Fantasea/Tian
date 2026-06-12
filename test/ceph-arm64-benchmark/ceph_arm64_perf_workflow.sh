@@ -193,11 +193,20 @@ phase1_install() {
 
     if [ ! -f "${CEPH_KEYRING_PATH}" ]; then
         log "PHASE1" "Generating admin keyring..."
+        sudo mkdir -p "$(dirname "${CEPH_KEYRING_PATH}")"
         local admin_key
         admin_key="$(ceph-authtool --gen-key /dev/stdout 2>/dev/null | head -1 | tr -d '\n\t' || echo 'AQAAarchAA==')"
         sudo ceph-authtool --create-keyring "${CEPH_KEYRING_PATH}" \
-            --name client.admin --add-key "${admin_key}" 2>/dev/null || true
-        sudo chmod 644 "${CEPH_KEYRING_PATH}"
+            --name client.admin --add-key "${admin_key}" 2>/dev/null
+        if [ ! -f "${CEPH_KEYRING_PATH}" ]; then
+            log "WARN" "ceph-authtool failed, creating keyring manually"
+            echo "[client.admin]" | sudo tee "${CEPH_KEYRING_PATH}" >/dev/null
+            echo "key = ${admin_key}" | sudo tee -a "${CEPH_KEYRING_PATH}" >/dev/null
+            echo "caps mds = \"allow *\"" | sudo tee -a "${CEPH_KEYRING_PATH}" >/dev/null
+            echo "caps mon = \"allow *\"" | sudo tee -a "${CEPH_KEYRING_PATH}" >/dev/null
+            echo "caps osd = \"allow *\"" | sudo tee -a "${CEPH_KEYRING_PATH}" >/dev/null
+        fi
+        sudo chmod 644 "${CEPH_KEYRING_PATH}" 2>/dev/null || true
     fi
 
     log "PHASE1" "Setting up loopback OSD devices..."
