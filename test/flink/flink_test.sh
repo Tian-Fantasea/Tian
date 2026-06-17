@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOFTWARE_NAME="flink"
-SOFTWARE_VERSION="${VERSION:-2.0.0}"
+SOFTWARE_VERSION="${VERSION:-2.1.0}"
 RESULTS_DIR="${SCRIPT_DIR}/results"
 SCRIPTS_DIR="${SCRIPT_DIR}/scripts"
 LOG_FILE="${RESULTS_DIR}/results.log"
@@ -389,7 +389,7 @@ Examples:
   ./flink_test.sh                     # Full run + shUnit2 validation
   ./flink_test.sh --check             # Check prerequisites only
   ./flink_test.sh -p 3a,3b            # Only TPC-DS and streaming
-  ./flink_test.sh --flink-home /opt/flink-2.0.0  # Custom Flink path
+  ./flink_test.sh --flink-home /opt/flink-2.1.0  # Custom Flink path
   ./flink_test.sh -i 5 -v 10          # 5 iterations, scale 10
 EOF
 }
