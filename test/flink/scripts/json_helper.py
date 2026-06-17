@@ -71,6 +71,8 @@ def cmd_count_results(args):
         for v in data.values():
             if isinstance(v, list):
                 count += len(v)
+            elif isinstance(v, dict) and "results" in v and isinstance(v["results"], list):
+                count += len(v["results"])
         print(count)
 
 
