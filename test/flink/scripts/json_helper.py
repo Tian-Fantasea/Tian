@@ -32,9 +32,7 @@ def navigate(data, keys):
                 return None
         else:
             return None
-    if isinstance(data, (dict, list)):
-        return data
-    return None
+    return data
 
 
 def cmd_get(args):
