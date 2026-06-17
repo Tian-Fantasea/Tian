@@ -5,6 +5,16 @@ import os
 import argparse
 
 
+def load_or_create_json(filepath):
+    if os.path.exists(filepath):
+        with open(filepath) as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return {}
+    return {}
+
+
 def navigate(data, keys):
     if not keys:
         return data
@@ -223,7 +233,14 @@ def cmd_write_version_info(args):
         "flink_found": int(args.values[11]) if args.values[11] else 0,
         "parallelism": int(args.values[12]) if args.values[12] else 4,
     }
-    json.dump(d, open(args.output, "w"), indent=2)
+    results = load_or_create_json(args.file)
+    results["software"] = d["software"]
+    results["version"] = d["version"]
+    results["architecture"] = d["architecture"]
+    results["timestamp"] = d["timestamp"]
+    results["version_info"] = d
+    with open(args.file, "w") as f:
+        json.dump(results, f, indent=2)
 
 
 def cmd_json_summary(args):
@@ -247,7 +264,7 @@ def cmd_json_summary(args):
 def main():
     parser = argparse.ArgumentParser(description="JSON helper for shUnit2 assertions")
     parser.add_argument("file", help="JSON file to operate on")
-    subparsers = parser.add_subparsers(dest="subparser_required", help="Commands")
+    subparsers = parser.add_subparsers(dest="subparser", help="Commands", required=True)
 
     sp_get = subparsers.add_parser("get", help="Get value by key path")
     sp_get.add_argument("keys", nargs="+", help="Key path (e.g., results 0 tpmC)")
@@ -279,9 +296,8 @@ def main():
     sp_qps_avg = subparsers.add_parser("qps_avg", help="Average QPS across results")
     sp_qps_avg.add_argument("keys", nargs="*", help="Key path to QPS values")
 
-    sp_write_vi = subparsers.add_parser("write_version_info", help="Write version info JSON")
+    sp_write_vi = subparsers.add_parser("write_version_info", help="Write version info into results.json section")
     sp_write_vi.add_argument("values", nargs=13, help="Values: timestamp arch kernel os cpu core memory software ver java_ver flink_home flink_found parallelism")
-    sp_write_vi.add_argument("--output", required=True, help="Output file")
 
     sp_json_summary = subparsers.add_parser("json_summary", help="Generate JSON summary")
     sp_json_summary.add_argument("--output", required=True, help="Output file")

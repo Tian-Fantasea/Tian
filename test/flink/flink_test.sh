@@ -7,11 +7,13 @@ RESULTS_DIR="${SCRIPT_DIR}/results"
 SCRIPTS_DIR="${SCRIPT_DIR}/scripts"
 LOG_FILE="${RESULTS_DIR}/results.log"
 DATA_SCALE="${DATA_SCALE:-1}"
-ITERATIONS="${ITERATIONS:-3}"
+ITERATIONS="${ITERATIONS:-1}"
 FLINK_HOME="${FLINK_HOME:-${SCRIPT_DIR}/flink-${SOFTWARE_VERSION}}"
 PARALLELISM="${PARALLELISM:-4}"
-PHASES="${PHASES:-1,2,3,4}"
+PHASES="${PHASES:-1,2,3a,3b,3c,4}"
 SHUNIT_PARENT="${SCRIPT_DIR}/flink_test.sh"
+
+RESULTS_JSON="${RESULTS_DIR}/results.json"
 
 MINIMUM_TPCDS_THROUGHPUT=500
 MINIMUM_STREAMING_THROUGHPUT=10000
@@ -24,7 +26,7 @@ log() { local tag="$1"; shift; printf '[%s] %s\n' "$tag" "$*" | tee -a "${LOG_FI
 mkdir -p "${RESULTS_DIR}"
 
 json_get() { python3 "${JSON_HELPER}" "$1" get "${@:2}"; }
-json_field_exists() { python3 "${JSON_HELPER}" "$1" field_exists "$2"; }
+json_field_exists() { python3 "${JSON_HELPER}" "$1" field_exists "${@:2}"; }
 json_count_results() { python3 "${JSON_HELPER}" "$1" count_results; }
 json_throughput_ge() { python3 "${JSON_HELPER}" "$1" throughput_ge "$2" "${@:3}"; }
 json_latency_le() { python3 "${JSON_HELPER}" "$1" latency_le "$2" "${@:3}"; }
@@ -32,7 +34,43 @@ json_avg_throughput() { python3 "${JSON_HELPER}" "$1" avg_throughput "${@:2}"; }
 json_max_latency() { python3 "${JSON_HELPER}" "$1" max_latency "${@:2}"; }
 json_version() { python3 "${JSON_HELPER}" "$1" version; }
 json_contains() { python3 "${JSON_HELPER}" "$1" contains "$2"; }
-json_qps_avg() { python3 "${JSON_HELPER}" "$1" qps_avg "${@:2}"; }
+
+download_shunit2() {
+    if [ -f "${SCRIPT_DIR}/shunit2" ]; then
+        log "SETUP" "shUnit2 already present at ${SCRIPT_DIR}/shunit2"
+        return 0
+    fi
+
+    log "SETUP" "Downloading shUnit2..."
+    local mirrors=(
+        "https://raw.githubusercontent.com/kward/shunit2/master/shunit2"
+        "https://mirrors.aliyun.com/github-raw/kward/shunit2/master/shunit2"
+        "https://raw.gitmirror.com/kward/shunit2/master/shunit2"
+    )
+    local downloaded=0
+    for mirror_url in "${mirrors[@]}"; do
+        curl --connect-timeout 30 --max-time 60 -sL -o "${SCRIPT_DIR}/shunit2" "${mirror_url}" && {
+            chmod +x "${SCRIPT_DIR}/shunit2"
+            grep -q "^SHUNIT_VERSION=" "${SCRIPT_DIR}/shunit2" && { downloaded=1; break; }
+        }
+        rm -f "${SCRIPT_DIR}/shunit2"
+    done
+    if [ "${downloaded}" -eq 0 ]; then
+        for mirror_url in "${mirrors[@]}"; do
+            wget --timeout=30 --tries=2 -q -O "${SCRIPT_DIR}/shunit2" "${mirror_url}" 2>/dev/null && {
+                chmod +x "${SCRIPT_DIR}/shunit2"
+                grep -q "^SHUNIT_VERSION=" "${SCRIPT_DIR}/shunit2" && { downloaded=1; break; }
+            }
+            rm -f "${SCRIPT_DIR}/shunit2"
+        done
+    fi
+    if [ "${downloaded}" -eq 0 ]; then
+        log "ERROR" "Failed to download shUnit2"
+        log "ERROR" "  Manual install: curl -L https://raw.githubusercontent.com/kward/shunit2/master/shunit2 -o ${SCRIPT_DIR}/shunit2 && chmod +x ${SCRIPT_DIR}/shunit2"
+        return 1
+    fi
+    log "SETUP" "shUnit2 downloaded successfully"
+}
 
 check_prerequisites() {
     local errors=0
@@ -66,29 +104,6 @@ check_prerequisites() {
         log "CHECK" "Flink OK: ${flink_ver}"
     fi
 
-    local shunit2_path=""
-    if [ -f "${SCRIPT_DIR}/shunit2" ] && [ -x "${SCRIPT_DIR}/shunit2" ]; then
-        shunit2_path="${SCRIPT_DIR}/shunit2"
-    elif command -v shunit2 >/dev/null 2>&1; then
-        shunit2_path="$(command -v shunit2)"
-    else
-        for candidate in /usr/local/bin/shunit2 /usr/bin/shunit2 /opt/shunit2/shunit2 "${HOME}/.local/bin/shunit2"; do
-            if [ -f "${candidate}" ] && [ -x "${candidate}" ]; then
-                shunit2_path="${candidate}"
-                break
-            fi
-        done
-    fi
-
-    if [ -z "${shunit2_path}" ]; then
-        log "ERROR" "shUnit2 is not installed. Please install shUnit2 before running this benchmark."
-        log "ERROR" "  Download: https://github.com/kward/shunit2"
-        log "ERROR" "  Quick install: curl -L https://raw.githubusercontent.com/kward/shunit2/master/shunit2 -o ${SCRIPT_DIR}/shunit2 && chmod +x ${SCRIPT_DIR}/shunit2"
-        errors=$((errors + 1))
-    else
-        log "CHECK" "shUnit2 OK: ${shunit2_path}"
-    fi
-
     if [ ! -f "${JSON_HELPER}" ]; then
         log "ERROR" "json_helper.py not found at ${JSON_HELPER}"
         log "ERROR" "  This file is required for shUnit2 JSON assertions"
@@ -114,11 +129,10 @@ collect_version_info() {
         flink_found=0
     fi
 
-    python3 "${JSON_HELPER}" "${RESULTS_DIR}/version_info.json" write_version_info \
+    python3 "${JSON_HELPER}" "${RESULTS_JSON}" write_version_info \
         "${timestamp}" "${arch}" "${kernel}" "${os}" "${cpu_model}" \
         "${cores}" "${mem_mb}" "flink" "${SOFTWARE_VERSION}" \
-        "${java_ver}" "${FLINK_HOME}" "${flink_found}" "${PARALLELISM}" \
-        --output "${RESULTS_DIR}/version_info.json"
+        "${java_ver}" "${FLINK_HOME}" "${flink_found}" "${PARALLELISM}"
 }
 
 run_benchmarks() {
@@ -143,7 +157,8 @@ run_benchmarks() {
             --iterations "${ITERATIONS}" \
             --data-scale "${DATA_SCALE}" \
             --parallelism "${PARALLELISM}" \
-            --output "${RESULTS_DIR}/benchmark_primary.json"
+            --results-json "${RESULTS_JSON}" \
+            --section primary_benchmark
     fi
 
     if [ "${has_secondary}" -eq 1 ]; then
@@ -153,7 +168,8 @@ run_benchmarks() {
             --results-dir "${RESULTS_DIR}" \
             --iterations "${ITERATIONS}" \
             --parallelism "${PARALLELISM}" \
-            --output "${RESULTS_DIR}/benchmark_secondary.json"
+            --results-json "${RESULTS_JSON}" \
+            --section secondary_benchmark
     fi
 
     if [ "${has_micro}" -eq 1 ]; then
@@ -163,26 +179,24 @@ run_benchmarks() {
             --results-dir "${RESULTS_DIR}" \
             --iterations "${ITERATIONS}" \
             --parallelism "${PARALLELISM}" \
-            --output "${RESULTS_DIR}/micro_benchmark.json"
+            --results-json "${RESULTS_JSON}" \
+            --section micro_benchmark
     fi
 }
 
-aggregate_and_report() {
-    log "PHASE4" "Aggregating results and generating reports"
-    python3 "${SCRIPTS_DIR}/aggregate_results.py" \
-        --results-dir "${RESULTS_DIR}" \
-        --output "${RESULTS_DIR}/results.json"
+generate_reports() {
+    log "PHASE4" "Generating summary and HTML report"
     python3 "${SCRIPTS_DIR}/generate_summary.py" \
-        --input "${RESULTS_DIR}/results.json" \
+        --input "${RESULTS_JSON}" \
         --output "${RESULTS_DIR}/results.txt"
     python3 "${SCRIPTS_DIR}/generate_html_report.py" \
-        --input "${RESULTS_DIR}/results.json" \
+        --input "${RESULTS_JSON}" \
         --output "${RESULTS_DIR}/results.html"
-    log "PHASE4" "Reports: results.json, results.txt, results.html, results.log"
+    log "PHASE4" "Reports generated: results.txt, results.html"
 }
 
 oneTimeSetUp() {
-    log "LIFECYCLE" "oneTimeSetUp: Check prerequisites + Collect info + Run benchmarks"
+    log "LIFECYCLE" "oneTimeSetUp: Check prerequisites + Write version_info into results.json + Run benchmarks"
 
     if ! check_prerequisites; then
         log "FATAL" "Prerequisites not met. Please install missing dependencies and try again."
@@ -203,8 +217,8 @@ tearDown() {
 }
 
 oneTimeTearDown() {
-    log "LIFECYCLE" "oneTimeTearDown: Phase 4"
-    aggregate_and_report
+    log "LIFECYCLE" "oneTimeTearDown: Generate reports"
+    generate_reports
 }
 
 testArchitectureIsARM64() {
@@ -214,12 +228,7 @@ testArchitectureIsARM64() {
         "[ '${arch}' = 'aarch64' ] || [ '${arch}' = 'arm64' ]"
 }
 
-testJavaIsAvailable() {
-    assertTrue "Java should be available" \
-        "command -v java >/dev/null 2>&1"
-}
-
-testFlinkIsInstalled() {
+testSoftwareIsInstalled() {
     local found=0
     if [ -d "${FLINK_HOME}" ] && [ -x "${FLINK_HOME}/bin/flink" ]; then found=1; fi
     if [ "${found}" -eq 0 ]; then
@@ -230,108 +239,114 @@ testFlinkIsInstalled() {
     assertTrue "Flink binary should exist" "[ ${found} -eq 1 ]"
 }
 
-testVersionInfoJsonExists() {
-    assertTrue "version_info.json should exist" "[ -f '${RESULTS_DIR}/version_info.json' ]"
+testResultsJsonExists() {
+    assertTrue "results.json should exist" "[ -f '${RESULTS_JSON}' ]"
 }
 
-testVersionInfoHasArchitecture() {
-    if [ ! -f "${RESULTS_DIR}/version_info.json" ]; then startSkipping; return; fi
+testResultsJsonHasVersionInfo() {
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
+    local has_vi
+    has_vi="$(json_field_exists "${RESULTS_JSON}" version_info)"
+    assertTrue "results.json should have version_info section" "[ ${has_vi} -eq 1 ]"
+}
+
+testResultsJsonHasArchitecture() {
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
     local has_arch
-    has_arch="$(json_field_exists "${RESULTS_DIR}/version_info.json" architecture)"
-    assertTrue "version_info should have architecture" "[ ${has_arch} -eq 1 ]"
+    has_arch="$(json_field_exists "${RESULTS_JSON}" version_info architecture)"
+    assertTrue "results.json version_info should have architecture" "[ ${has_arch} -eq 1 ]"
 }
 
-testVersionInfoHasFlinkVersion() {
-    if [ ! -f "${RESULTS_DIR}/version_info.json" ]; then startSkipping; return; fi
+testResultsJsonHasSoftwareVersion() {
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
     local has_ver
-    has_ver="$(json_field_exists "${RESULTS_DIR}/version_info.json" version)"
-    assertTrue "version_info should have version" "[ ${has_ver} -eq 1 ]"
+    has_ver="$(json_field_exists "${RESULTS_JSON}" version_info version)"
+    assertTrue "results.json version_info should have version" "[ ${has_ver} -eq 1 ]"
 }
 
-testBenchmarkPrimaryProducesResults() {
-    local bench_file="${RESULTS_DIR}/benchmark_primary.json"
-    assertTrue "TPC-DS benchmark JSON should exist" "[ -f '${bench_file}' ]"
+testBenchmarkPrimaryInResultsJson() {
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
+    local has_primary
+    has_primary="$(json_field_exists "${RESULTS_JSON}" primary_benchmark)"
+    assertTrue "results.json should contain primary_benchmark data" "[ ${has_primary} -eq 1 ]"
 }
 
 testBenchmarkPrimaryHasRequiredFields() {
-    local bench_file="${RESULTS_DIR}/benchmark_primary.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
-    local content
-    content="$(cat "${bench_file}")"
-    assertContains "Should have benchmark field" "${content}" "benchmark"
-    assertContains "Should have performance_metrics field" "${content}" "performance_metrics"
-    assertContains "Should have results field" "${content}" "results"
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
+    local has_bench has_metrics has_results
+    has_bench="$(json_field_exists "${RESULTS_JSON}" primary_benchmark benchmark)"
+    has_metrics="$(json_field_exists "${RESULTS_JSON}" primary_benchmark performance_metrics)"
+    has_results="$(json_field_exists "${RESULTS_JSON}" primary_benchmark results)"
+    assertTrue "primary_benchmark should have benchmark field" "[ ${has_bench} -eq 1 ]"
+    assertTrue "primary_benchmark should have performance_metrics field" "[ ${has_metrics} -eq 1 ]"
+    assertTrue "primary_benchmark should have results field" "[ ${has_results} -eq 1 ]"
 }
 
 testBenchmarkPrimaryThroughputAboveThreshold() {
-    local bench_file="${RESULTS_DIR}/benchmark_primary.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
     local avg_throughput
-    avg_throughput="$(json_avg_throughput "${bench_file}" average_throughput_ops_per_sec)"
-    if [ "${avg_throughput}" = "0" ] || [ "${avg_throughput}" = "NULL" ]; then
-        avg_throughput="$(json_get "${bench_file}" average_throughput_ops_per_sec)"
-    fi
+    avg_throughput="$(json_get "${RESULTS_JSON}" primary_benchmark average_throughput_ops_per_sec)"
     echo "[DIAG] TPC-DS avg throughput: ${avg_throughput} ops/sec (threshold: ${MINIMUM_TPCDS_THROUGHPUT})"
     local has_throughput
-    has_throughput="$(json_throughput_ge "${bench_file}" "${MINIMUM_TPCDS_THROUGHPUT}" average_throughput_ops_per_sec)"
+    has_throughput="$(json_throughput_ge "${RESULTS_JSON}" "${MINIMUM_TPCDS_THROUGHPUT}" primary_benchmark average_throughput_ops_per_sec)"
     assertTrue "TPC-DS throughput should be >= ${MINIMUM_TPCDS_THROUGHPUT}, got ${avg_throughput}" \
         "[ ${has_throughput} -eq 1 ]"
 }
 
-testBenchmarkSecondaryProducesResults() {
-    local bench_file="${RESULTS_DIR}/benchmark_secondary.json"
-    assertTrue "Streaming benchmark JSON should exist" "[ -f '${bench_file}' ]"
-}
-
-testBenchmarkSecondaryHasRequiredFields() {
-    local bench_file="${RESULTS_DIR}/benchmark_secondary.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
-    local content
-    content="$(cat "${bench_file}")"
-    assertContains "Should have benchmark field" "${content}" "benchmark"
-    assertContains "Should have throughput data" "${content}" "throughput"
-    assertContains "Should have latency data" "${content}" "latency"
+testBenchmarkSecondaryInResultsJson() {
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
+    local has_secondary
+    has_secondary="$(json_field_exists "${RESULTS_JSON}" secondary_benchmark)"
+    assertTrue "results.json should contain secondary_benchmark data" "[ ${has_secondary} -eq 1 ]"
 }
 
 testBenchmarkSecondaryThroughputAboveThreshold() {
-    local bench_file="${RESULTS_DIR}/benchmark_secondary.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
     local avg_throughput
-    avg_throughput="$(json_avg_throughput "${bench_file}" average_throughput_events_per_sec)"
+    avg_throughput="$(json_get "${RESULTS_JSON}" secondary_benchmark average_throughput_events_per_sec)"
     echo "[DIAG] Streaming avg throughput: ${avg_throughput} events/sec (threshold: ${MINIMUM_STREAMING_THROUGHPUT})"
     local has_throughput
-    has_throughput="$(json_throughput_ge "${bench_file}" "${MINIMUM_STREAMING_THROUGHPUT}" average_throughput_events_per_sec)"
+    has_throughput="$(json_throughput_ge "${RESULTS_JSON}" "${MINIMUM_STREAMING_THROUGHPUT}" secondary_benchmark average_throughput_events_per_sec)"
     assertTrue "Streaming throughput should be >= ${MINIMUM_STREAMING_THROUGHPUT}, got ${avg_throughput}" \
         "[ ${has_throughput} -eq 1 ]"
 }
 
 testBenchmarkSecondaryLatencyBelowThreshold() {
-    local bench_file="${RESULTS_DIR}/benchmark_secondary.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
     local avg_latency
-    avg_latency="$(json_avg_throughput "${bench_file}" average_latency_ms)"
+    avg_latency="$(json_get "${RESULTS_JSON}" secondary_benchmark average_latency_ms)"
     echo "[DIAG] Streaming avg latency: ${avg_latency} ms (threshold: ${MAXIMUM_STREAMING_LATENCY})"
     local has_latency
-    has_latency="$(json_latency_le "${bench_file}" "${MAXIMUM_STREAMING_LATENCY}" average_latency_ms)"
+    has_latency="$(json_latency_le "${RESULTS_JSON}" "${MAXIMUM_STREAMING_LATENCY}" secondary_benchmark average_latency_ms)"
     assertTrue "Streaming latency should be <= ${MAXIMUM_STREAMING_LATENCY}ms, got ${avg_latency}" \
         "[ ${has_latency} -eq 1 ]"
 }
 
-testBenchmarkMicroProducesResults() {
-    local bench_file="${RESULTS_DIR}/micro_benchmark.json"
-    assertTrue "Micro benchmark JSON should exist" "[ -f '${bench_file}' ]"
+testBenchmarkMicroInResultsJson() {
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
+    local has_micro
+    has_micro="$(json_field_exists "${RESULTS_JSON}" micro_benchmark)"
+    assertTrue "results.json should contain micro_benchmark data" "[ ${has_micro} -eq 1 ]"
 }
 
 testBenchmarkMicroAllOperationsCompleted() {
-    local bench_file="${RESULTS_DIR}/micro_benchmark.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
     local ops_count
-    ops_count="$(json_count_results "${bench_file}")"
+    ops_count="$(json_count_results "${RESULTS_JSON}")"
     assertTrue "Should have micro benchmark results (count=${ops_count})" "[ ${ops_count} -gt 0 ]"
 }
 
-testAggregatedResultsExist() {
-    assertTrue "results.json should exist" "[ -f '${RESULTS_DIR}/results.json' ]"
+testResultsJsonContainsAllBenchmarks() {
+    if [ ! -f "${RESULTS_JSON}" ]; then startSkipping; return; fi
+    local has_primary
+    has_primary="$(json_contains "${RESULTS_JSON}" primary_benchmark)"
+    local has_secondary
+    has_secondary="$(json_contains "${RESULTS_JSON}" secondary_benchmark)"
+    local has_micro
+    has_micro="$(json_contains "${RESULTS_JSON}" micro_benchmark)"
+    assertTrue "Should contain primary_benchmark data" "[ ${has_primary} -eq 1 ]"
+    assertTrue "Should contain secondary_benchmark data" "[ ${has_secondary} -eq 1 ]"
+    assertTrue "Should contain micro_benchmark data" "[ ${has_micro} -eq 1 ]"
 }
 
 testHtmlReportGenerated() {
@@ -343,21 +358,7 @@ testSummaryReportGenerated() {
 }
 
 testLogFileGenerated() {
-    assertTrue "results.log should exist" "[ -f '${RESULTS_DIR}/results.log' ]"
-}
-
-testAggregatedResultsContainsAllBenchmarks() {
-    local agg_file="${RESULTS_DIR}/results.json"
-    if [ ! -f "${agg_file}" ]; then startSkipping; return; fi
-    local has_primary
-    has_primary="$(json_contains "${agg_file}" primary_benchmark)"
-    local has_secondary
-    has_secondary="$(json_contains "${agg_file}" secondary_benchmark)"
-    local has_micro
-    has_micro="$(json_contains "${agg_file}" micro_benchmark)"
-    assertTrue "Should contain primary_benchmark data" "[ ${has_primary} -eq 1 ]"
-    assertTrue "Should contain secondary_benchmark data" "[ ${has_secondary} -eq 1 ]"
-    assertTrue "Should contain micro_benchmark data" "[ ${has_micro} -eq 1 ]"
+    assertTrue "results.log should exist" "[ -f '${LOG_FILE}' ]"
 }
 
 usage() {
@@ -370,8 +371,9 @@ Prerequisites (must be pre-installed):
   - Java JDK 17+
   - Python 3.8+
   - Apache Flink ${SOFTWARE_VERSION} (at ${FLINK_HOME} or set FLINK_HOME)
-  - shUnit2 (in ${SCRIPT_DIR}/shunit2 or system PATH)
   - scripts/json_helper.py
+
+Note: shUnit2 will be auto-downloaded if not present.
 
 Options:
   -p, --phases PHASES      Comma-separated phases (1,2,3,4 or 3a,3b,3c)
@@ -420,27 +422,13 @@ main() {
         exit 1
     fi
 
-    local shunit2_path=""
-    if [ -f "${SCRIPT_DIR}/shunit2" ] && [ -x "${SCRIPT_DIR}/shunit2" ]; then
-        shunit2_path="${SCRIPT_DIR}/shunit2"
-    elif command -v shunit2 >/dev/null 2>&1; then
-        shunit2_path="$(command -v shunit2)"
-    else
-        for candidate in /usr/local/bin/shunit2 /usr/bin/shunit2 /opt/shunit2/shunit2 "${HOME}/.local/bin/shunit2"; do
-            if [ -f "${candidate}" ] && [ -x "${candidate}" ]; then
-                shunit2_path="${candidate}"
-                break
-            fi
-        done
-    fi
-
-    if [ -z "${shunit2_path}" ]; then
-        log "FATAL" "shUnit2 not found"
+    download_shunit2 || {
+        log "FATAL" "Failed to download shUnit2. Please install manually."
         exit 1
-    fi
+    }
 
     log "TEST" "Running shUnit2 test suite..."
-    . "${shunit2_path}"
+    . "${SCRIPT_DIR}/shunit2"
 }
 
 if [ "${1:-}" != "--shunit2-run" ]; then

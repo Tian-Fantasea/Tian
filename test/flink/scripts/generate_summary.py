@@ -6,12 +6,16 @@ import os
 PASS_MARK = "[PASS]"
 FAIL_MARK = "[FAIL]"
 
+TPCDS_MIN_THROUGHPUT = 500
+STREAMING_MIN_THROUGHPUT = 10000
+STREAMING_MAX_LATENCY = 500
+
 def format_threshold_check(name, actual, threshold, unit, pass_result):
     mark = PASS_MARK if pass_result else FAIL_MARK
     return "{} {}: {} {} (threshold: {} {})".format(mark, name, actual, unit, threshold, unit)
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate text summary")
+    parser = argparse.ArgumentParser(description="Generate text summary from results.json")
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
@@ -29,55 +33,56 @@ def main():
     lines.append("Timestamp:      {}".format(data.get("timestamp", "unknown")))
     lines.append("")
 
-    env = data.get("environment", {})
-    if env:
+    vi = data.get("version_info", {})
+    if vi:
         lines.append("--- Environment Info ---")
-        lines.append("OS:             {}".format(env.get("os", "unknown")))
-        lines.append("Kernel:         {}".format(env.get("kernel", "unknown")))
-        lines.append("CPU:            {}".format(env.get("cpu_model", "unknown")))
-        lines.append("Cores:          {}".format(env.get("cores", "unknown")))
-        lines.append("Memory:         {} MB".format(env.get("memory_mb", "unknown")))
-        lines.append("Java:           {}".format(env.get("java_version", "unknown")))
+        lines.append("OS:             {}".format(vi.get("os", "unknown")))
+        lines.append("Kernel:         {}".format(vi.get("kernel", "unknown")))
+        lines.append("CPU:            {}".format(vi.get("cpu_model", "unknown")))
+        lines.append("Cores:          {}".format(vi.get("cores", "unknown")))
+        lines.append("Memory:         {} MB".format(vi.get("memory_mb", "unknown")))
+        lines.append("Java:           {}".format(vi.get("java_version", "unknown")))
         lines.append("")
 
-    summary = data.get("summary", {})
-    thresholds = data.get("thresholds", {})
-
     lines.append("--- Threshold Checks ---")
-    tpcds_t = summary.get("tpcds_avg_throughput_ops_per_sec", 0)
-    tpcds_min = thresholds.get("tpcds_min_throughput_ops_per_sec", 500)
+
+    primary = data.get("primary_benchmark", {})
+    tpcds_avg = primary.get("average_throughput_ops_per_sec", 0)
+    tpcds_pass = tpcds_avg >= TPCDS_MIN_THROUGHPUT
     lines.append(format_threshold_check(
-        "TPC-DS Throughput", tpcds_t, tpcds_min, "ops/sec", summary.get("tpcds_pass", False)
+        "TPC-DS Throughput", tpcds_avg, TPCDS_MIN_THROUGHPUT, "ops/sec", tpcds_pass
     ))
 
-    stream_t = summary.get("streaming_avg_throughput_events_per_sec", 0)
-    stream_min = thresholds.get("streaming_min_throughput_events_per_sec", 10000)
+    secondary = data.get("secondary_benchmark", {})
+    stream_avg_t = secondary.get("average_throughput_events_per_sec", 0)
+    stream_avg_l = secondary.get("average_latency_ms", 0)
+    stream_pass = stream_avg_t >= STREAMING_MIN_THROUGHPUT and stream_avg_l <= STREAMING_MAX_LATENCY
     lines.append(format_threshold_check(
-        "Streaming Throughput", stream_t, stream_min, "events/sec", summary.get("streaming_pass", False)
+        "Streaming Throughput", stream_avg_t, STREAMING_MIN_THROUGHPUT, "events/sec", stream_avg_t >= STREAMING_MIN_THROUGHPUT
+    ))
+    lines.append(format_threshold_check(
+        "Streaming Latency", stream_avg_l, STREAMING_MAX_LATENCY, "ms", stream_avg_l <= STREAMING_MAX_LATENCY
     ))
 
-    stream_l = summary.get("streaming_avg_latency_ms", 0)
-    stream_max_l = thresholds.get("streaming_max_latency_ms", 500)
-    lines.append(format_threshold_check(
-        "Streaming Latency", stream_l, stream_max_l, "ms",
-        stream_l <= stream_max_l
-    ))
+    tpcds_pass_val = primary.get("pass", tpcds_pass)
+    stream_pass_val = secondary.get("pass", stream_pass)
+    overall_pass = tpcds_pass_val and stream_pass_val
 
-    overall = summary.get("overall_pass", False)
     lines.append("")
     lines.append("--- Overall Result ---")
-    lines.append("{} {}".format(PASS_MARK if overall else FAIL_MARK, "OVERALL: All thresholds passed" if overall else "OVERALL: Some thresholds not met"))
+    lines.append("{} {}".format(PASS_MARK if overall_pass else FAIL_MARK, "OVERALL: All thresholds passed" if overall_pass else "OVERALL: Some thresholds not met"))
     lines.append("")
 
-    micro_ops = summary.get("micro_operations", {})
-    if micro_ops:
+    micro = data.get("micro_benchmark", {})
+    micro_results = micro.get("results", [])
+    if micro_results:
         lines.append("--- Micro Benchmarks ---")
-        for op_id, op_data in micro_ops.items():
+        for op in micro_results:
             lines.append("  {}: {} ops/sec, {} ms latency ({})".format(
-                op_data.get("name", op_id),
-                op_data.get("throughput", 0),
-                op_data.get("latency", 0),
-                op_data.get("category", "unknown")
+                op.get("name", op.get("operation_id", "unknown")),
+                op.get("average_throughput_ops_per_sec", 0),
+                op.get("average_latency_ms", 0),
+                op.get("category", "unknown")
             ))
         lines.append("")
 

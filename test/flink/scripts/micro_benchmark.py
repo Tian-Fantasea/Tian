@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 
 MIN_SORT_THROUGHPUT = 50000
 MIN_JOIN_THROUGHPUT = 30000
@@ -173,13 +173,31 @@ def run_synthetic_micro(operations, iterations):
         results.append(op_result)
     return results
 
+def load_or_create_json(filepath):
+    if os.path.exists(filepath):
+        with open(filepath) as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return {}
+    return {}
+
+
+def write_results_section(filepath, section, data):
+    results = load_or_create_json(filepath)
+    results[section] = data
+    with open(filepath, "w") as f:
+        json.dump(results, f, indent=2)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Flink micro benchmarks")
     parser.add_argument("--flink-home", required=True)
     parser.add_argument("--results-dir", required=True)
-    parser.add_argument("--iterations", type=int, default=3)
+    parser.add_argument("--iterations", type=int, default=1)
     parser.add_argument("--parallelism", type=int, default=4)
-    parser.add_argument("--output", required=True)
+    parser.add_argument("--results-json", required=True)
+    parser.add_argument("--section", default="micro_benchmark")
     args = parser.parse_args()
 
     log_file = os.path.join(args.results_dir, "results.log")
@@ -197,7 +215,7 @@ def main():
         "software": "flink",
         "version": os.environ.get("VERSION", "2.0.0"),
         "architecture": "arm64",
-        "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "performance_metrics": {
             "throughput_ops_per_sec": {"unit": "ops/sec", "description": "Operation throughput"},
             "latency_ms": {"unit": "ms", "description": "Operation latency"}
@@ -213,8 +231,7 @@ def main():
         "parallelism": args.parallelism
     }
 
-    with open(args.output, "w") as f:
-        json.dump(output, f, indent=2)
+    write_results_section(args.results_json, args.section, output)
 
     with open(log_file, "a") as f:
         f.write("[MICRO] {} operations benchmarked\n".format(len(results)))

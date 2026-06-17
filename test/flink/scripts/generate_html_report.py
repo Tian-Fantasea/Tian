@@ -4,6 +4,10 @@ import json
 import os
 from datetime import datetime
 
+TPCDS_MIN_THROUGHPUT = 500
+STREAMING_MIN_THROUGHPUT = 10000
+STREAMING_MAX_LATENCY = 500
+
 CSS_STYLE = """
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -37,6 +41,9 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f5f5f5; colo
 .bar-fill.pass { background: linear-gradient(90deg, #27ae60, #2ecc71); }
 .bar-fill.fail { background: linear-gradient(90deg, #e74c3c, #c0392b); }
 .bar-fill.neutral { background: linear-gradient(90deg, #2e86c1, #3498db); }
+.shunit2-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+.shunit2-table th, .shunit2-table td { padding: 6px 10px; border: 1px solid #ddd; text-align: left; font-size: 13px; }
+.shunit2-table th { background: #34495e; color: white; }
 .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
 </style>
 """
@@ -55,31 +62,34 @@ def make_bar_chart(items, max_val, unit=""):
         ))
     return '<div class="bar-chart">{}</div>'.format("\n".join(rows))
 
+
 def generate_html(data):
-    env = data.get("environment", {})
-    summary = data.get("summary", {})
-    thresholds = data.get("thresholds", {})
+    vi = data.get("version_info", {})
     primary = data.get("primary_benchmark", {})
     secondary = data.get("secondary_benchmark", {})
     micro = data.get("micro_benchmark", {})
+    shunit2 = data.get("shunit2_results", {})
 
-    tpcds_t = summary.get("tpcds_avg_throughput_ops_per_sec", 0)
-    stream_t = summary.get("streaming_avg_throughput_events_per_sec", 0)
-    stream_l = summary.get("streaming_avg_latency_ms", 0)
-    overall_pass = summary.get("overall_pass", False)
+    tpcds_avg = primary.get("average_throughput_ops_per_sec", 0)
+    stream_avg_t = secondary.get("average_throughput_events_per_sec", 0)
+    stream_avg_l = secondary.get("average_latency_ms", 0)
+
+    tpcds_pass = primary.get("pass", tpcds_avg >= TPCDS_MIN_THROUGHPUT)
+    stream_pass = secondary.get("pass", stream_avg_t >= STREAMING_MIN_THROUGHPUT and stream_avg_l <= STREAMING_MAX_LATENCY)
+    overall_pass = tpcds_pass and stream_pass
 
     overall_status = "PASS" if overall_pass else "FAIL"
     overall_color = "#27ae60" if overall_pass else "#e74c3c"
 
     env_rows = ""
     env_fields = [
-        ("OS", env.get("os", "unknown")),
-        ("Kernel", env.get("kernel", "unknown")),
-        ("Architecture", env.get("architecture", "arm64")),
-        ("CPU", env.get("cpu_model", "unknown")),
-        ("Cores", env.get("cores", "unknown")),
-        ("Memory", "{} MB".format(env.get("memory_mb", "unknown"))),
-        ("Java", env.get("java_version", "unknown")),
+        ("OS", vi.get("os", "unknown")),
+        ("Kernel", vi.get("kernel", "unknown")),
+        ("Architecture", vi.get("architecture", data.get("architecture", "arm64"))),
+        ("CPU", vi.get("cpu_model", "unknown")),
+        ("Cores", vi.get("cores", "unknown")),
+        ("Memory", "{} MB".format(vi.get("memory_mb", "unknown"))),
+        ("Java", vi.get("java_version", "unknown")),
         ("Flink Version", data.get("version", "unknown")),
     ]
     for label, value in env_fields:
@@ -87,9 +97,9 @@ def generate_html(data):
 
     metric_cards = ""
     cards = [
-        ("TPC-DS Throughput", "{} ops/sec".format(tpcds_t), summary.get("tpcds_pass", False)),
-        ("Streaming Throughput", "{} events/sec".format(stream_t), summary.get("streaming_pass", False)),
-        ("Streaming Latency", "{} ms".format(stream_l), stream_l <= thresholds.get("streaming_max_latency_ms", 500)),
+        ("TPC-DS Throughput", "{} ops/sec".format(tpcds_avg), tpcds_pass),
+        ("Streaming Throughput", "{} events/sec".format(stream_avg_t), stream_avg_t >= STREAMING_MIN_THROUGHPUT),
+        ("Streaming Latency", "{} ms".format(stream_avg_l), stream_avg_l <= STREAMING_MAX_LATENCY),
     ]
     for label, value, passed in cards:
         cls = "pass" if passed else "fail"
@@ -123,21 +133,50 @@ def generate_html(data):
             )
 
     throughput_chart_items = [
-        {"label": "TPC-DS", "value": tpcds_t, "threshold": thresholds.get("tpcds_min_throughput_ops_per_sec", 500), "pass": summary.get("tpcds_pass", False)},
-        {"label": "Streaming", "value": stream_t, "threshold": thresholds.get("streaming_min_throughput_events_per_sec", 10000), "pass": summary.get("streaming_pass", False)},
+        {"label": "TPC-DS", "value": tpcds_avg, "threshold": TPCDS_MIN_THROUGHPUT, "pass": tpcds_pass},
+        {"label": "Streaming", "value": stream_avg_t, "threshold": STREAMING_MIN_THROUGHPUT, "pass": stream_avg_t >= STREAMING_MIN_THROUGHPUT},
     ]
-    max_throughput = max(tpcds_t, stream_t, 1) * 1.2
+    max_throughput = max(tpcds_avg, stream_avg_t, 1) * 1.2
     throughput_chart = make_bar_chart(throughput_chart_items, max_throughput, "ops/s")
 
-    micro_ops = summary.get("micro_operations", {})
+    micro_results = micro.get("results", [])
     micro_chart_items = []
     max_micro = 1
-    for op_id, op_data in micro_ops.items():
-        t = op_data.get("throughput", 0)
+    for op in micro_results:
+        t = op.get("average_throughput_ops_per_sec", 0)
         max_micro = max(max_micro, t)
-        micro_chart_items.append({"label": op_data.get("name", op_id), "value": t, "threshold": 50000, "pass": t >= 50000})
+        micro_chart_items.append({"label": op.get("name", op.get("operation_id", "")), "value": t, "threshold": 50000, "pass": t >= 50000})
     max_micro = max_micro * 1.2
     micro_chart = make_bar_chart(micro_chart_items, max_micro, "ops/s") if micro_chart_items else "<p>No micro benchmark data.</p>"
+
+    shunit2_section = ""
+    if shunit2:
+        total_tests = shunit2.get("total_tests", 0)
+        tests_passed = shunit2.get("tests_passed", 0)
+        tests_failed = shunit2.get("tests_failed", 0)
+        tests_skipped = shunit2.get("tests_skipped", 0)
+        test_details = shunit2.get("test_details", [])
+        shunit2_section = """<div class="section">
+<h2>shUnit2 Test Results</h2>
+<div class="metrics-grid">
+<div class="metric-card {}"><div class="value">{}</div><div class="label">Total Tests</div></div>
+<div class="metric-card {}"><div class="value">{}</div><div class="label">Passed</div></div>
+<div class="metric-card {}"><div class="value">{}</div><div class="label">Failed</div></div>
+<div class="metric-card {}"><div class="value">{}</div><div class="label">Skipped</div></div>
+</div>
+<table class="shunit2-table">
+<tr><th>Test</th><th>Result</th></tr>{}
+</table>
+</div>""".format(
+            "pass" if tests_failed == 0 else "fail",
+            total_tests,
+            "pass", tests_passed,
+            "fail" if tests_failed > 0 else "pass", tests_failed,
+            "neutral", tests_skipped,
+            "".join('<tr><td>{}</td><td class="status-{}">{}</td></tr>'.format(
+                d.get("name", ""), d.get("result", "skip").lower(), d.get("result", "SKIP")
+            ) for d in test_details)
+        )
 
     html = """<!DOCTYPE html>
 <html lang="en">
@@ -191,6 +230,8 @@ def generate_html(data):
 </table>
 </div>
 
+{shunit2_section}
+
 <div class="footer">
 Generated by flink ARM64 performance benchmark on {timestamp}
 </div>
@@ -210,12 +251,14 @@ Generated by flink ARM64 performance benchmark on {timestamp}
         secondary_rows=secondary_results_rows,
         micro_chart=micro_chart,
         micro_rows=micro_results_rows,
+        shunit2_section=shunit2_section,
     )
 
     return html
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Generate HTML report")
+    parser = argparse.ArgumentParser(description="Generate HTML report from results.json")
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
