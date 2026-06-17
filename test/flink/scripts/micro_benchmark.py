@@ -213,7 +213,7 @@ def main():
         "description": "Micro benchmarks measuring individual Flink operations on ARM64",
         "reference": "HiBench, Flink official benchmarks",
         "software": "flink",
-        "version": os.environ.get("VERSION", "2.0.0"),
+        "version": os.environ.get("VERSION", "2.1.0"),
         "architecture": "arm64",
         "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "performance_metrics": {
