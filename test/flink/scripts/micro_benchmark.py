@@ -41,10 +41,10 @@ def get_micro_operations():
             "id": "wordcount_streaming",
             "name": "WordCount Streaming",
             "category": "streaming",
-            "description": "Streaming WordCount - map/reduce throughput on text data",
+            "description": "Streaming WordCount - map/reduce throughput using built-in data source",
             "jar": "streaming/WordCount.jar",
-            "needs_input": True,
-            "data_size_mb": 10,
+            "needs_input": False,
+            "data_size_mb": 0,
         },
         {
             "id": "window_aggregation",
@@ -96,10 +96,10 @@ def get_micro_operations():
             "id": "kryo_serialization",
             "name": "Kryo Serialization",
             "category": "serialization",
-            "description": "Serialization throughput with Kryo serializer via WordCount",
+            "description": "Serialization throughput with Kryo serializer via WordCount built-in source",
             "jar": "streaming/WordCount.jar",
-            "needs_input": True,
-            "data_size_mb": 10,
+            "needs_input": False,
+            "data_size_mb": 0,
             "force_kryo": True,
         },
         {
@@ -134,7 +134,7 @@ def get_micro_operations():
 
 def cluster_is_running():
     try:
-        url = "{} /overview".format(FLINK_REST_URL)
+        url = "{}/overview".format(FLINK_REST_URL)
         with urllib.request.urlopen(url, timeout=3) as resp:
             json.loads(resp.read().decode())
             return True
@@ -188,8 +188,14 @@ def parse_job_id(output_text):
     return None
 
 
-def submit_job(flink_bin, jar_path, parallelism, extra_args="", log_file=None):
-    cmd = "{} run -d -p {} {} {}".format(flink_bin, parallelism, jar_path, extra_args.strip())
+def submit_job(flink_bin, jar_path, parallelism, flink_config_args="", jar_args="", log_file=None):
+    parts = [flink_bin, "run", "-d", "-p", str(parallelism)]
+    if flink_config_args:
+        parts.extend(flink_config_args.strip().split())
+    parts.append(jar_path)
+    if jar_args:
+        parts.append(jar_args.strip())
+    cmd = " ".join(parts)
     result = run_cmd(cmd, timeout=30, log_file=log_file)
     if not result:
         return None
@@ -197,7 +203,8 @@ def submit_job(flink_bin, jar_path, parallelism, extra_args="", log_file=None):
     job_id = parse_job_id(result.stdout + result.stderr)
     if not job_id:
         with open(log_file, "a") as f:
-            f.write("[MICRO] Could not parse job ID from: {}\n".format(result.stdout[:200]))
+            f.write("[MICRO] Could not parse job ID from: stdout={}\nstderr={}\n".format(
+                result.stdout[:200], result.stderr[:200]))
         return None
 
     with open(log_file, "a") as f:
@@ -210,9 +217,9 @@ def cancel_job(flink_bin, job_id, log_file=None):
     run_cmd(cmd, timeout=10, log_file=log_file)
 
 
-def get_job_throughput(job_id, duration_sec):
+def get_job_throughput(job_id, duration_sec, log_file=None):
     try:
-        url = "{} /jobs/{}".format(FLINK_REST_URL, job_id)
+        url = "{}/jobs/{}".format(FLINK_REST_URL, job_id)
         with urllib.request.urlopen(url, timeout=5) as resp:
             job_data = json.loads(resp.read().decode())
 
@@ -221,7 +228,7 @@ def get_job_throughput(job_id, duration_sec):
 
         for vertex in job_data.get("vertices", []):
             vid = vertex.get("id", "")
-            metrics_url = "{} /jobs/{}/vertices/{}/metrics?get=numRecordsIn,numRecordsOut,numRecordsInPerSecond,numRecordsOutPerSecond".format(
+            metrics_url = "{}/jobs/{}/vertices/{}/metrics?get=numRecordsIn,numRecordsOut,numRecordsInPerSecond,numRecordsOutPerSecond".format(
                 FLINK_REST_URL, job_id, vid)
             try:
                 with urllib.request.urlopen(metrics_url, timeout=5) as resp:
@@ -237,8 +244,15 @@ def get_job_throughput(job_id, duration_sec):
                         total_records_out += val * duration_sec
                     elif mid == "numRecordsInPerSecond":
                         total_records_in += val * duration_sec
-            except Exception:
-                pass
+            except Exception as e:
+                if log_file:
+                    with open(log_file, "a") as f:
+                        f.write("[MICRO] Vertex metrics error: {}\n".format(str(e)))
+
+        if log_file:
+            with open(log_file, "a") as f:
+                f.write("[MICRO] Job {} metrics: records_in={}, records_out={}\n".format(
+                    job_id, total_records_in, total_records_out))
 
         if total_records_out > 0:
             throughput = int(total_records_out / max(duration_sec, 1))
@@ -248,18 +262,21 @@ def get_job_throughput(job_id, duration_sec):
             throughput = 0
 
         return throughput
-    except Exception:
+    except Exception as e:
+        if log_file:
+            with open(log_file, "a") as f:
+                f.write("[MICRO] REST API error: {}\n".format(str(e)))
         return 0
 
 
-def run_streaming_job(flink_bin, jar_path, parallelism, duration_sec, extra_args="", log_file=None):
-    job_id = submit_job(flink_bin, jar_path, parallelism, extra_args, log_file)
+def run_streaming_job(flink_bin, jar_path, parallelism, duration_sec, flink_config_args="", jar_args="", log_file=None):
+    job_id = submit_job(flink_bin, jar_path, parallelism, flink_config_args, jar_args, log_file)
     if not job_id:
         return {"throughput": 0, "latency_ms": 0, "status": "submit_failed"}
 
     time.sleep(duration_sec)
 
-    throughput = get_job_throughput(job_id, duration_sec)
+    throughput = get_job_throughput(job_id, duration_sec, log_file)
 
     cancel_job(flink_bin, job_id, log_file)
 
@@ -289,21 +306,17 @@ def run_operation(op, flink_home, iterations, parallelism, results_dir, log_file
         "iterations": [],
     }
 
-    input_file = None
-    if op.get("needs_input"):
-        input_file = generate_text_file(WORDCOUNT_INPUT_LINES, results_dir)
-
     if op.get("compare_checkpoint"):
         results_no_cp = []
         results_with_cp = []
         for iter_num in range(iterations):
             no_cp = run_streaming_job(
-                flink_bin, jar_path, parallelism, MEASURE_DURATION_SEC, "", log_file)
+                flink_bin, jar_path, parallelism, MEASURE_DURATION_SEC, "", "", log_file)
             results_no_cp.append(no_cp)
 
-            cp_args = "-Dexecution.checkpointing.interval=5s -Dexecution.checkpointing.mode=EXACTLY_ONCE"
+            cp_config = "-Dexecution.checkpointing.interval=5s -Dexecution.checkpointing.mode=EXACTLY_ONCE"
             with_cp = run_streaming_job(
-                flink_bin, jar_path, parallelism, MEASURE_DURATION_SEC, cp_args, log_file)
+                flink_bin, jar_path, parallelism, MEASURE_DURATION_SEC, cp_config, "", log_file)
             results_with_cp.append(with_cp)
 
         avg_no_cp = sum(r["throughput"] for r in results_no_cp if r["throughput"] > 0) // max(
@@ -331,15 +344,14 @@ def run_operation(op, flink_home, iterations, parallelism, results_dir, log_file
         op_result["checkpoint_overhead_pct"] = overhead_pct
 
     else:
-        extra_args = ""
-        if op.get("needs_input") and input_file:
-            extra_args = "--input {}".format(input_file)
+        flink_config_args = ""
+        jar_args = ""
         if op.get("force_kryo"):
-            extra_args += " -Dpipeline.force-kryo=true"
+            flink_config_args = "-Dpipeline.force-kryo=true"
 
         for iter_num in range(iterations):
             run_result = run_streaming_job(
-                flink_bin, jar_path, parallelism, MEASURE_DURATION_SEC, extra_args, log_file)
+                flink_bin, jar_path, parallelism, MEASURE_DURATION_SEC, flink_config_args, jar_args, log_file)
 
             op_result["iterations"].append({
                 "iteration": iter_num + 1,
@@ -352,9 +364,6 @@ def run_operation(op, flink_home, iterations, parallelism, results_dir, log_file
         avg_latency = int(sum(r["latency_ms"] for r in op_result["iterations"]) / max(iterations, 1))
         op_result["average_throughput_ops_per_sec"] = avg_throughput
         op_result["average_latency_ms"] = avg_latency
-
-    if input_file and os.path.exists(input_file):
-        os.unlink(input_file)
 
     return op_result
 
