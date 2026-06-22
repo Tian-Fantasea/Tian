@@ -28,8 +28,8 @@ apt_install() {
         python)    sudo apt-get install -y python3 python3-pip python3-venv; link_bin python python3 pip3 ;;
         zstd)      sudo apt-get install -y zstd;              link_bin zstd zstd ;;
         ceph)      sudo apt-get install -y ceph ceph-mds ceph-common fio; link_bin ceph ceph fio ;;
-        lz4)       sudo apt-get install -y lz4;               link_bin lz4 lz4 ;;
-        protobuf)  sudo apt-get install -y protobuf-compiler; link_bin protobuf protoc ;;
+        lz4)       sudo apt-get install -y lz4 liblz4-dev; link_bin lz4 lz4; setup_venv; pip install lz4 numpy ;;
+        protobuf)  sudo apt-get install -y protobuf-compiler; link_bin protobuf protoc; setup_venv; pip install protobuf==${v} ;;
         mysql)     sudo apt-get install -y mysql-server mysql-client sysbench; link_bin mysql mysql mysqld sysbench ;;
         brpc)      sudo apt-get install -y libbrpc-dev protobuf-compiler libprotobuf-dev libssl-dev cmake ;;
         folly)     sudo apt-get install -y libfolly-dev ;;
@@ -51,18 +51,22 @@ yum_install() {
         gcc)       sudo yum install -y gcc gcc-c++;           link_bin gcc gcc g++ ;;
         python)    sudo yum install -y python3 python3-pip;   link_bin python python3 ;;
         zstd)      sudo yum install -y zstd;                  link_bin zstd zstd ;;
-        lz4)       sudo yum install -y lz4;                   link_bin lz4 lz4 ;;
-        protobuf)  sudo yum install -y protobuf-compiler;     link_bin protobuf protoc ;;
+        lz4)       sudo yum install -y lz4 lz4-devel;               link_bin lz4 lz4; setup_venv; pip install lz4 numpy ;;
+        protobuf)  sudo yum install -y protobuf-compiler;     link_bin protobuf protoc; setup_venv; pip install protobuf==${v} ;;
         openjdk)   sudo yum install -y java-${v}-openjdk-devel; link_bin openjdk java javac ;;
         folly)     sudo yum install -y folly-devel cmake gcc-c++ ;;
         brpc)      sudo yum install -y brpc-devel protobuf-compiler cmake gcc-c++ ;;
     esac
 }
 
-pip_install() {
-    local v="$1"
+setup_venv() {
     [ ! -d "${SOFT_DIR}/venv" ] && python3 -m venv "${SOFT_DIR}/venv"
     export PATH="${SOFT_DIR}/venv/bin:${PATH}"
+}
+
+pip_install() {
+    local v="$1"
+    setup_venv
     case "$SW" in
         faiss)     pip install faiss-cpu numpy ;;
         hnswlib)   pip install hnswlib==${v} numpy ;;
@@ -112,8 +116,19 @@ binary_install() {
             ;;
         oceanbase)
             printf "[DL] OceanBase %s\n" "$v"
-            dl "https://github.com/oceanbase/oceanbase/releases/download/v${v}/observer-v${v}-linux-aarch64.tar.gz" "${t}/ob.tgz" 300 || return 1
-            mkdir -p "${SOFT_DIR}/oceanbase"; tar -xzf "${t}/ob.tgz" -C "${SOFT_DIR}/oceanbase/"
+            local rpm_v="$(printf '%s' "$v" | sed 's/\./_/g; s/^/4_/; s/^/oceanbase-ce-/')"
+            local major="$(printf '%s' "$v" | cut -d. -f1-2 | sed 's/\././')"
+            local url="https://github.com/oceanbase/oceanbase/releases/download/v${v}/oceanbase-ce-${v}-101000022026050611.el8.aarch64.rpm"
+            dl "$url" "${t}/ob.rpm" 300 || return 1
+            mkdir -p "${SOFT_DIR}/oceanbase"
+            if command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
+                rpm2cpio "${t}/ob.rpm" | cpio -idmv -D "${SOFT_DIR}/oceanbase/" 2>/dev/null
+            elif command -v rpm >/dev/null 2>&1; then
+                sudo rpm --force -i "${t}/ob.rpm"
+                cp -r /usr/bin/observer "${SOFT_DIR}/oceanbase/observer" 2>/dev/null
+            else
+                printf "[WARN] No rpm2cpio or rpm, cannot extract OceanBase RPM\n"; return 1
+            fi
             ;;
     esac
 }
