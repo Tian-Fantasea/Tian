@@ -41,7 +41,7 @@ done
 
 SELECTED=()
 EXCLUDED=()
-VERSION_OVERrides=()
+VERSION_OVERRIDES=()
 DRY_RUN=0
 VERBOSE=0
 CONTINUE_ON_ERROR=0
@@ -192,6 +192,7 @@ apply_version_overrides() {
 run_single() {
     local name="$1"
     local test_script="$(find_test_script "$name")"
+    local software_dir="${DESKTOP_DIR}/${name}"
 
     if [ -z "$test_script" ]; then
         printf "[FAIL] %s — test script not found\n" "$name"
@@ -211,15 +212,18 @@ run_single() {
     fi
 
     local start_ts="$(date +%s)"
-    local log_file="${DESKTOP_DIR}/${name}/results/install.log"
-    mkdir -p "${DESKTOP_DIR}/${name}/results"
+    local log_file="${software_dir}/results/install.log"
+    mkdir -p "${software_dir}/results"
 
     local rc=0
+    local saved_dir="$(pwd)"
+    cd "$software_dir"
     if [ "$VERBOSE" -eq 1 ]; then
         bash "$test_script" 2>&1 | tee "$log_file" || rc=$?
     else
         bash "$test_script" > "$log_file" 2>&1 || rc=$?
     fi
+    cd "$saved_dir"
 
     local end_ts="$(date +%s)"
     local duration=$((end_ts - start_ts))
@@ -444,7 +448,7 @@ run_parallel() {
             continue
         fi
 
-        bash "$test_script" > "$log_file" 2>&1 &
+        ( cd "${DESKTOP_DIR}/${name}" && bash "$test_script" > "$log_file" 2>&1 ) &
         pids+=($!)
         names+=("$name")
         logs+=("$log_file")
