@@ -227,32 +227,45 @@ def get_job_throughput(job_id, duration_sec, log_file=None):
         total_records_in = 0
 
         for vertex in job_data.get("vertices", []):
+            vm = vertex.get("metrics", {})
+            wr = vm.get("write-records", 0)
+            rr = vm.get("read-records", 0)
+            total_records_out += wr
+            total_records_in += rr
+
             vid = vertex.get("id", "")
-            metrics_url = "{}/jobs/{}/vertices/{}/metrics?get=numRecordsIn,numRecordsOut,numRecordsInPerSecond,numRecordsOutPerSecond".format(
+            metrics_url = "{}/jobs/{}/vertices/{}/metrics".format(
                 FLINK_REST_URL, job_id, vid)
             try:
                 with urllib.request.urlopen(metrics_url, timeout=5) as resp:
                     metrics = json.loads(resp.read().decode())
+                metric_names = set()
                 for m in metrics:
                     mid = m.get("id", "")
+                    metric_names.add(mid)
                     val = float(m.get("value", 0))
-                    if mid == "numRecordsOut":
+                    if mid in ("numRecordsOut", "numRecordsOutPerSecond"):
                         total_records_out += val
-                    elif mid == "numRecordsIn":
+                    elif mid in ("numRecordsIn", "numRecordsInPerSecond"):
                         total_records_in += val
-                    elif mid == "numRecordsOutPerSecond":
+                    elif mid == "numRecordsOutPerSecond" and val > 0:
                         total_records_out += val * duration_sec
-                    elif mid == "numRecordsInPerSecond":
+                    elif mid == "numRecordsInPerSecond" and val > 0:
                         total_records_in += val * duration_sec
             except Exception as e:
                 if log_file:
                     with open(log_file, "a") as f:
-                        f.write("[MICRO] Vertex metrics error: {}\n".format(str(e)))
+                        f.write("[MICRO] Vertex {} metrics error: {}\n".format(vid, str(e)))
+
+            if log_file:
+                with open(log_file, "a") as f:
+                    f.write("[MICRO] Vertex {}: write-records={}, read-records={}, available metrics: {}\n".format(
+                        vid, wr, rr, sorted(metric_names) if 'metric_names' in dir() else "N/A"))
 
         if log_file:
             with open(log_file, "a") as f:
-                f.write("[MICRO] Job {} metrics: records_in={}, records_out={}\n".format(
-                    job_id, total_records_in, total_records_out))
+                f.write("[MICRO] Job {} total: records_in={}, records_out={}, duration={}s\n".format(
+                    job_id, total_records_in, total_records_out, duration_sec))
 
         if total_records_out > 0:
             throughput = int(total_records_out / max(duration_sec, 1))
