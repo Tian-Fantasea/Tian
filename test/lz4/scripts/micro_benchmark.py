@@ -68,13 +68,13 @@ def measure_block_compress(data, iterations=1):
 
 
 def measure_block_decompress(data, iterations=1):
-    compressed = lz4.block.compress(data, mode='default', acceleration=1)
+    compressed = lz4.block.compress(data, mode='default', acceleration=1, store_size=True)
     latencies = []
     for _ in range(iterations):
         start = time.perf_counter()
-        decompressed = lz4.block.decompress(compressed, uncompressed_size=len(data))
+        decompressed = lz4.block.decompress(compressed)
         elapsed = time.perf_counter() - start
-        assert len(decompressed) == len(data), f"Decompression size mismatch"
+        assert len(decompressed) == len(data), "Decompression size mismatch"
         latencies.append(elapsed)
 
     avg = sum(latencies) / len(latencies)

@@ -46,19 +46,44 @@ class JsonHelper:
         rest = keys[1:]
         if isinstance(data, dict):
             if key in data:
-                return self._navigate(data[key], rest)
+                val = self._navigate(data[key], rest)
+                if val is not None and not isinstance(val, dict):
+                    return val
             values = []
             for sub_key, sub_val in data.items():
-                if isinstance(sub_val, dict):
+                if sub_key == 'results' and isinstance(sub_val, list):
+                    for item in sub_val:
+                        try:
+                            v = self._navigate(item, keys)
+                            if v is not None:
+                                if isinstance(v, list):
+                                    values.extend(v)
+                                elif isinstance(v, (int, float)):
+                                    values.append(v)
+                                elif isinstance(v, dict):
+                                    for dv in v.values():
+                                        if isinstance(dv, (int, float)):
+                                            values.append(dv)
+                        except (KeyError, TypeError):
+                            pass
+                elif isinstance(sub_val, dict):
                     try:
-                        val = self._navigate(sub_val, keys)
-                        if val is not None:
-                            if isinstance(val, (int, float)):
-                                values.append(val)
-                            elif isinstance(val, dict):
-                                for v in val.values():
-                                    if isinstance(v, (int, float)):
-                                        values.append(v)
+                        v = self._navigate(sub_val, keys)
+                        if v is not None:
+                            if isinstance(v, (int, float)):
+                                values.append(v)
+                            elif isinstance(v, list):
+                                for x in v:
+                                    if isinstance(x, (int, float)):
+                                        values.append(x)
+                                    elif isinstance(x, dict):
+                                        for dv in x.values():
+                                            if isinstance(dv, (int, float)):
+                                                values.append(dv)
+                            elif isinstance(v, dict):
+                                for dv in v.values():
+                                    if isinstance(dv, (int, float)):
+                                        values.append(dv)
                     except (KeyError, TypeError):
                         pass
             if values:
