@@ -96,7 +96,7 @@ jobs:
 
       - name: Checkout repo
         if: steps.auth.outputs.authorized == 'true'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
