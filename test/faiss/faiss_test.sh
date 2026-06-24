@@ -140,6 +140,7 @@ oneTimeSetUp() {
     fi
     phase2_verify || log "WARN" "Phase 2 had issues, continuing..."
     phase3_run_benchmarks || log "WARN" "Phase 3 had issues, continuing"
+    phase4_results || log "WARN" "Phase 4 had issues"
 }
 setUp() {
     rm -f "${RESULTS_DIR}/test_temp_*.json"
@@ -327,8 +328,7 @@ testAggregatedResultsContainsAllBenchmarks() {
     assertTrue "Should contain micro_benchmark data" "[ ${has_micro} -eq 1 ]"
 }
 oneTimeTearDown() {
-    phase4_results || log "WARN" "Phase 4 had issues"
-    log "DONE" "Benchmark complete. Results in: ${RESULTS_DIR}/"
+    :
 }
 usage() {
     cat <<USAGE
