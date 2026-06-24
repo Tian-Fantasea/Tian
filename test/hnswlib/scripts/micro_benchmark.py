@@ -9,6 +9,8 @@ import numpy as np
 import hnswlib
 
 SCALE_MAP = {
+    "10K": 10000,
+    "100K": 100000,
     "1M": 1000000,
     "10M": 10000000,
     "100M": 100000000,

@@ -43,6 +43,8 @@ INDEX_CONFIGS = {
 EF_SEARCH_VALUES = [10, 50, 100, 200, 500]
 
 SCALE_MAP = {
+    "10K": 10000,
+    "100K": 100000,
     "1M": 1000000,
     "10M": 10000000,
     "100M": 100000000,
@@ -66,7 +68,7 @@ def compute_ground_truth_l2(xb, xq, k):
     nq = xq.shape[0]
     nb = xb.shape[0]
     gt_I = np.zeros((nq, k), dtype=np.int64)
-    chunk = 1000
+    chunk = min(100, nq)
     for i in range(0, nq, chunk):
         end = min(i + chunk, nq)
         dists = np.sum((xq[i:end].reshape(end - i, 1, -1) - xb.reshape(1, nb, -1)) ** 2, axis=2)
