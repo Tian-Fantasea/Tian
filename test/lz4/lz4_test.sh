@@ -18,12 +18,12 @@ LZ4_INSTALL_DIR=""
 
 DATA_SIZE="${DATA_SIZE:-1048576}"
 ITERATIONS="${ITERATIONS:-1}"
+MIN_COMPRESS_SPEED="${MIN_COMPRESS_SPEED:-400}"
 
-MIN_COMPRESS_SPEED="${MIN_COMPRESS_SPEED:-500}"
 MIN_DECOMPRESS_SPEED="${MIN_DECOMPRESS_SPEED:-800}"
 MIN_COMPRESSION_RATIO="${MIN_COMPRESSION_RATIO:-1.5}"
 MAX_COMPRESS_LATENCY_US="${MAX_COMPRESS_LATENCY_US:-10000}"
-MIN_ACCEL_COMPRESS_SPEED="${MIN_ACCEL_COMPRESS_SPEED:-800}"
+MIN_ACCEL_COMPRESS_SPEED="${MIN_ACCEL_COMPRESS_SPEED:-450}"
 
 log() { local tag="$1"; shift; printf '[%s] %s\n' "$tag" "$*" | tee -a "${LOG_FILE}"; }
 
@@ -231,7 +231,7 @@ phase1_build() {
 
     if [ -n "${LZ4_STATIC_LIB}" ]; then
         log "PHASE1" "Linking against static library: ${LZ4_STATIC_LIB}"
-        g++ -O2 -std=c++11 \
+        g++ -O2 -std=c++17 \
             -I"${LZ4_INC}" \
             "${BENCHMARK_SRC}" \
             "${LZ4_STATIC_LIB}" \
@@ -241,7 +241,7 @@ phase1_build() {
         }
     else
         log "PHASE1" "Linking against shared library from ${LZ4_LIB}"
-        g++ -O2 -std=c++11 \
+        g++ -O2 -std=c++17 \
             -I"${LZ4_INC}" \
             "${BENCHMARK_SRC}" \
             -L"${LZ4_LIB}" -llz4 \

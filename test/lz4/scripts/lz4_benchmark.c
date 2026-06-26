@@ -3,6 +3,7 @@
 #include <string.h>
 #include <chrono>
 #include <ctime>
+#include <string>
 #include <vector>
 #include <thread>
 #include <lz4.h>
