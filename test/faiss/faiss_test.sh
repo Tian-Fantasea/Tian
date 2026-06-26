@@ -4,6 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOFTWARE_NAME="faiss"
 SOFTWARE_VERSION="${SOFTWARE_VERSION:-1.14.3}"
 TARGET_OS="${TARGET_OS:-openEuler 24.03 SP3}"
+TARGET_MODEL="${TARGET_MODEL:-Kunpeng-920}"
 RESULTS_DIR="${SCRIPT_DIR}/results/${SOFTWARE_VERSION}"
 BUILD_METHOD="source_build"
 LOG_FILE="${RESULTS_DIR}/results.log"
@@ -237,12 +238,12 @@ phase1_build() {
 
 phase2_verify() {
     log "PHASE2" "=== Phase 2: Collect Version Info ==="
-    local timestamp arch kernel os_name cpu_model cores mem_mb python_ver faiss_ver numpy_ver blas os_id
+    local timestamp model arch kernel os_name cpu_model cores python_ver numpy_ver
     timestamp="$(date -u '+%Y-%m-%dT%H:%M:%SZ' | tr -d '\n\t')"
+    model="${TARGET_MODEL}"
     arch="$(uname -m | tr -d '\n\t')"
     kernel="$(uname -r | tr -d '\n\t')"
     os_name="$(detect_os_name | tr -d '\n\t')"
-    os_id="$(detect_os_id | tr -d '\n\t')"
     cpu_model="$(grep 'model name' /proc/cpuinfo 2>/dev/null | head -1 | cut -d: -f2 | xargs | tr -d '\n\t')"
     if [ -z "${cpu_model}" ]; then
         local num_proc
@@ -250,15 +251,12 @@ phase2_verify() {
         cpu_model="ARM64 CPU (${num_proc} cores)"
     fi
     cores="$(nproc 2>/dev/null | tr -d '\n\t' || echo '4')"
-    mem_mb="$(free -m 2>/dev/null | awk '/^Mem:/ {print $2}' | tr -d '\n\t' || echo '0')"
     python_ver="$(python3 --version 2>&1 | tr -d '\n\t')"
-    faiss_ver="$(python3 -c 'import faiss; print(faiss.__version__)' 2>/dev/null | tr -d '\n\t' || echo 'unknown')"
     numpy_ver="$(python3 -c 'import numpy; print(numpy.__version__)' 2>/dev/null | tr -d '\n\t' || echo 'unknown')"
-    blas="$(python3 -c 'import numpy; numpy.show_config()' 2>/dev/null | grep -c 'openblas' | tr -d '\n\t' || echo '0')"
     python3 "${JSON_HELPER}" "${RESULTS_DIR}/version_info.json" write_version_info \
-        "${timestamp}" "${arch}" "${kernel}" "${os_name}" "${cpu_model}" \
-        "${cores}" "${mem_mb}" "${SOFTWARE_NAME}" "${SOFTWARE_VERSION}" \
-        "${python_ver}" "${faiss_ver}" "${numpy_ver}" "${blas}" "${cores}"
+        "${timestamp}" "${model}" "${arch}" "${kernel}" "${os_name}" "${cpu_model}" \
+        "${cores}" "${SOFTWARE_NAME}" "${SOFTWARE_VERSION}" \
+        "${python_ver}" "${numpy_ver}"
     log "PHASE2" "Version info saved (OS: ${os_name}, Build: ${BUILD_METHOD})"
 }
 

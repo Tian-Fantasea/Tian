@@ -6,7 +6,7 @@
   "version": "1.14.2",
   "architecture": "aarch64",
   "build_method": "source_build",
-  "timestamp": "2026-06-26T04:06:22Z",
+  "timestamp": "2026-06-26T04:06:56Z",
   "performance_metrics": {
     "avg_latency_ms": {
       "unit": "ms",
@@ -31,47 +31,47 @@
     "dimension": 128,
     "iterations": 1
   },
-  "avg_latency_ms": 342.83,
+  "avg_latency_ms": 311.98,
   "results": [
     {
       "test": "kmeans_clustering",
       "description": "K-means clustering on random vectors (100 centroids, 20 iters)",
-      "avg_time_s": 0.7768,
-      "avg_latency_ms": 776.8
+      "avg_time_s": 0.7291,
+      "avg_latency_ms": 729.1
     },
     {
       "test": "add_vectors_flat",
       "description": "Add vectors to IndexFlatL2 (bulk insertion throughput)",
-      "avg_time_s": 0.0378,
-      "add_rate_per_sec": 2642996.94,
-      "avg_latency_ms": 37.8
+      "avg_time_s": 0.04,
+      "add_rate_per_sec": 2502896.56,
+      "avg_latency_ms": 40.0
     },
     {
       "test": "search_single_flat",
       "description": "Single query search on IndexFlatL2 (per-query latency)",
-      "avg_latency_us": 2667.68,
-      "avg_latency_ms": 2.6677
+      "avg_latency_us": 2481.07,
+      "avg_latency_ms": 2.4811
     },
     {
       "test": "search_batch_flat",
       "description": "Batch query search on IndexFlatL2 (batch throughput)",
-      "avg_time_s": 0.6374,
-      "avg_qps": 1568.95,
-      "avg_latency_ms": 637.4
+      "avg_time_s": 0.5386,
+      "avg_qps": 1856.62,
+      "avg_latency_ms": 538.6
     },
     {
       "test": "range_search_flat",
       "description": "Range search on IndexFlatL2 (radius-based search)",
-      "avg_time_s": 0.0704,
-      "avg_qps": 1419.56,
-      "avg_latency_ms": 70.4
+      "avg_time_s": 0.0551,
+      "avg_qps": 1814.6,
+      "avg_latency_ms": 55.1
     },
     {
       "test": "pq_encoding",
       "description": "Product Quantization encoding throughput",
-      "avg_time_s": 0.5319,
-      "encode_rate_per_sec": 187998.63,
-      "avg_latency_ms": 531.9
+      "avg_time_s": 0.5066,
+      "encode_rate_per_sec": 197377.15,
+      "avg_latency_ms": 506.6
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "test_time": "2026-06-26T04:05:59Z",
+  "test_time": "2026-06-26T04:06:33Z",
   "Model": "Kunpeng-920",
   "architecture": "aarch64",
   "kernel": "6.8.0-87-generic",
@@ -7,7 +7,7 @@
   "cpu_model": "ARM64 CPU (32 cores)",
   "cpu_cores": 32,
   "software_name": "faiss",
-  "software_version": "1.14.3",
+  "software_version": "1.14.2",
   "python_version": "Python 3.12.3",
   "numpy_version": "2.5.0"
 }
