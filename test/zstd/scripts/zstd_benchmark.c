@@ -281,6 +281,9 @@ int main(int argc, char* argv[]) {
     size_t data_size = 1024 * 1024;
     if (argc >= 5) data_size = atol(argv[4]);
 
+    const char* env_version = getenv("SOFTWARE_VERSION");
+    std::string version_str = env_version ? env_version : "1.5.7";
+
     srand(42);
 
     if (mode == "compression") {
@@ -310,7 +313,7 @@ int main(int argc, char* argv[]) {
         fprintf(fp, "  \"description\": \"ZSTD compression/decompression speed across data patterns and compression levels on ARM64\",\n");
         fprintf(fp, "  \"reference\": \"https://github.com/facebook/zstd\",\n");
         fprintf(fp, "  \"software\": \"zstd\",\n");
-        fprintf(fp, "  \"version\": \"1.5.7\",\n");
+        fprintf(fp, "  \"version\": \"%s\",\n", version_str.c_str());
         fprintf(fp, "  \"architecture\": \"arm64\",\n");
         fprintf(fp, "  \"timestamp\": \"%s\",\n", get_timestamp().c_str());
         fprintf(fp, "  \"performance_metrics\": {\n");
@@ -375,7 +378,7 @@ int main(int argc, char* argv[]) {
         fprintf(fp, "  \"description\": \"ZSTD micro benchmarks: block-level compress/decompress latency and multithread scaling on ARM64\",\n");
         fprintf(fp, "  \"reference\": \"https://github.com/facebook/zstd\",\n");
         fprintf(fp, "  \"software\": \"zstd\",\n");
-        fprintf(fp, "  \"version\": \"1.5.7\",\n");
+        fprintf(fp, "  \"version\": \"%s\",\n", version_str.c_str());
         fprintf(fp, "  \"architecture\": \"arm64\",\n");
         fprintf(fp, "  \"timestamp\": \"%s\",\n", get_timestamp().c_str());
         fprintf(fp, "  \"performance_metrics\": {\n");

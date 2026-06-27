@@ -1,8 +1,8 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOFTWARE_NAME="zstd"
-SOFTWARE_VERSION="${SOFTWARE_VERSION:-1.5.7}"
+SOFTWARE_NAME="redis"
+SOFTWARE_VERSION="${SOFTWARE_VERSION:-8.6.4}"
 export SOFTWARE_VERSION
 BUILD_METHOD="source_build"
 TARGET_OS="${TARGET_OS:-openEuler 24.03 SP3}"
@@ -15,16 +15,22 @@ JSON_HELPER="${SCRIPT_DIR}/scripts/json_helper.py"
 BUILD_TMPDIR=""
 SHUNIT2_PATH=""
 BENCHMARK_BIN=""
-ZSTD_INSTALL_DIR=""
+REDIS_SERVER_BIN=""
+REDIS_CLI_BIN=""
+REDIS_PORT="${REDIS_PORT:-16379}"
+REDIS_RUNTIME_DIR=""
 
-DATA_SIZE="${DATA_SIZE:-1048576}"
+NUM_OPS="${NUM_OPS:-100000}"
+VALUE_SIZE="${VALUE_SIZE:-256}"
 ITERATIONS="${ITERATIONS:-1}"
 
-MIN_COMPRESS_SPEED="${MIN_COMPRESS_SPEED:-200}"
-MIN_DECOMPRESS_SPEED="${MIN_DECOMPRESS_SPEED:-400}"
-MIN_COMPRESSION_RATIO="${MIN_COMPRESSION_RATIO:-2.0}"
-MAX_COMPRESS_LATENCY_US="${MAX_COMPRESS_LATENCY_US:-30000}"
-MIN_LEVEL1_COMPRESS_SPEED="${MIN_LEVEL1_COMPRESS_SPEED:-400}"
+MIN_SET_OPS="${MIN_SET_OPS:-50000}"
+MIN_GET_OPS="${MIN_GET_OPS:-80000}"
+MIN_WRITE_SPEED="${MIN_WRITE_SPEED:-10}"
+MIN_READ_SPEED="${MIN_READ_SPEED:-10}"
+MAX_SET_LATENCY_US="${MAX_SET_LATENCY_US:-20}"
+MAX_GET_LATENCY_US="${MAX_GET_LATENCY_US:-15}"
+MIN_PIPELINE_OPS="${MIN_PIPELINE_OPS:-100000}"
 
 log() { local tag="$1"; shift; printf '[%s] %s\n' "$tag" "$*" | tee -a "${LOG_FILE}"; }
 
@@ -52,7 +58,7 @@ detect_os_name() {
 }
 
 create_build_tmpdir() {
-    BUILD_TMPDIR="$(mktemp -d /tmp/zstd_build_XXXXXX)"
+    BUILD_TMPDIR="$(mktemp -d /tmp/redis_build_XXXXXX)"
     log "BUILD" "Created temp build directory: ${BUILD_TMPDIR}"
 }
 
@@ -61,6 +67,54 @@ cleanup_build_tmpdir() {
         log "BUILD" "Cleaning up temp build directory: ${BUILD_TMPDIR}"
         rm -rf "${BUILD_TMPDIR}"
         BUILD_TMPDIR=""
+    fi
+}
+
+create_runtime_tmpdir() {
+    REDIS_RUNTIME_DIR="$(mktemp -d /tmp/redis_runtime_XXXXXX)"
+    log "RUNTIME" "Created runtime directory: ${REDIS_RUNTIME_DIR}"
+}
+
+cleanup_runtime_tmpdir() {
+    stop_redis_server
+    if [ -n "${REDIS_RUNTIME_DIR}" ] && [ -d "${REDIS_RUNTIME_DIR}" ]; then
+        log "RUNTIME" "Cleaning up runtime directory: ${REDIS_RUNTIME_DIR}"
+        rm -rf "${REDIS_RUNTIME_DIR}"
+        REDIS_RUNTIME_DIR=""
+    fi
+}
+
+start_redis_server() {
+    if [ -z "${REDIS_SERVER_BIN}" ] || [ ! -x "${REDIS_SERVER_BIN}" ]; then
+        log "ERROR" "redis-server binary not found"
+        return 1
+    fi
+    create_runtime_tmpdir
+    log "PHASE3" "Starting redis-server on port ${REDIS_PORT}..."
+    "${REDIS_SERVER_BIN}" \
+        --port "${REDIS_PORT}" \
+        --daemonize yes \
+        --dir "${REDIS_RUNTIME_DIR}" \
+        --logfile "${REDIS_RUNTIME_DIR}/redis.log" \
+        --save "" \
+        --appendonly no \
+        2>&1 | tee -a "${LOG_FILE}"
+    sleep 2
+    if [ -n "${REDIS_CLI_BIN}" ] && [ -x "${REDIS_CLI_BIN}" ]; then
+        "${REDIS_CLI_BIN}" -p "${REDIS_PORT}" PING 2>&1 | tee -a "${LOG_FILE}" || {
+            log "WARN" "redis-server may not have started properly"
+            sleep 2
+            "${REDIS_CLI_BIN}" -p "${REDIS_PORT}" PING 2>&1 | tee -a "${LOG_FILE}"
+        }
+    fi
+    log "PHASE3" "redis-server started on port ${REDIS_PORT}"
+}
+
+stop_redis_server() {
+    if [ -n "${REDIS_CLI_BIN}" ] && [ -x "${REDIS_CLI_BIN}" ]; then
+        log "PHASE3" "Stopping redis-server..."
+        "${REDIS_CLI_BIN}" -p "${REDIS_PORT}" SHUTDOWN NOSAVE 2>&1 | tee -a "${LOG_FILE}" || true
+        sleep 1
     fi
 }
 
@@ -109,8 +163,8 @@ check_prerequisites() {
         log "CHECK" "Python3 OK: $(python3 --version 2>&1)"
     fi
 
-    if ! command -v gcc >/dev/null 2>&1 && ! command -v g++ >/dev/null 2>&1; then
-        log "WARN" "gcc/g++ not found - will install in build phase"
+    if ! command -v gcc >/dev/null 2>&1; then
+        log "WARN" "gcc not found - will install in build phase"
     else
         log "CHECK" "GCC OK: $(gcc --version 2>&1 | head -1)"
     fi
@@ -125,6 +179,12 @@ check_prerequisites() {
         log "WARN" "git not found - will install in build phase"
     else
         log "CHECK" "Git OK: $(git --version 2>&1)"
+    fi
+
+    if ! command -v pkg-config >/dev/null 2>&1; then
+        log "WARN" "pkg-config not found - will install in build phase"
+    else
+        log "CHECK" "pkg-config OK"
     fi
 
     if [ ! -f "${JSON_HELPER}" ]; then
@@ -145,110 +205,150 @@ check_prerequisites() {
 }
 
 phase1_build() {
-    log "PHASE1" "=== Phase 1: Source Build ZSTD v${SOFTWARE_VERSION} ==="
+    log "PHASE1" "=== Phase 1: Source Build Redis v${SOFTWARE_VERSION} ==="
 
     create_build_tmpdir
 
-    local ZSTD_SRC_DIR="${BUILD_TMPDIR}/zstd_src"
-    ZSTD_INSTALL_DIR="${BUILD_TMPDIR}/install"
+    local REDIS_SRC_DIR="${BUILD_TMPDIR}/redis_src"
+    local REDIS_INSTALL_DIR="${BUILD_TMPDIR}/install"
 
     local os_id
     os_id="$(detect_os_id)"
-    log "PHASE1" "Building ZSTD from source on ${os_id}..."
+    log "PHASE1" "Building Redis from source on ${os_id}..."
 
     case "${os_id}" in
         ubuntu|debian)
             log "PHASE1" "Installing build dependencies (Ubuntu/Debian)..."
             sudo apt-get update -qq 2>&1 | tee -a "${LOG_FILE}"
-            sudo apt-get install -y -qq build-essential gcc g++ make \
+            sudo apt-get install -y -qq build-essential gcc make pkg-config \
                 git wget curl 2>&1 | tee -a "${LOG_FILE}"
             ;;
         openeuler)
             log "PHASE1" "Installing build dependencies (openEuler 24.03 SP3)..."
-            sudo dnf install -y gcc gcc-c++ make git wget curl 2>&1 | tee -a "${LOG_FILE}"
+            sudo dnf install -y gcc gcc-c++ make pkg-config \
+                git wget curl 2>&1 | tee -a "${LOG_FILE}"
             ;;
         centos|rhel|fedora)
             log "PHASE1" "Installing build dependencies (RHEL-family)..."
-            sudo dnf install -y gcc gcc-c++ make git wget curl 2>&1 | tee -a "${LOG_FILE}"
+            sudo dnf install -y gcc gcc-c++ make pkg-config \
+                git wget curl 2>&1 | tee -a "${LOG_FILE}"
             ;;
         *)
             log "WARN" "Unknown OS: ${os_id}, attempting generic build..."
             ;;
     esac
 
-    log "PHASE1" "Cloning ZSTD v${SOFTWARE_VERSION}..."
-    git clone --branch v${SOFTWARE_VERSION} --depth 1 \
-        https://github.com/facebook/zstd.git \
-        "${ZSTD_SRC_DIR}" 2>&1 | tee -a "${LOG_FILE}" || {
-        log "ERROR" "Failed to clone ZSTD"
-        return 1
-    }
-
-    log "PHASE1" "Compiling ZSTD (make)..."
-    (cd "${ZSTD_SRC_DIR}" && make -j$(nproc) 2>&1 | tee -a "${LOG_FILE}") || {
-        log "ERROR" "ZSTD compilation failed"
-        return 1
-    }
-
-    log "PHASE1" "Installing ZSTD..."
-    (cd "${ZSTD_SRC_DIR}" && make install PREFIX="${ZSTD_INSTALL_DIR}" 2>&1 | tee -a "${LOG_FILE}") || {
-        log "WARN" "make install with PREFIX failed, trying system install..."
-        (cd "${ZSTD_SRC_DIR}" && sudo make install 2>&1 | tee -a "${LOG_FILE}") || {
-            log "WARN" "System install also failed, continuing..."
-        }
-        ZSTD_INSTALL_DIR="/usr/local"
-    }
-
-    local zstd_lib_dir="${ZSTD_INSTALL_DIR}/lib"
-    if [ ! -d "${zstd_lib_dir}" ]; then zstd_lib_dir="${ZSTD_INSTALL_DIR}/lib64"; fi
-    if [ ! -f "${zstd_lib_dir}/libzstd.a" ] && [ ! -f "${zstd_lib_dir}/libzstd.so" ]; then
-        log "PHASE1" "Library not found in install dir, checking /usr/local..."
-        if [ -f "/usr/local/lib/libzstd.a" ] || [ -f "/usr/local/lib/libzstd.so" ] || \
-           [ -f "/usr/local/lib64/libzstd.a" ] || [ -f "/usr/local/lib64/libzstd.so" ]; then
-            ZSTD_INSTALL_DIR="/usr/local"
-            log "PHASE1" "Using system-installed ZSTD at /usr/local"
-        else
-            log "ERROR" "ZSTD library not found after build"
+    log "PHASE1" "Cloning Redis v${SOFTWARE_VERSION}..."
+    local tag_name="${SOFTWARE_VERSION}"
+    git clone --branch "${tag_name}" --depth 1 \
+        https://github.com/redis/redis.git \
+        "${REDIS_SRC_DIR}" 2>&1 | tee -a "${LOG_FILE}" || {
+        log "WARN" "Tag '${tag_name}' not found, trying 'v${SOFTWARE_VERSION}'..."
+        rm -rf "${REDIS_SRC_DIR}"
+        git clone --branch "v${SOFTWARE_VERSION}" --depth 1 \
+            https://github.com/redis/redis.git \
+            "${REDIS_SRC_DIR}" 2>&1 | tee -a "${LOG_FILE}" || {
+            log "ERROR" "Failed to clone Redis (tried tags '${tag_name}' and 'v${SOFTWARE_VERSION}')"
             return 1
-        fi
+        }
+    }
+
+    log "PHASE1" "Compiling Redis (make)..."
+    (cd "${REDIS_SRC_DIR}" && make -j$(nproc) 2>&1 | tee -a "${LOG_FILE}") || {
+        log "ERROR" "Redis compilation failed"
+        return 1
+    }
+
+    log "PHASE1" "Installing Redis..."
+    (cd "${REDIS_SRC_DIR}" && make install PREFIX="${REDIS_INSTALL_DIR}" 2>&1 | tee -a "${LOG_FILE}") || {
+        log "WARN" "make install to prefix failed, trying system install..."
+        (cd "${REDIS_SRC_DIR}" && sudo make install 2>&1 | tee -a "${LOG_FILE}") || {
+            log "WARN" "System install also failed"
+        }
+    }
+
+    REDIS_SERVER_BIN="${REDIS_INSTALL_DIR}/bin/redis-server"
+    REDIS_CLI_BIN="${REDIS_INSTALL_DIR}/bin/redis-cli"
+
+    if [ ! -x "${REDIS_SERVER_BIN}" ]; then
+        log "PHASE1" "redis-server not in install dir, checking system paths..."
+        for p in /usr/local/bin/redis-server /usr/bin/redis-server; do
+            if [ -x "${p}" ]; then
+                REDIS_SERVER_BIN="${p}"
+                log "PHASE1" "Found redis-server at ${p}"
+                break
+            fi
+        done
     fi
+    if [ ! -x "${REDIS_CLI_BIN}" ]; then
+        for p in /usr/local/bin/redis-cli /usr/bin/redis-cli; do
+            if [ -x "${p}" ]; then
+                REDIS_CLI_BIN="${p}"
+                log "PHASE1" "Found redis-cli at ${p}"
+                break
+            fi
+        done
+    fi
+
+    if [ ! -x "${REDIS_SERVER_BIN}" ]; then
+        log "ERROR" "redis-server binary not found after build"
+        return 1
+    fi
+    log "PHASE1" "redis-server: ${REDIS_SERVER_BIN}"
+    log "PHASE1" "redis-cli: ${REDIS_CLI_BIN}"
 
     log "PHASE1" "Compiling benchmark program..."
-    local BENCHMARK_SRC="${SCRIPT_DIR}/scripts/zstd_benchmark.c"
-    BENCHMARK_BIN="${BUILD_TMPDIR}/zstd_benchmark"
+    local BENCHMARK_SRC="${SCRIPT_DIR}/scripts/redis_benchmark.c"
+    BENCHMARK_BIN="${BUILD_TMPDIR}/redis_benchmark"
 
-    local ZSTD_INC="${ZSTD_INSTALL_DIR}/include"
-    local ZSTD_LIB="${ZSTD_INSTALL_DIR}/lib"
-    if [ ! -d "${ZSTD_LIB}" ]; then ZSTD_LIB="${ZSTD_INSTALL_DIR}/lib64"; fi
+    local HIREDIS_INC="${REDIS_SRC_DIR}/deps/hiredis"
+    local HIREDIS_LIB=""
+    for d in "${REDIS_SRC_DIR}/deps/hiredis" \
+             "${REDIS_INSTALL_DIR}/lib" "${REDIS_INSTALL_DIR}/lib64" \
+             /usr/local/lib /usr/local/lib64 /usr/lib /usr/lib64; do
+        if [ -f "${d}/libhiredis.a" ]; then
+            HIREDIS_LIB="${d}/libhiredis.a"
+            break
+        fi
+        if [ -f "${d}/libhiredis.so" ] || [ -f "${d}/libhiredis.so.1" ]; then
+            HIREDIS_LIB="${d}"
+            break
+        fi
+    done
 
-    local ZSTD_STATIC_LIB=""
-    if [ -f "${ZSTD_LIB}/libzstd.a" ]; then
-        ZSTD_STATIC_LIB="${ZSTD_LIB}/libzstd.a"
-    elif [ -f "/usr/local/lib/libzstd.a" ]; then
-        ZSTD_STATIC_LIB="/usr/local/lib/libzstd.a"
-    elif [ -f "/usr/lib/libzstd.a" ]; then
-        ZSTD_STATIC_LIB="/usr/lib/libzstd.a"
-    elif [ -f "/usr/lib64/libzstd.a" ]; then
-        ZSTD_STATIC_LIB="/usr/lib64/libzstd.a"
+    if [ -z "${HIREDIS_LIB}" ]; then
+        log "PHASE1" "hiredis library not found in expected paths, building from Redis deps..."
+        (cd "${REDIS_SRC_DIR}/deps/hiredis" && make static 2>&1 | tee -a "${LOG_FILE}") || {
+            log "WARN" "hiredis static build failed, trying shared..."
+            (cd "${REDIS_SRC_DIR}/deps/hiredis" && make 2>&1 | tee -a "${LOG_FILE}") || {
+                log "ERROR" "Failed to build hiredis"
+                return 1
+            }
+        }
+        HIREDIS_LIB="${REDIS_SRC_DIR}/deps/hiredis/libhiredis.a"
     fi
 
-    if [ -n "${ZSTD_STATIC_LIB}" ]; then
-        log "PHASE1" "Linking against static library: ${ZSTD_STATIC_LIB}"
-        g++ -O2 -std=c++11 \
-            -I"${ZSTD_INC}" \
+    log "PHASE1" "hiredis: inc=${HIREDIS_INC}, lib=${HIREDIS_LIB}"
+
+    if [ -f "${HIREDIS_LIB}" ] && [[ "${HIREDIS_LIB}" == *.a ]]; then
+        log "PHASE1" "Linking with static libhiredis: ${HIREDIS_LIB}"
+        gcc -O2 -std=c11 \
+            -I"${HIREDIS_INC}" \
             "${BENCHMARK_SRC}" \
-            "${ZSTD_STATIC_LIB}" \
+            "${HIREDIS_LIB}" \
+            -lm -lpthread \
             -o "${BENCHMARK_BIN}" 2>&1 | tee -a "${LOG_FILE}" || {
-            log "ERROR" "Benchmark compilation (static) failed"
+            log "ERROR" "Benchmark compilation failed"
             return 1
         }
     else
-        log "PHASE1" "Linking against shared library from ${ZSTD_LIB}"
-        g++ -O2 -std=c++11 \
-            -I"${ZSTD_INC}" \
+        log "PHASE1" "Linking with shared libhiredis from ${HIREDIS_LIB}"
+        gcc -O2 -std=c11 \
+            -I"${HIREDIS_INC}" \
             "${BENCHMARK_SRC}" \
-            -L"${ZSTD_LIB}" -lzstd \
-            -Wl,-rpath,"${ZSTD_LIB}" \
+            -L"${HIREDIS_LIB}" -lhiredis \
+            -lm -lpthread \
+            -Wl,-rpath,"${HIREDIS_LIB}" \
             -o "${BENCHMARK_BIN}" 2>&1 | tee -a "${LOG_FILE}" || {
             log "ERROR" "Benchmark compilation (shared) failed"
             return 1
@@ -257,21 +357,14 @@ phase1_build() {
 
     log "PHASE1" "Verifying benchmark binary..."
     if [ -x "${BENCHMARK_BIN}" ]; then
-        "${BENCHMARK_BIN}" compression 1 "${BUILD_TMPDIR}/test_verify.json" 1024 2>&1 | tee -a "${LOG_FILE}" || {
-            log "WARN" "Benchmark verification run failed"
-        }
-        if [ -f "${BUILD_TMPDIR}/test_verify.json" ]; then
-            log "PHASE1" "Benchmark binary verified successfully"
-            rm -f "${BUILD_TMPDIR}/test_verify.json"
-        else
-            log "WARN" "Benchmark verification output not found, but continuing..."
-        fi
+        "${BENCHMARK_BIN}" --help 2>&1 | head -5 | tee -a "${LOG_FILE}" || true
+        log "PHASE1" "Benchmark binary verified successfully"
     else
         log "ERROR" "Benchmark binary not executable"
         return 1
     fi
 
-    log "PHASE1" "ZSTD source build and benchmark compilation complete"
+    log "PHASE1" "Redis source build and benchmark compilation complete"
 }
 
 phase2_verify() {
@@ -303,18 +396,30 @@ phase3_run_benchmarks() {
     log "PHASE3" "=== Phase 3: Run Benchmarks ==="
     mkdir -p "${RESULTS_DIR}"
 
-    log "PHASE3A" "Running compression benchmark..."
-    python3 "${SCRIPT_DIR}/scripts/benchmark_compression.py" \
+    start_redis_server || {
+        log "ERROR" "Failed to start redis-server"
+        return 1
+    }
+
+    log "PHASE3A" "Running KV store benchmark..."
+    python3 "${SCRIPT_DIR}/scripts/benchmark_kv.py" \
         "${BENCHMARK_BIN}" \
-        "${RESULTS_DIR}/benchmark_compression.json" \
-        "${DATA_SIZE}" \
-        "${ITERATIONS}" 2>&1 | tee -a "${LOG_FILE}" || log "WARN" "Compression benchmark had issues"
+        "${RESULTS_DIR}/benchmark_kv.json" \
+        "${NUM_OPS}" \
+        "${VALUE_SIZE}" \
+        "${ITERATIONS}" \
+        "${REDIS_PORT}" 2>&1 | tee -a "${LOG_FILE}" || log "WARN" "KV benchmark had issues"
 
     log "PHASE3B" "Running micro benchmark..."
     python3 "${SCRIPT_DIR}/scripts/micro_benchmark.py" \
         "${BENCHMARK_BIN}" \
         "${RESULTS_DIR}/micro_benchmark.json" \
-        "${ITERATIONS}" 2>&1 | tee -a "${LOG_FILE}" || log "WARN" "Micro benchmark had issues"
+        "${NUM_OPS}" \
+        "${VALUE_SIZE}" \
+        "${ITERATIONS}" \
+        "${REDIS_PORT}" 2>&1 | tee -a "${LOG_FILE}" || log "WARN" "Micro benchmark had issues"
+
+    stop_redis_server
 }
 
 phase4_results() {
@@ -348,6 +453,7 @@ oneTimeSetUp() {
 }
 
 oneTimeTearDown() {
+    cleanup_runtime_tmpdir
     cleanup_build_tmpdir
     if [ -n "${SHUNIT2_PATH}" ]; then
         local shunit2_dir="$(dirname "${SHUNIT2_PATH}")"
@@ -373,20 +479,18 @@ testArchitectureIsARM64() {
 
 testSoftwareIsInstalled() {
     local found=0
-    if [ -f "/usr/local/lib/libzstd.so" ] || [ -f "/usr/local/lib/libzstd.a" ]; then found=1; fi
-    if [ -f "/usr/lib/libzstd.so" ] || [ -f "/usr/lib/libzstd.a" ]; then found=1; fi
-    if [ -f "/usr/lib64/libzstd.so" ] || [ -f "/usr/lib64/libzstd.a" ]; then found=1; fi
-    if [ -n "${ZSTD_INSTALL_DIR}" ]; then
-        local zstd_lib="${ZSTD_INSTALL_DIR}/lib"
-        if [ ! -d "${zstd_lib}" ]; then zstd_lib="${ZSTD_INSTALL_DIR}/lib64"; fi
-        if [ -f "${zstd_lib}/libzstd.so" ] || [ -f "${zstd_lib}/libzstd.a" ]; then found=1; fi
+    if [ -x "${REDIS_SERVER_BIN}" ]; then found=1; fi
+    if [ "${found}" -eq 0 ]; then
+        for p in /usr/local/bin/redis-server /usr/bin/redis-server; do
+            if [ -x "${p}" ]; then found=1; break; fi
+        done
     fi
     if [ "${found}" -eq 0 ]; then
-        echo "WARNING: ZSTD library not found, skipping install check"
+        echo "WARNING: redis-server not found, skipping install check"
         startSkipping
         return
     fi
-    assertTrue "ZSTD library should exist" "[ ${found} -eq 1 ]"
+    assertTrue "redis-server should exist" "[ ${found} -eq 1 ]"
 }
 
 testSoftwareVersionMatches() {
@@ -425,11 +529,11 @@ testVersionInfoHasSoftwareVersion() {
 }
 
 testBenchmarkPrimaryProducesResults() {
-    assertTrue "Compression benchmark JSON should exist" "[ -f '${RESULTS_DIR}/benchmark_compression.json' ]"
+    assertTrue "KV benchmark JSON should exist" "[ -f '${RESULTS_DIR}/benchmark_kv.json' ]"
 }
 
 testBenchmarkPrimaryHasRequiredFields() {
-    local bench_file="${RESULTS_DIR}/benchmark_compression.json"
+    local bench_file="${RESULTS_DIR}/benchmark_kv.json"
     if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
     local has_benchmark has_metrics has_results
     has_benchmark="$(json_contains "${bench_file}" benchmark)"
@@ -440,86 +544,68 @@ testBenchmarkPrimaryHasRequiredFields() {
     assertTrue "Should have results_summary field" "[ ${has_results} -eq 1 ]"
 }
 
-testBenchmarkPrimaryCompressionSpeedAboveThreshold() {
-    local bench_file="${RESULTS_DIR}/benchmark_compression.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
-    local text_compress_speed
-    text_compress_speed="$(json_get "${bench_file}" results_summary text_data compress_speed_mbs)"
-    if [ "${text_compress_speed}" = "NULL" ] || [ -z "${text_compress_speed}" ]; then
-        startSkipping
-        return
-    fi
-    echo "[DIAG] Text compress speed (level 3): ${text_compress_speed} MB/s (threshold: ${MIN_COMPRESS_SPEED})"
-    assertTrue "Text compress speed (${text_compress_speed}) should be >= ${MIN_COMPRESS_SPEED} MB/s" \
-        "[ $(echo "${text_compress_speed} >= ${MIN_COMPRESS_SPEED}" | bc -l) -eq 1 ]"
-}
-
-testBenchmarkPrimaryDecompressSpeedAboveThreshold() {
-    local bench_file="${RESULTS_DIR}/benchmark_compression.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
-    local text_decompress_speed
-    text_decompress_speed="$(json_get "${bench_file}" results_summary text_data decompress_speed_mbs)"
-    if [ "${text_decompress_speed}" = "NULL" ] || [ -z "${text_decompress_speed}" ]; then
-        startSkipping
-        return
-    fi
-    echo "[DIAG] Text decompress speed (level 3): ${text_decompress_speed} MB/s (threshold: ${MIN_DECOMPRESS_SPEED})"
-    assertTrue "Text decompress speed (${text_decompress_speed}) should be >= ${MIN_DECOMPRESS_SPEED} MB/s" \
-        "[ $(echo "${text_decompress_speed} >= ${MIN_DECOMPRESS_SPEED}" | bc -l) -eq 1 ]"
-}
-
-testBenchmarkPrimaryCompressionRatioAboveThreshold() {
-    local bench_file="${RESULTS_DIR}/benchmark_compression.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
-    local text_ratio
-    text_ratio="$(json_get "${bench_file}" results_summary text_data compression_ratio)"
-    if [ "${text_ratio}" = "NULL" ] || [ -z "${text_ratio}" ]; then
-        startSkipping
-        return
-    fi
-    echo "[DIAG] Text compression ratio (level 3): ${text_ratio} (threshold: ${MIN_COMPRESSION_RATIO})"
-    assertTrue "Text compression ratio (${text_ratio}) should be >= ${MIN_COMPRESSION_RATIO}" \
-        "[ $(echo "${text_ratio} >= ${MIN_COMPRESSION_RATIO}" | bc -l) -eq 1 ]"
-}
-
-testBenchmarkPrimaryIsCompression() {
-    local bench_file="${RESULTS_DIR}/benchmark_compression.json"
+testBenchmarkPrimaryIsKV() {
+    local bench_file="${RESULTS_DIR}/benchmark_kv.json"
     if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
     local bench_name
     bench_name="$(json_get "${bench_file}" benchmark)"
-    assertEquals "Benchmark name should be compression" "compression" "${bench_name}"
+    assertEquals "Benchmark name should be kv_store" "kv_store" "${bench_name}"
 }
 
-testBenchmarkPrimaryLevelSweepExists() {
-    local bench_file="${RESULTS_DIR}/benchmark_compression.json"
+testBenchmarkPrimarySetOpsAboveThreshold() {
+    local bench_file="${RESULTS_DIR}/benchmark_kv.json"
     if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
-    local has_level_sweep
-    has_level_sweep="$(json_contains "${bench_file}" level_sweep)"
-    assertTrue "Should have level_sweep results" "[ ${has_level_sweep} -eq 1 ]"
-}
-
-testBenchmarkPrimaryLevel1SpeedAboveThreshold() {
-    local bench_file="${RESULTS_DIR}/benchmark_compression.json"
-    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
-    local level1_speed
-    level1_speed="$(json_get "${bench_file}" level_sweep 1 compress_speed_mbs)"
-    if [ "${level1_speed}" = "NULL" ] || [ -z "${level1_speed}" ]; then
+    local set_ops
+    set_ops="$(json_get "${bench_file}" results_summary set_only total_ops_per_sec)"
+    if [ "${set_ops}" = "NULL" ] || [ -z "${set_ops}" ]; then
         startSkipping
         return
     fi
-    echo "[DIAG] Level 1 compress speed: ${level1_speed} MB/s (threshold: ${MIN_LEVEL1_COMPRESS_SPEED})"
-    assertTrue "Level 1 compress speed (${level1_speed}) should be >= ${MIN_LEVEL1_COMPRESS_SPEED} MB/s" \
-        "[ $(echo "${level1_speed} >= ${MIN_LEVEL1_COMPRESS_SPEED}" | bc -l) -eq 1 ]"
+    echo "[DIAG] SET-only ops/s: ${set_ops} (threshold: ${MIN_SET_OPS})"
+    assertTrue "SET-only ops/s (${set_ops}) should be >= ${MIN_SET_OPS}" \
+        "[ $(echo "${set_ops} >= ${MIN_SET_OPS}" | bc -l) -eq 1 ]"
 }
 
-testBenchmarkPrimaryLevelSweepCoversRange() {
-    local bench_file="${RESULTS_DIR}/benchmark_compression.json"
+testBenchmarkPrimaryGetOpsAboveThreshold() {
+    local bench_file="${RESULTS_DIR}/benchmark_kv.json"
     if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
-    local has_low has_high
-    has_low="$(json_contains "${bench_file}" 1)"
-    has_high="$(json_contains "${bench_file}" 22)"
-    assertTrue "Should have level 1 data" "[ ${has_low} -eq 1 ]"
-    assertTrue "Should have level 22 data" "[ ${has_high} -eq 1 ]"
+    local get_ops
+    get_ops="$(json_get "${bench_file}" results_summary get_only total_ops_per_sec)"
+    if [ "${get_ops}" = "NULL" ] || [ -z "${get_ops}" ]; then
+        startSkipping
+        return
+    fi
+    echo "[DIAG] GET-only ops/s: ${get_ops} (threshold: ${MIN_GET_OPS})"
+    assertTrue "GET-only ops/s (${get_ops}) should be >= ${MIN_GET_OPS}" \
+        "[ $(echo "${get_ops} >= ${MIN_GET_OPS}" | bc -l) -eq 1 ]"
+}
+
+testBenchmarkPrimaryWriteSpeedAboveThreshold() {
+    local bench_file="${RESULTS_DIR}/benchmark_kv.json"
+    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
+    local write_mbs
+    write_mbs="$(json_get "${bench_file}" results_summary set_only write_speed_mbs)"
+    if [ "${write_mbs}" = "NULL" ] || [ -z "${write_mbs}" ]; then
+        startSkipping
+        return
+    fi
+    echo "[DIAG] SET-only MB/s: ${write_mbs} (threshold: ${MIN_WRITE_SPEED})"
+    assertTrue "SET MB/s (${write_mbs}) should be >= ${MIN_WRITE_SPEED}" \
+        "[ $(echo "${write_mbs} >= ${MIN_WRITE_SPEED}" | bc -l) -eq 1 ]"
+}
+
+testBenchmarkPrimaryReadSpeedAboveThreshold() {
+    local bench_file="${RESULTS_DIR}/benchmark_kv.json"
+    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
+    local read_mbs
+    read_mbs="$(json_get "${bench_file}" results_summary get_only read_speed_mbs)"
+    if [ "${read_mbs}" = "NULL" ] || [ -z "${read_mbs}" ]; then
+        startSkipping
+        return
+    fi
+    echo "[DIAG] GET-only MB/s: ${read_mbs} (threshold: ${MIN_READ_SPEED})"
+    assertTrue "GET MB/s (${read_mbs}) should be >= ${MIN_READ_SPEED}" \
+        "[ $(echo "${read_mbs} >= ${MIN_READ_SPEED}" | bc -l) -eq 1 ]"
 }
 
 testBenchmarkMicroProducesResults() {
@@ -546,18 +632,46 @@ testBenchmarkMicroAllOperationsCompleted() {
     assertTrue "Should have micro benchmark results (count=${ops_count})" "[ ${ops_count} -ge 2 ]"
 }
 
-testBenchmarkMicroBlockLatencyBelowThreshold() {
+testBenchmarkMicroSetLatencyBelowThreshold() {
     local bench_file="${RESULTS_DIR}/micro_benchmark.json"
     if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
-    local latency
-    latency="$(json_get "${bench_file}" results block_compress_decompress 65536 compress_latency_us)"
-    if [ "${latency}" = "NULL" ] || [ -z "${latency}" ]; then
+    local set_latency
+    set_latency="$(json_get "${bench_file}" results single_commands SET latency_us)"
+    if [ "${set_latency}" = "NULL" ] || [ -z "${set_latency}" ]; then
         startSkipping
         return
     fi
-    echo "[DIAG] 64KB block compress latency: ${latency} us (threshold: ${MAX_COMPRESS_LATENCY_US})"
-    assertTrue "64KB block compress latency (${latency}us) should be <= ${MAX_COMPRESS_LATENCY_US}us" \
-        "[ $(echo "${latency} <= ${MAX_COMPRESS_LATENCY_US}" | bc -l) -eq 1 ]"
+    echo "[DIAG] SET latency: ${set_latency} us (threshold: ${MAX_SET_LATENCY_US})"
+    assertTrue "SET latency (${set_latency}us) should be <= ${MAX_SET_LATENCY_US}us" \
+        "[ $(echo "${set_latency} <= ${MAX_SET_LATENCY_US}" | bc -l) -eq 1 ]"
+}
+
+testBenchmarkMicroGetLatencyBelowThreshold() {
+    local bench_file="${RESULTS_DIR}/micro_benchmark.json"
+    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
+    local get_latency
+    get_latency="$(json_get "${bench_file}" results single_commands GET latency_us)"
+    if [ "${get_latency}" = "NULL" ] || [ -z "${get_latency}" ]; then
+        startSkipping
+        return
+    fi
+    echo "[DIAG] GET latency: ${get_latency} us (threshold: ${MAX_GET_LATENCY_US})"
+    assertTrue "GET latency (${get_latency}us) should be <= ${MAX_GET_LATENCY_US}us" \
+        "[ $(echo "${get_latency} <= ${MAX_GET_LATENCY_US}" | bc -l) -eq 1 ]"
+}
+
+testBenchmarkMicroPipelineThroughputAboveThreshold() {
+    local bench_file="${RESULTS_DIR}/micro_benchmark.json"
+    if [ ! -f "${bench_file}" ]; then startSkipping; return; fi
+    local pipeline_ops
+    pipeline_ops="$(json_get "${bench_file}" results pipeline pipeline_100 ops_per_sec)"
+    if [ "${pipeline_ops}" = "NULL" ] || [ -z "${pipeline_ops}" ]; then
+        startSkipping
+        return
+    fi
+    echo "[DIAG] Pipeline-100 ops/s: ${pipeline_ops} (threshold: ${MIN_PIPELINE_OPS})"
+    assertTrue "Pipeline-100 ops/s (${pipeline_ops}) should be >= ${MIN_PIPELINE_OPS}" \
+        "[ $(echo "${pipeline_ops} >= ${MIN_PIPELINE_OPS}" | bc -l) -eq 1 ]"
 }
 
 testBenchmarkMicroMultithreadScaling() {
@@ -586,35 +700,36 @@ testAggregatedResultsContainsAllBenchmarks() {
     local has_primary has_micro
     has_primary="$(json_contains "${agg_file}" primary_benchmark)"
     has_micro="$(json_contains "${agg_file}" micro)"
-    assertTrue "Should contain primary_benchmark (compression) data" "[ ${has_primary} -eq 1 ]"
+    assertTrue "Should contain primary_benchmark (KV) data" "[ ${has_primary} -eq 1 ]"
     assertTrue "Should contain micro_benchmark data" "[ ${has_micro} -eq 1 ]"
 }
 
 usage() {
     cat <<USAGE
 Usage: $(basename "$0") [OPTIONS]
-ZSTD Source Build & Performance Benchmark (shUnit2)
+Redis Source Build & Performance Benchmark (shUnit2)
 Options:
   --check    Check prerequisites only (do not run benchmarks)
   -h|--help  Show this help
 Environment variables:
-  SOFTWARE_VERSION              ZSTD version (default: 1.5.7)
-  TARGET_OS                    OS name in results (default: openEuler 24.03 SP3)
-  TARGET_MODEL                 Hardware model (default: Kunpeng-920)
-  DATA_SIZE                    Data size in bytes (default: 1048576 = 1MB)
-  ITERATIONS                   Number of iterations (default: 1)
-  MIN_COMPRESS_SPEED           Minimum compress speed MB/s at level 3 (default: 200)
-  MIN_DECOMPRESS_SPEED         Minimum decompress speed MB/s at level 3 (default: 400)
-  MIN_COMPRESSION_RATIO        Minimum compression ratio at level 3 (default: 2.0)
-  MAX_COMPRESS_LATENCY_US      Maximum compress latency us (default: 30000)
-  MIN_LEVEL1_COMPRESS_SPEED    Minimum level-1 compress speed MB/s (default: 400)
+  SOFTWARE_VERSION         Redis version (default: 8.6.4)
+  TARGET_OS               OS name in results (default: openEuler 24.03 SP3)
+  TARGET_MODEL            Hardware model (default: Kunpeng-920)
+  REDIS_PORT              Redis server port for benchmarks (default: 16379)
+  NUM_OPS                 Number of operations (default: 100000)
+  VALUE_SIZE              Value size in bytes (default: 256)
+  ITERATIONS              Number of iterations (default: 1)
+  MIN_SET_OPS             Minimum SET ops/s threshold (default: 50000)
+  MIN_GET_OPS             Minimum GET ops/s threshold (default: 80000)
+  MIN_WRITE_SPEED         Minimum write MB/s threshold (default: 10)
+  MIN_READ_SPEED          Minimum read MB/s threshold (default: 10)
+  MAX_SET_LATENCY_US      Maximum SET latency us (default: 20)
+  MAX_GET_LATENCY_US      Maximum GET latency us (default: 15)
+  MIN_PIPELINE_OPS        Minimum pipeline ops/s threshold (default: 100000)
 Examples:
-  # Check prerequisites
-  ./zstd_test.sh --check
-  # Full run
-  ./zstd_test.sh
-  # Custom params
-  DATA_SIZE=1048576 ITERATIONS=3 ./zstd_test.sh
+  ./redis_test.sh --check
+  ./redis_test.sh
+  NUM_OPS=500000 VALUE_SIZE=512 ./redis_test.sh
 USAGE
 }
 
