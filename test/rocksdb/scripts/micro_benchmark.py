@@ -5,8 +5,8 @@ import os
 import json
 
 
-def run_micro_benchmark(benchmark_bin, output_file, num_ops, value_size, iterations):
-    cmd = [benchmark_bin, "micro", str(iterations), output_file, str(num_ops), str(value_size)]
+def run_micro_benchmark(benchmark_bin, output_file, num_ops, value_size, iterations, version="unknown"):
+    cmd = [benchmark_bin, "micro", str(iterations), output_file, str(num_ops), str(value_size), version]
     print(f"[BENCHMARK_MICRO] Running: {' '.join(cmd)}")
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
@@ -18,7 +18,7 @@ def run_micro_benchmark(benchmark_bin, output_file, num_ops, value_size, iterati
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: micro_benchmark.py <benchmark_bin> <output_file> [num_ops] [value_size] [iterations]")
+        print("Usage: micro_benchmark.py <benchmark_bin> <output_file> [num_ops] [value_size] [iterations] [version]")
         sys.exit(1)
 
     benchmark_bin = sys.argv[1]
@@ -26,12 +26,13 @@ def main():
     num_ops = int(sys.argv[3]) if len(sys.argv) >= 4 else 10000
     value_size = int(sys.argv[4]) if len(sys.argv) >= 5 else 256
     iterations = int(sys.argv[5]) if len(sys.argv) >= 6 else 1
+    version = sys.argv[6] if len(sys.argv) >= 7 else "unknown"
 
     if not os.path.exists(benchmark_bin):
         print(f"[BENCHMARK_MICRO] Benchmark binary not found: {benchmark_bin}")
         sys.exit(1)
 
-    success = run_micro_benchmark(benchmark_bin, output_file, num_ops, value_size, iterations)
+    success = run_micro_benchmark(benchmark_bin, output_file, num_ops, value_size, iterations, version)
 
     if success and os.path.exists(output_file):
         try:

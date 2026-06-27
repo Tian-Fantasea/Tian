@@ -344,6 +344,9 @@ int main(int argc, char* argv[]) {
     if (argc >= 5) num_ops = atoi(argv[4]);
     if (argc >= 6) value_size = atol(argv[5]);
 
+    const char* env_version = getenv("SOFTWARE_VERSION");
+    std::string version_str = env_version ? env_version : "11.1.2";
+
     srand(42);
 
     if (mode == "kv") {
@@ -374,7 +377,7 @@ int main(int argc, char* argv[]) {
         fprintf(fp, "  \"description\": \"RocksDB key-value store throughput across workload patterns on ARM64\",\n");
         fprintf(fp, "  \"reference\": \"https://github.com/facebook/rocksdb\",\n");
         fprintf(fp, "  \"software\": \"rocksdb\",\n");
-        fprintf(fp, "  \"version\": \"11.1.2\",\n");
+        fprintf(fp, "  \"version\": \"%s\",\n", version_str.c_str());
         fprintf(fp, "  \"architecture\": \"arm64\",\n");
         fprintf(fp, "  \"timestamp\": \"%s\",\n", get_timestamp().c_str());
         fprintf(fp, "  \"performance_metrics\": {\n");
@@ -426,7 +429,7 @@ int main(int argc, char* argv[]) {
         fprintf(fp, "  \"description\": \"RocksDB micro benchmarks: single-op latency, batch, iterator, multithread on ARM64\",\n");
         fprintf(fp, "  \"reference\": \"https://github.com/facebook/rocksdb\",\n");
         fprintf(fp, "  \"software\": \"rocksdb\",\n");
-        fprintf(fp, "  \"version\": \"11.1.2\",\n");
+        fprintf(fp, "  \"version\": \"%s\",\n", version_str.c_str());
         fprintf(fp, "  \"architecture\": \"arm64\",\n");
         fprintf(fp, "  \"timestamp\": \"%s\",\n", get_timestamp().c_str());
         fprintf(fp, "  \"performance_metrics\": {\n");

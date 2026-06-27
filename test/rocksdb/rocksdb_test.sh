@@ -3,6 +3,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOFTWARE_NAME="rocksdb"
 SOFTWARE_VERSION="${SOFTWARE_VERSION:-11.1.2}"
+export SOFTWARE_VERSION
 BUILD_METHOD="source_build"
 TARGET_OS="${TARGET_OS:-openEuler 24.03 SP3}"
 TARGET_MODEL="${TARGET_MODEL:-Kunpeng-920}"
