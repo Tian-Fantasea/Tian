@@ -844,21 +844,35 @@ class TestGenerator:
         except Exception as e:
             return {"success": False, "image": image, "error": str(e)}
 
-    def _copy_common_scripts(self, dest_scripts: Path):
-        for script_name in COMMON_SCRIPTS:
+    COMMON_SCRIPTS_COPY = ["json_helper.py"]
+    COMMON_SCRIPTS_GENERATE = ["aggregate_results.py", "generate_summary.py"]
+
+    def _copy_common_scripts(self, dest_scripts: Path, software: str = ""):
+        for script_name in self.COMMON_SCRIPTS_COPY:
             src = self.reference_dir / script_name
             dst = dest_scripts / script_name
             if src.exists():
                 shutil.copy2(str(src), str(dst))
                 logger.info(f"Copied {script_name} from reference")
             else:
-                self._generate_common_script(script_name, dst)
+                self._generate_common_script(script_name, dst, software)
+        for script_name in self.COMMON_SCRIPTS_GENERATE:
+            dst = dest_scripts / script_name
+            self._generate_common_script(script_name, dst, software)
 
-    def _generate_common_script(self, script_name: str, dest: Path):
+    def _generate_common_script(self, script_name: str, dest: Path, software: str = ""):
         if script_name == "aggregate_results.py":
-            template = AGGREGATE_RESULTS_SKELETON
+            content = AGGREGATE_RESULTS_SKELETON.replace("{software}", software)
+            with open(dest, "w") as f:
+                f.write(content)
+            logger.info(f"Generated {script_name} for {software}")
+            return
         elif script_name == "generate_summary.py":
-            template = GENERATE_SUMMARY_SKELETON
+            content = GENERATE_SUMMARY_SKELETON.replace("{software}", software)
+            with open(dest, "w") as f:
+                f.write(content)
+            logger.info(f"Generated {script_name} for {software}")
+            return
         elif script_name == "json_helper.py":
             if self.reference_dir.exists():
                 src = self.reference_dir / "json_helper.py"
@@ -953,9 +967,6 @@ if __name__ == "__main__":
             return
         else:
             return
-
-        with open(dest, "w") as f:
-            f.write(template)
 
     def _generate_benchmark_script(self, benchmark_type: str, software: str, dest: Path):
         if benchmark_type == "benchmark_ann":
@@ -1179,7 +1190,7 @@ if __name__ == "__main__":
         benchmark_type = self.get_benchmark_type(category)
         build_method = self.get_build_method(software)
 
-        self._copy_common_scripts(scripts_dir)
+        self._copy_common_scripts(scripts_dir, software)
         self._generate_benchmark_script(benchmark_type, software, scripts_dir)
         self._generate_micro_benchmark(software, scripts_dir)
 
