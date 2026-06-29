@@ -17,7 +17,7 @@ EXPECTED_RESULT_FILES = [
 
 class TestRunner:
     def __init__(self, tests_dir: str, timeout: int = 3600):
-        self.tests_dir = Path(tests_dir)
+        self.tests_dir = Path(tests_dir).resolve()
         self.timeout = timeout
 
     def has_complete_results(self, software: str, version: str) -> bool:

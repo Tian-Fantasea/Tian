@@ -2,7 +2,7 @@ import json
 import sqlite3
 import logging
 import yaml
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from src.gitcode_client import GitCodeClient
@@ -94,7 +94,7 @@ def save_dockerhub_status(db_path: str, pr_number: int, software: str, version: 
     conn.execute(
         "INSERT INTO dockerhub_status VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)",
         (pr_number, software, version, os_version, int(pushed), tag, reason,
-         datetime.utcnow().isoformat()),
+         datetime.now(timezone.utc).isoformat()),
     )
     conn.commit()
     conn.close()
@@ -106,7 +106,7 @@ def save_verification(db_path: str, pr_number: int, software: str, tag: str,
     conn.execute(
         "INSERT INTO docker_verification VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (pr_number, software, tag, int(verified), image, digest, size, reason,
-         datetime.utcnow().isoformat()),
+         datetime.now(timezone.utc).isoformat()),
     )
     conn.commit()
     conn.close()
@@ -135,7 +135,7 @@ def run_pipeline(config_path: str):
         docker_pull_timeout=v_cfg.get("docker_pull_timeout", 600),
     )
 
-    since = (datetime.utcnow() - timedelta(hours=sch_cfg["lookback_hours"])).isoformat() + "Z"
+    since = (datetime.now(timezone.utc) - timedelta(hours=sch_cfg["lookback_hours"])).isoformat() + "Z"
     logger.info(f"Fetching merged PRs since {since}")
 
     prs = gitcode.get_merged_prs_since(since)
@@ -226,7 +226,7 @@ def run_pipeline(config_path: str):
                 f"verified={verification.get('verified', False)}"
             )
 
-    timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')
     report_dir = Path(config_path).parent / "results" / timestamp
     report_dir.mkdir(parents=True, exist_ok=True)
 
@@ -315,7 +315,7 @@ def generate_text_report(results: list, txt_path: Path):
     lines = []
     lines.append("=" * 80)
     lines.append(f"openEuler Docker Image Monitor Report")
-    lines.append(f"Generated: {datetime.utcnow().isoformat()}")
+    lines.append(f"Generated: {datetime.now(timezone.utc).isoformat()}")
     lines.append(f"Total PRs: {total}  |  Pushed: {len(pushed)}  |  Not Pushed: {len(not_pushed)}")
     lines.append("=" * 80)
 
@@ -388,7 +388,7 @@ def generate_test_generation_report(gen_results: list, txt_path: Path):
     lines = []
     lines.append("=" * 80)
     lines.append("  Test Scaffolding Generation Report")
-    lines.append(f"  Generated: {datetime.utcnow().isoformat()}")
+    lines.append(f"  Generated: {datetime.now(timezone.utc).isoformat()}")
     lines.append(f"  Total: {total}  |  New: {len(generated)}  |  Existing: {len(existing)}")
     lines.append("=" * 80)
 
@@ -442,7 +442,7 @@ def generate_test_execution_report(run_results: list, txt_path: Path):
     lines = []
     lines.append("=" * 80)
     lines.append("  Test Execution Report")
-    lines.append(f"  Generated: {datetime.utcnow().isoformat()}")
+    lines.append(f"  Generated: {datetime.now(timezone.utc).isoformat()}")
     lines.append(f"  Total: {total}  |  Completed: {len(completed)}  |  Partial: {len(partial)}  |  Failed: {len(failed)}  |  Skipped: {len(skipped)}")
     lines.append("=" * 80)
 
