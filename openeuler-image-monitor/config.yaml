@@ -1,0 +1,25 @@
+gitcode:
+  base_url: "https://gitcode.com/api/v5"
+  repo_owner: "openeuler"
+  repo_name: "openeuler-docker-images"
+  access_token: ""
+
+dockerhub:
+  base_url: "https://hub.docker.com/v2"
+  namespace: "openeuler"
+  image_prefix: "openeuler"
+
+verification:
+  enabled: false
+  ssh_host: ""
+  ssh_user: ""
+  ssh_port: 22
+  ssh_key_path: ""
+  docker_pull_timeout: 600
+
+schedule:
+  interval_minutes: 60
+  lookback_hours: 168
+
+state:
+  db_path: "state.db"
