@@ -36,6 +36,16 @@ class TestRunner:
         required.add("micro_benchmark.json")
         return required.issubset(existing)
 
+    def is_scaffold_test(self, software: str) -> bool:
+        test_sh = self.tests_dir / software / f"{software}_test.sh"
+        if not test_sh.exists():
+            return False
+        try:
+            content = test_sh.read_text()
+            return "TODO" in content or "placeholder" in content.lower()
+        except Exception:
+            return False
+
     def run_test(self, software: str, version: str) -> Dict:
         test_sh = self.tests_dir / software / f"{software}_test.sh"
         if not test_sh.exists():
@@ -45,6 +55,15 @@ class TestRunner:
                 "version": version,
                 "status": "script_not_found",
                 "path": str(test_sh),
+            }
+
+        if self.is_scaffold_test(software):
+            logger.info(f"{software} test.sh is a scaffold (contains TODO), skipping execution")
+            return {
+                "software": software,
+                "version": version,
+                "status": "scaffold_skipped",
+                "message": "Test script is a scaffold placeholder, needs manual implementation",
             }
 
         if self.has_complete_results(software, version):

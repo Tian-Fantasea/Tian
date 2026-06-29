@@ -349,7 +349,17 @@ def generate_text_report(results: list, txt_path: Path):
             title = r["title"][:50] if r["title"] else "-"
             lines.append(f"  {r['pr_number']:<8} {sw:<22} {ver:<18} {reason:<30} {title}")
     else:
-        lines.append("  (none - all images are pushed!)")
+        lines.append("  (none)")
+
+    lines.append("")
+    lines.append("=" * 80)
+    lines.append(f"  SCAFFOLD (needs manual implementation) ({len(scaffold)} software)")
+    lines.append("=" * 80)
+    if scaffold:
+        for r in scaffold:
+            lines.append(f"  {r.get('software','-')} v{r.get('version','-')}: {r.get('message','-')}")
+    else:
+        lines.append("  (none)")
 
     lines.append("")
     lines.append("=" * 80)
@@ -437,13 +447,14 @@ def generate_test_execution_report(run_results: list, txt_path: Path):
     partial = [r for r in run_results if r.get("status", "").startswith("partial")]
     failed = [r for r in run_results if r.get("status") in ("timeout", "error", "script_not_found")]
     skipped = [r for r in run_results if r.get("status") == "already_completed"]
+    scaffold = [r for r in run_results if r.get("status") == "scaffold_skipped"]
     total = len(run_results)
 
     lines = []
     lines.append("=" * 80)
     lines.append("  Test Execution Report")
     lines.append(f"  Generated: {datetime.now(timezone.utc).isoformat()}")
-    lines.append(f"  Total: {total}  |  Completed: {len(completed)}  |  Partial: {len(partial)}  |  Failed: {len(failed)}  |  Skipped: {len(skipped)}")
+    lines.append(f"  Total: {total}  |  Completed: {len(completed)}  |  Partial: {len(partial)}  |  Failed: {len(failed)}  |  Skipped: {len(skipped)}  |  Scaffold: {len(scaffold)}")
     lines.append("=" * 80)
 
     lines.append("")
