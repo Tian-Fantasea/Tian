@@ -21,5 +21,11 @@ schedule:
   interval_minutes: 60
   lookback_hours: 168
 
+test_generation:
+  enabled: true
+  tests_dir: "../tests"
+  reference_software: "faiss"
+  docker_pull: false
+
 state:
   db_path: "state.db"

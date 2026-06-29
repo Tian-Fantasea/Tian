@@ -8,6 +8,7 @@ from pathlib import Path
 from src.gitcode_client import GitCodeClient
 from src.dockerhub_client import DockerHubClient
 from src.docker_verifier import DockerVerifier
+from src.test_generator import TestGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -225,16 +226,54 @@ def run_pipeline(config_path: str):
             )
 
     timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
-    report_dir = Path(config_path).parent
+    report_dir = Path(config_path).parent / "results" / timestamp
+    report_dir.mkdir(parents=True, exist_ok=True)
 
-    report_path = report_dir / f"report_{timestamp}.json"
+    report_path = report_dir / "report.json"
     with open(report_path, "w") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
     logger.info(f"Report saved to {report_path}")
 
-    txt_path = report_dir / f"report_{timestamp}.txt"
+    txt_path = report_dir / "report.txt"
     generate_text_report(results, txt_path)
     logger.info(f"Text report saved to {txt_path}")
+
+    tg_cfg = config.get("test_generation", {})
+    if tg_cfg.get("enabled", False):
+        tests_dir = tg_cfg.get("tests_dir", "../tests")
+        tests_dir_path = Path(config_path).parent / tests_dir
+        if not tests_dir_path.exists():
+            logger.warning(f"Tests directory not found: {tests_dir_path}")
+        else:
+            reference_sw = tg_cfg.get("reference_software", "faiss")
+            reference_dir = tests_dir_path / reference_sw / "scripts"
+            docker_pull = tg_cfg.get("docker_pull", False)
+            generator = TestGenerator(
+                tests_dir=str(tests_dir_path),
+                reference_dir=str(reference_dir) if reference_dir.exists() else "",
+                docker_pull_enabled=docker_pull,
+                ssh_host=v_cfg.get("ssh_host", ""),
+                ssh_user=v_cfg.get("ssh_user", ""),
+                ssh_port=v_cfg.get("ssh_port", 22),
+                ssh_key_path=v_cfg.get("ssh_key_path", ""),
+                docker_pull_timeout=v_cfg.get("docker_pull_timeout", 600),
+            )
+            pushed_results = [r for r in results if r["dockerhub_pushed"]]
+            gen_results = generator.generate_for_pushed_images(
+                pushed_results,
+                namespace=dh_cfg["namespace"],
+                docker_pull=docker_pull,
+            )
+            logger.info(f"Test scaffolding generated for {len([g for g in gen_results if g.get('status') == 'generated'])} new software")
+
+            gen_report_path = report_dir / "test_generation.json"
+            with open(gen_report_path, "w") as f:
+                json.dump(gen_results, f, ensure_ascii=False, indent=2)
+            logger.info(f"Test generation report saved to {gen_report_path}")
+
+            txt_report_path = report_dir / "test_generation.txt"
+            generate_test_generation_report(gen_results, txt_report_path)
+            logger.info(f"Test generation text report saved to {txt_report_path}")
 
     return results
 
@@ -304,6 +343,58 @@ def generate_text_report(results: list, txt_path: Path):
     lines.append(f"  Exact version tag (e.g. 7.22-oe2403sp3):  {exact_tag}")
     lines.append(f"  Only 'latest' tag:                          {latest_only}")
     lines.append(f"  No tag info:                                 {no_tag_info}")
+
+    lines.append("")
+    lines.append("=" * 80)
+
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+
+def generate_test_generation_report(gen_results: list, txt_path: Path):
+    generated = [g for g in gen_results if g.get("status") == "generated"]
+    existing = [g for g in gen_results if g.get("status") == "existing"]
+    total = len(gen_results)
+
+    lines = []
+    lines.append("=" * 80)
+    lines.append("  Test Scaffolding Generation Report")
+    lines.append(f"  Generated: {datetime.utcnow().isoformat()}")
+    lines.append(f"  Total: {total}  |  New: {len(generated)}  |  Existing: {len(existing)}")
+    lines.append("=" * 80)
+
+    lines.append("")
+    lines.append("=" * 80)
+    lines.append(f"  NEWLY GENERATED ({len(generated)} software)")
+    lines.append("=" * 80)
+    if generated:
+        lines.append(f"  {'Software':<22} {'Version':<18} {'Benchmark':<18} {'Build':<16} {'Docker':<16}")
+        lines.append(f"  {'--------':<22} {'-------':<18} {'---------':<18} {'-----':<16} {'-----':<16}")
+        for g in generated:
+            sw = g.get("software", "-")
+            ver = g.get("version", "-")
+            bm = g.get("benchmark_type", "-")
+            build = g.get("build_method", "-")
+            docker = g.get("docker_status", "-")
+            lines.append(f"  {sw:<22} {ver:<18} {bm:<18} {build:<16} {docker:<16}")
+        lines.append("")
+        for g in generated:
+            lines.append(f"  {g.get('software','-')} files:")
+            for f_name in g.get("files", []):
+                lines.append(f"    - {f_name}")
+            lines.append("")
+    else:
+        lines.append("  (none - all software already have tests)")
+
+    lines.append("")
+    lines.append("=" * 80)
+    lines.append(f"  ALREADY EXISTING ({len(existing)} software)")
+    lines.append("=" * 80)
+    if existing:
+        for g in existing:
+            lines.append(f"  {g.get('software','-')}: {g.get('message','-')}")
+    else:
+        lines.append("  (none)")
 
     lines.append("")
     lines.append("=" * 80)
