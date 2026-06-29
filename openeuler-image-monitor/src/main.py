@@ -9,6 +9,7 @@ from src.gitcode_client import GitCodeClient
 from src.dockerhub_client import DockerHubClient
 from src.docker_verifier import DockerVerifier
 from src.test_generator import TestGenerator
+from src.test_runner import TestRunner
 
 logger = logging.getLogger(__name__)
 
@@ -275,6 +276,34 @@ def run_pipeline(config_path: str):
             generate_test_generation_report(gen_results, txt_report_path)
             logger.info(f"Test generation text report saved to {txt_report_path}")
 
+    tr_cfg = config.get("test_runner", {})
+    if tr_cfg.get("enabled", False):
+        tests_dir = tg_cfg.get("tests_dir", "../tests") if tg_cfg.get("enabled", False) else "../tests"
+        tests_dir_path = Path(config_path).parent / tests_dir
+        if not tests_dir_path.exists():
+            logger.warning(f"Tests directory not found: {tests_dir_path}, cannot run tests")
+        else:
+            runner = TestRunner(
+                tests_dir=str(tests_dir_path),
+                timeout=tr_cfg.get("timeout", 3600),
+            )
+            pushed_results = [r for r in results if r["dockerhub_pushed"]]
+            software_list = [
+                {"software": r["software"], "version": r["version"]}
+                for r in pushed_results if r["software"]
+            ]
+            run_results = runner.run_all(software_list)
+            logger.info(f"Test execution completed: {len([r for r in run_results if r.get('status') == 'completed'])} completed")
+
+            run_report_path = report_dir / "test_execution.json"
+            with open(run_report_path, "w") as f:
+                json.dump(run_results, f, ensure_ascii=False, indent=2)
+            logger.info(f"Test execution report saved to {run_report_path}")
+
+            txt_exec_path = report_dir / "test_execution.txt"
+            generate_test_execution_report(run_results, txt_exec_path)
+            logger.info(f"Test execution text report saved to {txt_exec_path}")
+
     return results
 
 
@@ -393,6 +422,79 @@ def generate_test_generation_report(gen_results: list, txt_path: Path):
     if existing:
         for g in existing:
             lines.append(f"  {g.get('software','-')}: {g.get('message','-')}")
+    else:
+        lines.append("  (none)")
+
+    lines.append("")
+    lines.append("=" * 80)
+
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+
+def generate_test_execution_report(run_results: list, txt_path: Path):
+    completed = [r for r in run_results if r.get("status") == "completed"]
+    partial = [r for r in run_results if r.get("status", "").startswith("partial")]
+    failed = [r for r in run_results if r.get("status") in ("timeout", "error", "script_not_found")]
+    skipped = [r for r in run_results if r.get("status") == "already_completed"]
+    total = len(run_results)
+
+    lines = []
+    lines.append("=" * 80)
+    lines.append("  Test Execution Report")
+    lines.append(f"  Generated: {datetime.utcnow().isoformat()}")
+    lines.append(f"  Total: {total}  |  Completed: {len(completed)}  |  Partial: {len(partial)}  |  Failed: {len(failed)}  |  Skipped: {len(skipped)}")
+    lines.append("=" * 80)
+
+    lines.append("")
+    lines.append("=" * 80)
+    lines.append(f"  COMPLETED ({len(completed)} software)")
+    lines.append("=" * 80)
+    if completed:
+        lines.append(f"  {'Software':<22} {'Version':<18} {'Time(s)':<12} {'ReturnCode':<12}")
+        lines.append(f"  {'--------':<22} {'-------':<18} {'------':<12} {'---------':<12}")
+        for r in completed:
+            sw = r.get("software", "-")
+            ver = r.get("version", "-")
+            elapsed = r.get("elapsed_seconds", "-")
+            rc = r.get("returncode", "-")
+            lines.append(f"  {sw:<22} {ver:<18} {elapsed:<12} {rc:<12}")
+    else:
+        lines.append("  (none)")
+
+    lines.append("")
+    lines.append("=" * 80)
+    lines.append(f"  PARTIAL ({len(partial)} software)")
+    lines.append("=" * 80)
+    if partial:
+        for r in partial:
+            lines.append(f"  {r.get('software','-')} v{r.get('version','-')}: {r.get('status','-')}")
+    else:
+        lines.append("  (none)")
+
+    lines.append("")
+    lines.append("=" * 80)
+    lines.append(f"  FAILED ({len(failed)} software)")
+    lines.append("=" * 80)
+    if failed:
+        lines.append(f"  {'Software':<22} {'Version':<18} {'Status':<16} {'Detail'}")
+        lines.append(f"  {'--------':<22} {'-------':<18} {'-----':<16} {'-----'}")
+        for r in failed:
+            sw = r.get("software", "-")
+            ver = r.get("version", "-")
+            st = r.get("status", "-")
+            detail = r.get("error", r.get("stderr_tail", "-"))[:40]
+            lines.append(f"  {sw:<22} {ver:<18} {st:<16} {detail}")
+    else:
+        lines.append("  (none)")
+
+    lines.append("")
+    lines.append("=" * 80)
+    lines.append(f"  SKIPPED (already had results) ({len(skipped)} software)")
+    lines.append("=" * 80)
+    if skipped:
+        for r in skipped:
+            lines.append(f"  {r.get('software','-')} v{r.get('version','-')}: {r.get('message','-')}")
     else:
         lines.append("  (none)")
 

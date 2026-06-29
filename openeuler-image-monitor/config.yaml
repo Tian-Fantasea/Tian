@@ -27,5 +27,9 @@ test_generation:
   reference_software: "faiss"
   docker_pull: false
 
+test_runner:
+  enabled: false
+  timeout: 3600
+
 state:
   db_path: "state.db"
