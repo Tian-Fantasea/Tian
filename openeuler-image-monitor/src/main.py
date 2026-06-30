@@ -353,16 +353,6 @@ def generate_text_report(results: list, txt_path: Path):
 
     lines.append("")
     lines.append("=" * 80)
-    lines.append(f"  SCAFFOLD (needs manual implementation) ({len(scaffold)} software)")
-    lines.append("=" * 80)
-    if scaffold:
-        for r in scaffold:
-            lines.append(f"  {r.get('software','-')} v{r.get('version','-')}: {r.get('message','-')}")
-    else:
-        lines.append("  (none)")
-
-    lines.append("")
-    lines.append("=" * 80)
     lines.append("  Summary by Category")
     lines.append("=" * 80)
     cats = {}
@@ -510,6 +500,17 @@ def generate_test_execution_report(run_results: list, txt_path: Path):
         lines.append("  (none)")
 
     lines.append("")
+    lines.append("=" * 80)
+    lines.append(f"  SCAFFOLD (needs manual implementation) ({len(scaffold)} software)")
+    lines.append("=" * 80)
+    if scaffold:
+        for r in scaffold:
+            lines.append(f"  {r.get('software','-')} v{r.get('version','-')}: {r.get('message','-')}")
+    else:
+        lines.append("  (none)")
+
+    lines.append("")
+    lines.append("=" * 80)
     lines.append("=" * 80)
 
     with open(txt_path, "w", encoding="utf-8") as f:
