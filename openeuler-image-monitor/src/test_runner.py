@@ -2,6 +2,7 @@ import subprocess
 import os
 import logging
 import time
+import re
 from pathlib import Path
 from typing import Dict, List
 
@@ -16,9 +17,43 @@ EXPECTED_RESULT_FILES = [
 
 
 class TestRunner:
-    def __init__(self, tests_dir: str, timeout: int = 3600):
+    def __init__(self, tests_dir: str, timeout: int = 3600, docker_check: bool = True):
         self.tests_dir = Path(tests_dir).resolve()
         self.timeout = timeout
+        self.docker_check = docker_check
+
+    def _extract_docker_info(self, test_sh_path: Path) -> Dict:
+        image = ""
+        tag = ""
+        content = test_sh_path.read_text()
+        m_img = re.search(r'DOCKER_IMAGE="([^"]+)"', content)
+        m_tag = re.search(r'DOCKER_TAG="\$\{DOCKER_TAG:-(.+)\}"', content)
+        if m_img:
+            image = m_img.group(1)
+        if m_tag:
+            tag = m_tag.group(1)
+        return {"image": image, "tag": tag}
+
+    def _check_docker_image_available(self, image: str, tag: str) -> bool:
+        if not image or not tag:
+            return True
+        full_image = f"{image}:{tag}"
+        try:
+            result = subprocess.run(
+                ["docker", "manifest", "inspect", full_image],
+                capture_output=True, text=True, timeout=30,
+            )
+            if result.returncode == 0:
+                logger.info(f"Docker image {full_image} available on registry")
+                return True
+            logger.warning(f"Docker image {full_image} NOT available on registry: {result.stderr[:200]}")
+            return False
+        except subprocess.TimeoutExpired:
+            logger.warning(f"Docker manifest check timed out for {full_image}")
+            return False
+        except Exception as e:
+            logger.warning(f"Docker manifest check failed for {full_image}: {e}")
+            return True
 
     def has_complete_results(self, software: str, version: str) -> bool:
         version_dir = self.tests_dir / software / "results" / version
@@ -55,6 +90,21 @@ class TestRunner:
                 "status": "already_completed",
                 "message": "All result files present, skipping",
             }
+
+        if self.docker_check:
+            docker_info = self._extract_docker_info(test_sh)
+            image = docker_info.get("image", "")
+            tag = docker_info.get("tag", "")
+            if image and tag:
+                if not self._check_docker_image_available(image, tag):
+                    logger.warning(f"Skipping {software}: Docker image {image}:{tag} not available")
+                    return {
+                        "software": software,
+                        "version": version,
+                        "status": "image_not_available",
+                        "docker_image": f"{image}:{tag}",
+                        "message": f"Docker image {image}:{tag} not available on registry",
+                    }
 
         logger.info(f"Executing {software}_test.sh (version={version}, timeout={self.timeout}s)")
 

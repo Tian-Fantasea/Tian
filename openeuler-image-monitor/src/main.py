@@ -437,6 +437,7 @@ def generate_test_execution_report(run_results: list, txt_path: Path):
     partial = [r for r in run_results if r.get("status", "").startswith("partial")]
     failed = [r for r in run_results if r.get("status") in ("timeout", "error", "script_not_found")]
     skipped = [r for r in run_results if r.get("status") == "already_completed"]
+    not_available = [r for r in run_results if r.get("status") == "image_not_available"]
     scaffold = [r for r in run_results if r.get("status") == "scaffold_skipped"]
     total = len(run_results)
 
@@ -444,7 +445,7 @@ def generate_test_execution_report(run_results: list, txt_path: Path):
     lines.append("=" * 80)
     lines.append("  Test Execution Report")
     lines.append(f"  Generated: {datetime.now(timezone.utc).isoformat()}")
-    lines.append(f"  Total: {total}  |  Completed: {len(completed)}  |  Partial: {len(partial)}  |  Failed: {len(failed)}  |  Skipped: {len(skipped)}  |  Scaffold: {len(scaffold)}")
+    lines.append(f"  Total: {total}  |  Completed: {len(completed)}  |  Partial: {len(partial)}  |  Failed: {len(failed)}  |  Skipped: {len(skipped)}  |  Not Available: {len(not_available)}  |  Scaffold: {len(scaffold)}")
     lines.append("=" * 80)
 
     lines.append("")
@@ -506,6 +507,20 @@ def generate_test_execution_report(run_results: list, txt_path: Path):
     if scaffold:
         for r in scaffold:
             lines.append(f"  {r.get('software','-')} v{r.get('version','-')}: {r.get('message','-')}")
+    else:
+        lines.append("  (none)")
+
+    lines.append("")
+    lines.append(f"  NOT AVAILABLE ({len(not_available)} software - Docker image missing)")
+    lines.append("=" * 80)
+    if not_available:
+        lines.append(f"  {'Software':<22} {'Version':<18} {'Image'}")
+        lines.append(f"  {'--------':<22} {'-------':<18} {'-----'}")
+        for r in not_available:
+            sw = r.get("software", "-")
+            ver = r.get("version", "-")
+            img = r.get("docker_image", "-")
+            lines.append(f"  {sw:<22} {ver:<18} {img}")
     else:
         lines.append("  (none)")
 

@@ -28,7 +28,7 @@ test_generation:
   docker_pull: false
 
 test_runner:
-  enabled: false
+  enabled: true
   timeout: 3600
 
 state:

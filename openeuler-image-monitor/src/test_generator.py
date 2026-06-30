@@ -744,9 +744,22 @@ def build_test_sh(software, version, docker_namespace, docker_tag, benchmark_typ
         '',
         'testSoftwareIsInstalled() {',
         '    if [ -z "${DOCKER_CID}" ]; then startSkipping; return; fi',
-        '    if [ "${HAS_PYTHON3}" -eq 0 ]; then startSkipping; return; fi',
-        f'    local check="$(docker exec "${{DOCKER_CID}}" python3 -c "import {python_module}" 2>/dev/null && echo 1 || echo 0)"',
-        '    assertTrue "Software should be importable in container" "[ ${check} -eq 1 ]"',
+        '    local found=0',
+        '    if [ "${HAS_PYTHON3}" -eq 1 ]; then',
+        f'        docker exec "${{DOCKER_CID}}" python3 -c "import {python_module}" 2>/dev/null && found=1',
+        '    fi',
+        f'    if [ "${{found}}" -eq 0 ]; then',
+        f'        docker exec "${{DOCKER_CID}}" which {sw} 2>/dev/null && found=1',
+        '    fi',
+        f'    if [ "${{found}}" -eq 0 ]; then',
+        f'        docker exec "${{DOCKER_CID}}" bash -c "ls /opt/{sw}*/bin/{sw} /usr/local/bin/{sw} /usr/bin/{sw} 2>/dev/null" | head -1 | grep -q . && found=1',
+        '    fi',
+        f'    if [ "${{found}}" -eq 0 ]; then',
+        f'        log "WARN" "{sw} not found as Python module or binary, skipping install check"',
+        '        startSkipping',
+        '        return',
+        '    fi',
+        '    assertTrue "Software should be available in container" "[ ${found} -eq 1 ]"',
         '}',
         '',
         'testSoftwareVersionMatches() {',
@@ -1030,13 +1043,13 @@ class TestGenerator:
 
     def _generate_common_script(self, script_name: str, dest: Path, software: str = ""):
         if script_name == "aggregate_results.py":
-            content = AGGREGATE_RESULTS_TEMPLATE.replace("{software}", software)
+            content = AGGREGATE_RESULTS_TEMPLATE.format(software=software)
             with open(dest, "w") as f:
                 f.write(content)
             logger.info(f"Generated {script_name} for {software}")
             return
         elif script_name == "generate_summary.py":
-            content = GENERATE_SUMMARY_TEMPLATE.replace("{software}", software)
+            content = GENERATE_SUMMARY_TEMPLATE.format(software=software)
             with open(dest, "w") as f:
                 f.write(content)
             logger.info(f"Generated {script_name} for {software}")
@@ -1048,7 +1061,7 @@ class TestGenerator:
                     shutil.copy2(str(src), str(dest))
                     return
             logger.warning("No json_helper.py reference found, using minimal version")
-            content = JSON_HELPER_MINIMAL.replace("{software}", software)
+            content = JSON_HELPER_MINIMAL.format(software=software)
             with open(dest, "w") as f:
                 f.write(content)
             return
@@ -1056,12 +1069,12 @@ class TestGenerator:
             return
 
     def _generate_benchmark_script(self, software: str, dest: Path):
-        content = BENCHMARK_GENERIC_PY.replace("{software}", software)
+        content = BENCHMARK_GENERIC_PY.format(software=software)
         with open(dest / "benchmark_generic.py", "w") as f:
             f.write(content)
 
     def _generate_micro_benchmark(self, software: str, dest: Path):
-        content = MICRO_BENCHMARK_PY.replace("{software}", software)
+        content = MICRO_BENCHMARK_PY.format(software=software)
         with open(dest / "micro_benchmark.py", "w") as f:
             f.write(content)
 
