@@ -934,10 +934,9 @@ class TestGenerator:
 
     def has_existing_tests(self, software: str) -> bool:
         sw_dir = self.tests_dir / software
-        if sw_dir.exists():
-            test_sh = sw_dir / f"{software}_test.sh"
-            if test_sh.exists():
-                return True
+        scripts_dir = sw_dir / "scripts"
+        if sw_dir.exists() and scripts_dir.exists():
+            return True
         return False
 
     def check_local_docker_image(self, namespace: str, software: str, tag: str) -> bool:
@@ -1019,6 +1018,9 @@ class TestGenerator:
         for script_name in COMMON_SCRIPTS_COPY:
             src = self.reference_dir / script_name
             dst = dest_scripts / script_name
+            if src.resolve() == dst.resolve():
+                logger.info(f"{script_name}: src and dst are same file, skipping copy")
+                continue
             if src.exists():
                 shutil.copy2(str(src), str(dst))
                 logger.info(f"Copied {script_name} from reference")
