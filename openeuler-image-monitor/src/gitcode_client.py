@@ -91,9 +91,13 @@ def _parse_dockerfile_path(filepath: str, pr_number: int) -> Optional[Dict]:
 
     category = parts[0]
     os_version = parts[-2]
-    version = parts[-3]
+    version = _sanitize_version(parts[-3])
     software = parts[-4]
     subdir = "/".join(parts[1:-4]) if len(parts) > 5 else ""
+
+    version = re.sub(r"[^a-zA-Z0-9._-]", "", version)
+    if not version:
+        return None
 
     return {
         "software": software,
@@ -120,6 +124,7 @@ def _extract_from_test_paths(files: List[Dict], pr_number: int) -> List[Dict]:
                 seen.add(software)
                 version_match = re.search(r"tests/{software}/(?:scripts|results)/(?P<version>[^/]+)/".format(software=software), filepath)
                 version = version_match.group("version") if version_match else ""
+                version = _sanitize_version(version)
                 results.append({
                     "software": software,
                     "version": version,
@@ -130,6 +135,10 @@ def _extract_from_test_paths(files: List[Dict], pr_number: int) -> List[Dict]:
                     "source": "test_path",
                 })
     return results
+
+
+def _sanitize_version(version: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9._-]", "", version)
 
 
 def _extract_from_title_and_body(title: str, body: str, pr_number: int) -> List[Dict]:
@@ -152,7 +161,7 @@ def _extract_from_title_and_body(title: str, body: str, pr_number: int) -> List[
             if sw.lower() in skip_words:
                 continue
             software = sw
-            version = m.group("version").strip()
+            version = _sanitize_version(m.group("version").strip())
             break
 
     body_os = _extract_os_from_body(body)
@@ -208,7 +217,7 @@ def _extract_from_body_table(body: str, pr_number: int) -> List[Dict]:
     if app_ver_match:
         return [{
             "software": "",
-            "version": app_ver_match.group(1).strip(),
+            "version": _sanitize_version(app_ver_match.group(1).strip()),
             "os_version": os_ver_match.group(1).strip() if os_ver_match else "",
             "category": "",
             "filepath": "",
