@@ -54,11 +54,15 @@ jobs:
 
       - name: Configure git identity
         run: |
+          HOME="${HOME:-/home/runner}"
+          export HOME
           git config --global user.email "runner@github-actions"
           git config --global user.name "GitHub Actions Runner"
 
       - name: Commit generated test scaffolding
         run: |
+          HOME="${HOME:-/home/runner}"
+          export HOME
           cd tests
           git add -A || true
           if ! git diff --cached --quiet; then
@@ -70,6 +74,8 @@ jobs:
 
       - name: Commit monitor results
         run: |
+          HOME="${HOME:-/home/runner}"
+          export HOME
           cd openeuler-image-monitor
           git add results/ state.db || true
           if ! git diff --cached --quiet; then
