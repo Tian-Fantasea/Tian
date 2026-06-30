@@ -287,22 +287,22 @@ def run_pipeline(config_path: str):
                 tests_dir=str(tests_dir_path),
                 timeout=tr_cfg.get("timeout", 3600),
             )
-            pushed_results = [r for r in results if r["dockerhub_pushed"]]
-            software_list = [
-                {"software": r["software"], "version": r["version"]}
-                for r in pushed_results if r["software"]
-            ]
-            run_results = runner.run_all(software_list)
-            logger.info(f"Test execution completed: {len([r for r in run_results if r.get('status') == 'completed'])} completed")
+            software_list = runner.discover_test_scripts()
+            if not software_list:
+                logger.info("No test scripts found to execute")
+            else:
+                logger.info(f"Discovered {len(software_list)} test scripts to execute")
+                run_results = runner.run_all(software_list)
+                logger.info(f"Test execution completed: {len([r for r in run_results if r.get('status') == 'completed'])} completed")
 
-            run_report_path = report_dir / "test_execution.json"
-            with open(run_report_path, "w") as f:
-                json.dump(run_results, f, ensure_ascii=False, indent=2)
-            logger.info(f"Test execution report saved to {run_report_path}")
+                run_report_path = report_dir / "test_execution.json"
+                with open(run_report_path, "w") as f:
+                    json.dump(run_results, f, ensure_ascii=False, indent=2)
+                logger.info(f"Test execution report saved to {run_report_path}")
 
-            txt_exec_path = report_dir / "test_execution.txt"
-            generate_test_execution_report(run_results, txt_exec_path)
-            logger.info(f"Test execution text report saved to {txt_exec_path}")
+                txt_exec_path = report_dir / "test_execution.txt"
+                generate_test_execution_report(run_results, txt_exec_path)
+                logger.info(f"Test execution text report saved to {txt_exec_path}")
 
     return results
 

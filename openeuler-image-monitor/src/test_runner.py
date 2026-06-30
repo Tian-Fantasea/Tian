@@ -144,6 +144,31 @@ class TestRunner:
             return "completed"
         return f"partial({len(found)}/{len(found) + len(missing)} files, missing: {','.join(missing)})"
 
+    def discover_test_scripts(self) -> List[Dict]:
+        discovered = []
+        for entry in sorted(self.tests_dir.iterdir()):
+            if not entry.is_dir():
+                continue
+            software = entry.name
+            test_sh = entry / f"{software}_test.sh"
+            if not test_sh.exists():
+                continue
+            version = self._detect_version(software)
+            discovered.append({"software": software, "version": version})
+        return discovered
+
+    def _detect_version(self, software: str) -> str:
+        results_base = self.tests_dir / software / "results"
+        if results_base.exists():
+            version_dirs = sorted(
+                [d for d in results_base.iterdir() if d.is_dir()],
+                key=lambda d: d.stat().st_mtime,
+                reverse=True,
+            )
+            if version_dirs:
+                return version_dirs[0].name
+        return ""
+
     def run_all(self, software_list: List[Dict]) -> List[Dict]:
         results = []
         for item in software_list:
