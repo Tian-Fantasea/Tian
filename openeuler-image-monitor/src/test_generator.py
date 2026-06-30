@@ -263,6 +263,8 @@ from datetime import datetime, timezone
 
 
 def aggregate_results(results_dir, output_file):
+    os.makedirs(results_dir, exist_ok=True)
+
     merged = {{
         "software_name": "{software}",
         "primary_benchmark": {{}},
@@ -300,9 +302,13 @@ def aggregate_results(results_dir, output_file):
         except Exception as e:
             print(f"[AGGREGATE] Failed to load {{env_file}}: {{e}}")
 
-    with open(output_file, "w") as f:
-        json.dump(merged, f, indent=2)
-    print(f"[AGGREGATE] Aggregated results saved to {{output_file}}")
+    try:
+        os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
+        with open(output_file, "w") as f:
+            json.dump(merged, f, indent=2)
+        print(f"[AGGREGATE] Aggregated results saved to {{output_file}}")
+    except Exception as e:
+        print(f"[AGGREGATE] Failed to write {{output_file}}: {{e}}")
     return merged
 
 
@@ -316,10 +322,27 @@ if __name__ == "__main__":
 GENERATE_SUMMARY_TEMPLATE = '''#!/usr/bin/env python3
 import sys
 import json
+import os
 from datetime import datetime, timezone
 
 
 def generate_summary(input_json, output_file):
+    if not os.path.exists(input_json):
+        lines = [
+            "=" * 70,
+            "  {software} Performance Benchmark Report",
+            "=" * 70,
+            f"  Generated: {{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}}",
+            "  Status: INCOMPLETE - benchmark data not available",
+            "=" * 70,
+        ]
+        summary = "\\n".join(lines)
+        os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
+        with open(output_file, "w") as f:
+            f.write(summary)
+        print(summary)
+        return
+
     with open(input_json) as f:
         data = json.load(f)
 
