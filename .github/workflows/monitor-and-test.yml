@@ -58,6 +58,7 @@ jobs:
           export HOME
           git config --global user.email "runner@github-actions"
           git config --global user.name "GitHub Actions Runner"
+          git config --global --add safe.directory '*'
 
       - name: Commit generated test scaffolding
         run: |
