@@ -23,17 +23,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: pip3 install requests pyyaml || pip install requests pyyaml
+      - name: Setup venv and install dependencies
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install requests pyyaml
 
       - name: Run monitor pipeline
         env:
           GITCODE_ACCESS_TOKEN: ${{ secrets.GITCODE_ACCESS_TOKEN }}
           LOOKBACK_HOURS: ${{ github.event.inputs.lookback_hours || '168' }}
-          VERBOSE_FLAG: ${{ github.event.inputs.verbose == 'true' && '-v' || '' }}
         run: |
+          source .venv/bin/activate
           cd openeuler-image-monitor
-          python3 -m src.main -c config.yaml $VERBOSE_FLAG
+          python3 -m src.main -c config.yaml
 
       - name: Check generated scaffolding
         run: |

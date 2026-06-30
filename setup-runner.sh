@@ -19,9 +19,17 @@ echo "[2/6] Installing Python3 and dependencies..."
 if command -v python3 >/dev/null 2>&1; then
     echo "Python3 already installed: $(python3 --version)"
 else
-    yum install -y python3 python3-pip || apt-get install -y python3 python3-pip
+    yum install -y python3 python3-pip || apt-get install -y python3 python3-pip python3-full
 fi
-pip3 install requests pyyaml || pip install requests pyyaml
+
+VENV_DIR="${INSTALL_DIR}/.venv"
+if [ ! -d "${VENV_DIR}" ]; then
+    python3 -m venv "${VENV_DIR}"
+    echo "Created virtual environment at ${VENV_DIR}"
+fi
+source "${VENV_DIR}/bin/activate"
+pip install requests pyyaml
+echo "Dependencies installed in venv"
 
 echo "[3/6] Cloning repository..."
 if [ -d "${INSTALL_DIR}" ]; then
@@ -54,14 +62,14 @@ print('config.yaml updated for local execution')
 fi
 
 echo "[6/6] Setting up cron (every 30 minutes)..."
-CRON_LINE="*/30 * * * * cd ${INSTALL_DIR}/openeuler-image-monitor && python3 -m src.main -c config.yaml >> ${INSTALL_DIR}/monitor.log 2>&1"
+CRON_LINE="*/30 * * * * source ${INSTALL_DIR}/.venv/bin/activate && cd ${INSTALL_DIR}/openeuler-image-monitor && python3 -m src.main -c config.yaml >> ${INSTALL_DIR}/monitor.log 2>&1"
 (crontab -l 2>/dev/null | grep -v "openeuler-image-monitor"; echo "${CRON_LINE}") | crontab -
 echo "Cron job installed. Monitor will run every 30 minutes."
 
 echo ""
 echo "=== Setup Complete ==="
-echo "Manual run:  cd ${INSTALL_DIR}/openeuler-image-monitor && python3 -m src.main -c config.yaml"
-echo "Verbose run: cd ${INSTALL_DIR}/openeuler-image-monitor && python3 -m src.main -c config.yaml -v"
+echo "Manual run:  cd ${INSTALL_DIR}/openeuler-image-monitor && source ${INSTALL_DIR}/.venv/bin/activate && python3 -m src.main -c config.yaml"
+echo "Verbose run: cd ${INSTALL_DIR}/openeuler-image-monitor && source ${INSTALL_DIR}/.venv/bin/activate && python3 -m src.main -c config.yaml -v"
 echo "View log:    tail -f ${INSTALL_DIR}/monitor.log"
 echo "View DB:     sqlite3 ${INSTALL_DIR}/openeuler-image-monitor/state.db"
 echo ""
