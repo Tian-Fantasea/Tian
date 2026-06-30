@@ -934,10 +934,8 @@ class TestGenerator:
 
     def has_existing_tests(self, software: str) -> bool:
         sw_dir = self.tests_dir / software
-        scripts_dir = sw_dir / "scripts"
-        if sw_dir.exists() and scripts_dir.exists():
-            return True
-        return False
+        test_sh = sw_dir / f"{software}_test.sh"
+        return test_sh.exists()
 
     def check_local_docker_image(self, namespace: str, software: str, tag: str) -> bool:
         image = f"{namespace}/{software}:{tag}"
