@@ -52,6 +52,11 @@ jobs:
             fi
           done || true
 
+      - name: Configure git identity
+        run: |
+          git config --global user.email "runner@github-actions"
+          git config --global user.name "GitHub Actions Runner"
+
       - name: Commit generated test scaffolding
         run: |
           cd tests
