@@ -2,7 +2,7 @@ gitcode:
   base_url: "https://gitcode.com/api/v5"
   repo_owner: "openeuler"
   repo_name: "openeuler-docker-images"
-  access_token: ""
+  access_token: ""                           # 环境变量 GITCODE_ACCESS_TOKEN 会自动覆盖
 
 dockerhub:
   base_url: "https://hub.docker.com/v2"
@@ -10,25 +10,25 @@ dockerhub:
   image_prefix: "openeuler"
 
 verification:
-  enabled: false
-  ssh_host: ""
-  ssh_user: ""
+  enabled: false                             # self-hosted runner 上改为 true，直接本地验证
+  ssh_host: ""                               # 环境变量 VM_SSH_HOST 会自动覆盖
+  ssh_user: ""                               # 环境变量 VM_SSH_USER 会自动覆盖
   ssh_port: 22
   ssh_key_path: ""
   docker_pull_timeout: 600
 
 schedule:
   interval_minutes: 60
-  lookback_hours: 168
+  lookback_hours: 168                        # 环境变量 LOOKBACK_HOURS 会自动覆盖
 
 test_generation:
   enabled: true
-  tests_dir: "../tests"
+  tests_dir: "../tests"                      # 相对于 openeuler-image-monitor 目录
   reference_software: "faiss"
-  docker_pull: false
+  docker_pull: false                         # self-hosted runner 上改为 true
 
 test_runner:
-  enabled: true
+  enabled: true                              # self-hosted runner 上启用
   timeout: 3600
 
 state:

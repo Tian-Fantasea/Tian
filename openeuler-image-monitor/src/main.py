@@ -1,4 +1,5 @@
 import json
+import os
 import sqlite3
 import logging
 import yaml
@@ -17,6 +18,30 @@ logger = logging.getLogger(__name__)
 def load_config(config_path: str) -> dict:
     with open(config_path) as f:
         return yaml.safe_load(f)
+
+
+def apply_env_overrides(config: dict) -> dict:
+    env_map = {
+        "GITCODE_ACCESS_TOKEN": ("gitcode", "access_token"),
+        "VM_SSH_HOST": ("verification", "ssh_host"),
+        "VM_SSH_USER": ("verification", "ssh_user"),
+        "VM_SSH_KEY_PATH": ("verification", "ssh_key_path"),
+        "LOOKBACK_HOURS": ("schedule", "lookback_hours"),
+        "TEST_GENERATION_ENABLED": ("test_generation", "enabled"),
+        "TEST_RUNNER_ENABLED": ("test_runner", "enabled"),
+        "DOCKER_PULL_ENABLED": ("test_generation", "docker_pull"),
+    }
+    for env_key, (section, field) in env_map.items():
+        val = os.environ.get(env_key)
+        if val is not None and section in config:
+            if isinstance(config[section].get(field), bool):
+                config[section][field] = val.lower() in ("true", "1", "yes")
+            elif isinstance(config[section].get(field), int):
+                config[section][field] = int(val)
+            else:
+                config[section][field] = val
+            logger.info(f"Override config.{section}.{field} from env {env_key}={val}")
+    return config
 
 
 def init_db(db_path: str):
@@ -113,7 +138,7 @@ def save_verification(db_path: str, pr_number: int, software: str, tag: str,
 
 
 def run_pipeline(config_path: str):
-    config = load_config(config_path)
+    config = apply_env_overrides(load_config(config_path))
     db_path = config["state"]["db_path"]
     init_db(db_path)
 

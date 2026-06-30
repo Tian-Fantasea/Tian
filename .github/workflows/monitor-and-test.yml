@@ -1,0 +1,82 @@
+name: Monitor and Generate Tests
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      lookback_hours:
+        description: 'Lookback hours for merged PRs'
+        required: false
+        default: '168'
+      verbose:
+        description: 'Enable verbose logging'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip3 install requests pyyaml || pip install requests pyyaml
+
+      - name: Run monitor pipeline
+        env:
+          GITCODE_ACCESS_TOKEN: ${{ secrets.GITCODE_ACCESS_TOKEN }}
+          LOOKBACK_HOURS: ${{ github.event.inputs.lookback_hours || '168' }}
+          VERBOSE_FLAG: ${{ github.event.inputs.verbose == 'true' && '-v' || '' }}
+        run: |
+          cd openeuler-image-monitor
+          python3 -m src.main -c config.yaml $VERBOSE_FLAG
+
+      - name: Check generated scaffolding
+        run: |
+          echo "=== Tests directory status ==="
+          ls -la tests/ || true
+          echo ""
+          echo "=== Newly generated software (if any) ==="
+          cd openeuler-image-monitor
+          for dir in results/*/; do
+            if [ -f "${dir}test_generation.txt" ]; then
+              echo "--- ${dir} ---"
+              head -20 "${dir}test_generation.txt"
+            fi
+          done || true
+
+      - name: Commit generated test scaffolding
+        run: |
+          cd tests
+          git add -A || true
+          if ! git diff --cached --quiet; then
+            git commit -m "auto: generate test scaffolding [skip ci]"
+            git push
+          else
+            echo "No new scaffolding to commit"
+          fi
+
+      - name: Commit monitor results
+        run: |
+          cd openeuler-image-monitor
+          git add results/ state.db || true
+          if ! git diff --cached --quiet; then
+            git commit -m "auto: monitor results update [skip ci]"
+            git push
+          else
+            echo "No new results to commit"
+          fi
+
+      - name: Upload results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitor-results-${{ github.run_number }}
+          path: |
+            openeuler-image-monitor/results/
+            openeuler-image-monitor/state.db
+          retention-days: 30
