@@ -103,22 +103,28 @@ verification = verifier.verify_local_pull(dh_cfg["namespace"], software, tag)
 
 当 `enabled: true` 时，对每个已推送到 DockerHub 但尚未在 tests 目录有测试的软件：
 
-1. 从参考软件（默认 faiss）复制通用脚本：`json_helper.py`、`aggregate_results.py`、`generate_summary.py`
-2. 根据软件类别生成对应的基准脚本：
+1. 从参考软件（默认 faiss）复制 `json_helper.py`（JSON 读写辅助）
+2. 根据软件名称生成 `aggregate_results.py` 和 `generate_summary.py`（从模板替换软件名）
+3. 根据软件类别生成对应的基准脚本：
    - ANN/vector_search 类 → `benchmark_ann.py`
    - database/kv_store/cache 类 → `benchmark_kv.py`
-   - 其他 → `benchmark_generic.py`
-3. 生成 `micro_benchmark.py` 骨架
-4. 生成 `<software>_test.sh` 主测试脚本（4阶段生命周期 + shUnit2 断言）
-5. 创建 `results/<version>/` 目录
+   - 其他 → `benchmark_generic.py`（自动检测容器内可用的 Python 模块和二进制，运行导入/版本/计时测试）
+4. 生成 `micro_benchmark.py`（自动检测可用二进制，运行基本计时测试）
+5. 生成 `<software>_test.sh` 主测试脚本（Docker-based 4阶段执行）：
+   - Phase1：`docker pull` + `docker run -d` 启动容器（挂载 scripts 和 results 目录）
+   - Phase2：`docker exec` 运行 `version_info.py`
+   - Phase3：`docker exec` 运行基准测试（benchmark + micro_benchmark）
+   - Phase4：宿主机运行 `aggregate_results.py` + `generate_summary.py`，汇总结果
+   - `oneTimeTearDown`：`docker stop` + `docker rm` 清理容器
+6. 创建 `results/<version>/` 目录
 
-已有测试的软件自动跳过，不会覆盖。
+已有测试的软件自动跳过，不会覆盖。所有脚本均为功能性脚本（非 TODO 占位符），可直接执行。
 
 ### 测试执行 (test_runner)
 
 当 `enabled: true` 时（建议在 Linux VM 上启用），对每个已推送到 DockerHub 的软件：
 
-1. 检查 `results/<version>/` 是否已有完整6个产物文件，有则跳过
+1. 检查 `results/<version>/` 是否已有完整产物文件，有则跳过
 2. 执行 `bash <software>_test.sh`，设置 `SOFTWARE_VERSION` 环境变量
 3. 超时自动终止（默认3600秒）
 4. 执行完成后检查产物完整性，标记状态：completed / partial / timeout / error
