@@ -963,7 +963,7 @@ class TestGenerator:
             return {"success": False, "image": image, "error": str(e)}
 
     def _copy_common_scripts(self, dest_scripts: Path, software: str = ""):
-        for script_name in self.COMMON_SCRIPTS_COPY:
+        for script_name in COMMON_SCRIPTS_COPY:
             src = self.reference_dir / script_name
             dst = dest_scripts / script_name
             if src.exists():
@@ -971,7 +971,7 @@ class TestGenerator:
                 logger.info(f"Copied {script_name} from reference")
             else:
                 self._generate_common_script(script_name, dst, software)
-        for script_name in self.COMMON_SCRIPTS_GENERATE:
+        for script_name in COMMON_SCRIPTS_GENERATE:
             dst = dest_scripts / script_name
             self._generate_common_script(script_name, dst, software)
 
