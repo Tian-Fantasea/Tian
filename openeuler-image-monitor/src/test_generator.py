@@ -131,6 +131,12 @@ def collect_system_info():
             pass
     return info
 
+def _fib_iter(n):
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+
 def benchmark_petsc(iterations):
     results_list = []
     summary = {{}}
@@ -310,30 +316,103 @@ def benchmark_petsc(iterations):
             "iterations": iterations,
         }})
     else:
-        cpu_times = []
-        for i in range(iterations):
-            n = 1000000
-            total = 0.0
-            t0 = time.time()
-            for j in range(n):
-                total += j * 0.0001
-            cpu_times.append(time.time() - t0)
-        summary["cpu_float_add_1M"] = compute_stats(cpu_times)
-        results_list.append({{
-            "operation": "cpu_float_add", "count": 1000000,
-            "avg_time_s": compute_stats(cpu_times).get("avg", 0),
-            "iterations": iterations,
-        }})
+        ops = [
+            ("float_add_1M", lambda: sum(j * 0.0001 for j in range(1000000))),
+            ("float_add_10M", lambda: sum(j * 0.0001 for j in range(10000000))),
+            ("list_sort_100K", lambda: sorted([j * 0.001 for j in range(100000)])),
+            ("list_sort_1M", lambda: sorted([j * 0.001 for j in range(1000000)])),
+            ("dict_create_100K", lambda: dict((j, j * 0.001) for j in range(100000))),
+            ("set_membership_100K", lambda: all(j in set(range(100000)) for j in range(0, 100000, 100))),
+            ("string_concat_10K", lambda: "".join(str(j) for j in range(10000))),
+            ("prime_sieve_10K", lambda: [j for j in range(2, 10000) if all(j % k != 0 for k in range(2, int(j**0.5)+1))]),
+            ("fibonacci_iter_100K", lambda: _fib_iter(100000)),
+        ]
+        for op_name, op_func in ops:
+            times = []
+            for i in range(iterations):
+                t0 = time.time()
+                op_func()
+                times.append(time.time() - t0)
+            summary[op_name] = compute_stats(times)
+            results_list.append({{
+                "operation": op_name, "iterations": iterations,
+                "avg_time_s": compute_stats(times).get("avg", 0),
+            }})
+
+        gcc_path = _find_binary("gcc")
+        if os.path.exists(gcc_path):
+            tmpdir = tempfile.mkdtemp(prefix="petsc_c_bench_")
+            c_code = """
+#include <stdio.h>
+#include <math.h>
+int main() {{
+    int n = 1000000;
+    double sum = 0.0;
+    for (int i = 0; i < n; i++) {{
+        sum += i * 0.0001;
+    }}
+    printf("sum = %f\\n", sum);
+    return 0;
+}}
+"""
+            c_path = os.path.join(tmpdir, "bench.c")
+            with open(c_path, "w") as f:
+                f.write(c_code)
+            compile_times = []
+            for i in range(iterations):
+                t0 = time.time()
+                r = subprocess.run([gcc_path, c_path, "-o", os.path.join(tmpdir, f"bench_{{i}}"), "-lm"],
+                                   capture_output=True, text=True, timeout=30)
+                compile_times.append(time.time() - t0)
+            summary["gcc_compile_c"] = compute_stats(compile_times)
+            results_list.append({{
+                "operation": "gcc_compile_c", "iterations": iterations,
+                "avg_time_s": compute_stats(compile_times).get("avg", 0),
+                "compile_success": r.returncode == 0,
+            }})
+            run_times = []
+            for i in range(iterations):
+                exe = os.path.join(tmpdir, f"bench_{{i}}")
+                if os.path.exists(exe):
+                    t0 = time.time()
+                    subprocess.run([exe], capture_output=True, timeout=10)
+                    run_times.append(time.time() - t0)
+            if run_times:
+                summary["c_float_add_1M_run"] = compute_stats(run_times)
+                results_list.append({{
+                    "operation": "c_float_add_1M_run", "iterations": len(run_times),
+                    "avg_time_s": compute_stats(run_times).get("avg", 0),
+                }})
+            try:
+                shutil.rmtree(tmpdir)
+            except Exception:
+                pass
 
     return summary, results_list
+
+def _find_binary(name):
+    try:
+        r = subprocess.run(["which", name], capture_output=True, text=True, timeout=5)
+        if r.returncode == 0:
+            return r.stdout.strip()
+    except Exception:
+        pass
+    for p in ["/usr/bin", "/usr/local/bin", "/opt/homebrew/bin", "/root/.cargo/bin",
+              os.path.expanduser("~/.cargo/bin")]:
+        fp = os.path.join(p, name)
+        if os.path.exists(fp):
+            return fp
+    return name
 
 def benchmark_rust(iterations):
     results_list = []
     summary = {{}}
     tmpdir = tempfile.mkdtemp(prefix="rustbench_")
 
-    rustc_ver = subprocess.run(["rustc", "--version"], capture_output=True, text=True, timeout=5)
-    cargo_ver = subprocess.run(["cargo", "--version"], capture_output=True, text=True, timeout=5)
+    rustc_path = _find_binary("rustc")
+    cargo_path = _find_binary("cargo")
+    rustc_ver = subprocess.run([rustc_path, "--version"], capture_output=True, text=True, timeout=5)
+    cargo_ver = subprocess.run([cargo_path, "--version"], capture_output=True, text=True, timeout=5)
 
     summary["rustc_version"] = rustc_ver.stdout.strip()[:100] if rustc_ver.returncode == 0 else "not_found"
     summary["cargo_version"] = cargo_ver.stdout.strip()[:100] if cargo_ver.returncode == 0 else "not_found"
@@ -354,7 +433,7 @@ fn main() {{
     compile_times = []
     for i in range(iterations):
         t0 = time.time()
-        r = subprocess.run(["rustc", src_path, "-o", os.path.join(tmpdir, f"hello_{{i}}")],
+        r = subprocess.run([rustc_path, src_path, "-o", os.path.join(tmpdir, f"hello_{{i}}")],
                            capture_output=True, text=True, timeout=60)
         compile_times.append(time.time() - t0)
     compile_stats = compute_stats(compile_times)
@@ -412,7 +491,7 @@ fn main() {{
     matmul_compile_times = []
     for i in range(iterations):
         t0 = time.time()
-        subprocess.run(["rustc", src_path2, "-o", os.path.join(tmpdir, f"matmul_{{i}}")],
+        subprocess.run([rustc_path, src_path2, "-o", os.path.join(tmpdir, f"matmul_{{i}}")],
                        capture_output=True, text=True, timeout=120)
         matmul_compile_times.append(time.time() - t0)
     matmul_compile_stats = compute_stats(matmul_compile_times)
@@ -610,30 +689,27 @@ def benchmark_generic_compute(iterations):
             "avg_time_s": compute_stats(fft_times).get("avg", 0),
         }})
     else:
-        cpu_times = []
-        for i in range(iterations):
-            n = 1000000
-            total = 0.0
-            t0 = time.time()
-            for j in range(n):
-                total += j * 0.0001
-            cpu_times.append(time.time() - t0)
-        summary["cpu_float_add_1M"] = compute_stats(cpu_times)
-        results_list.append({{
-            "operation": "cpu_float_add_1M", "iterations": iterations,
-            "avg_time_s": compute_stats(cpu_times).get("avg", 0),
-        }})
-
-        sort_times = []
-        for i in range(iterations):
-            t0 = time.time()
-            sorted(range(100000))
-            sort_times.append(time.time() - t0)
-        summary["python_sort_100K"] = compute_stats(sort_times)
-        results_list.append({{
-            "operation": "python_sort_100K", "iterations": iterations,
-            "avg_time_s": compute_stats(sort_times).get("avg", 0),
-        }})
+        ops = [
+            ("float_add_1M", lambda: sum(j * 0.0001 for j in range(1000000))),
+            ("float_add_10M", lambda: sum(j * 0.0001 for j in range(10000000))),
+            ("list_sort_100K", lambda: sorted([j * 0.001 for j in range(100000)])),
+            ("list_sort_1M", lambda: sorted([j * 0.001 for j in range(1000000)])),
+            ("dict_create_100K", lambda: dict((j, j * 0.001) for j in range(100000))),
+            ("set_membership_100K", lambda: all(j in set(range(100000)) for j in range(0, 100000, 100))),
+            ("string_concat_10K", lambda: "".join(str(j) for j in range(10000))),
+            ("fibonacci_iter_100K", lambda: _fib_iter(100000)),
+        ]
+        for op_name, op_func in ops:
+            times = []
+            for i in range(iterations):
+                t0 = time.time()
+                op_func()
+                times.append(time.time() - t0)
+            summary[op_name] = compute_stats(times)
+            results_list.append({{
+                "operation": op_name, "iterations": iterations,
+                "avg_time_s": compute_stats(times).get("avg", 0),
+            }})
 
     return summary, results_list
 
