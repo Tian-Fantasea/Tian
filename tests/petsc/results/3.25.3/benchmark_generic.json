@@ -1,0 +1,234 @@
+{
+  "benchmark": "container_performance",
+  "description": "petsc performance benchmark - real computational tests in container environment",
+  "reference": "https://github.com/erikbern/ann-benchmarks methodology",
+  "software": "petsc",
+  "version": "3.25.3",
+  "architecture": "aarch64",
+  "timestamp": "2026-07-01T09:13:56Z",
+  "performance_metrics": {
+    "float_add_1M": {
+      "unit": "seconds",
+      "avg_s": 0.0918,
+      "min_s": 0.0918,
+      "max_s": 0.0918,
+      "p99_s": 0.0918
+    },
+    "float_add_10M": {
+      "unit": "seconds",
+      "avg_s": 0.9165,
+      "min_s": 0.9165,
+      "max_s": 0.9165,
+      "p99_s": 0.9165
+    },
+    "list_sort_100K": {
+      "unit": "seconds",
+      "avg_s": 0.0124,
+      "min_s": 0.0124,
+      "max_s": 0.0124,
+      "p99_s": 0.0124
+    },
+    "list_sort_1M": {
+      "unit": "seconds",
+      "avg_s": 0.1289,
+      "min_s": 0.1289,
+      "max_s": 0.1289,
+      "p99_s": 0.1289
+    },
+    "dict_create_100K": {
+      "unit": "seconds",
+      "avg_s": 0.0281,
+      "min_s": 0.0281,
+      "max_s": 0.0281,
+      "p99_s": 0.0281
+    },
+    "set_membership_100K": {
+      "unit": "seconds",
+      "avg_s": 3.8315,
+      "min_s": 3.8315,
+      "max_s": 3.8315,
+      "p99_s": 3.8315
+    },
+    "string_concat_10K": {
+      "unit": "seconds",
+      "avg_s": 0.0018,
+      "min_s": 0.0018,
+      "max_s": 0.0018,
+      "p99_s": 0.0018
+    },
+    "prime_sieve_10K": {
+      "unit": "seconds",
+      "avg_s": 0.0246,
+      "min_s": 0.0246,
+      "max_s": 0.0246,
+      "p99_s": 0.0246
+    },
+    "fibonacci_iter_100K": {
+      "unit": "seconds",
+      "avg_s": 0.1407,
+      "min_s": 0.1407,
+      "max_s": 0.1407,
+      "p99_s": 0.1407
+    },
+    "gcc_compile_c": {
+      "unit": "seconds",
+      "avg_s": 0.0445,
+      "min_s": 0.0445,
+      "max_s": 0.0445,
+      "p99_s": 0.0445
+    }
+  },
+  "system_info": {
+    "architecture": "aarch64",
+    "cpu_cores": 32,
+    "platform": "linux",
+    "python_version": "3.11.6",
+    "kernel": "6.8.0-87-generic",
+    "cpu_model": "0x48",
+    "memory_mb": 63876
+  },
+  "parameters": {
+    "iterations": 1,
+    "software_specific": true
+  },
+  "container_environment": {
+    "python_packages": {
+      "sqlite3": "unknown"
+    },
+    "binaries": {
+      "gcc": "gcc (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)\nCopyright (C) 2022 Free Softwa",
+      "g++": "g++ (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)\nCopyright (C) 2022 Free Softwa",
+      "make": "GNU Make 4.4.1\nBuilt for aarch64-openEuler-linux-gnu\nCopyright (C) 1988-2023 Fre",
+      "java": "openjdk 11.0.29 2025-10-21\nOpenJDK Runtime Environment BiSheng (build 11.0.29+7)",
+      "javac": "javac 11.0.29",
+      "python3": "Python 3.11.6",
+      "curl": "curl 8.4.0 (aarch64-openEuler-linux-gnu) libcurl/8.4.0 OpenSSL/3.0.12 zlib/1.2.1",
+      "git": "git version 2.43.0"
+    }
+  },
+  "results_summary": {
+    "float_add_1M": {
+      "avg": 0.0918,
+      "min": 0.0918,
+      "max": 0.0918,
+      "p99": 0.0918,
+      "count": 1
+    },
+    "float_add_10M": {
+      "avg": 0.9165,
+      "min": 0.9165,
+      "max": 0.9165,
+      "p99": 0.9165,
+      "count": 1
+    },
+    "list_sort_100K": {
+      "avg": 0.0124,
+      "min": 0.0124,
+      "max": 0.0124,
+      "p99": 0.0124,
+      "count": 1
+    },
+    "list_sort_1M": {
+      "avg": 0.1289,
+      "min": 0.1289,
+      "max": 0.1289,
+      "p99": 0.1289,
+      "count": 1
+    },
+    "dict_create_100K": {
+      "avg": 0.0281,
+      "min": 0.0281,
+      "max": 0.0281,
+      "p99": 0.0281,
+      "count": 1
+    },
+    "set_membership_100K": {
+      "avg": 3.8315,
+      "min": 3.8315,
+      "max": 3.8315,
+      "p99": 3.8315,
+      "count": 1
+    },
+    "string_concat_10K": {
+      "avg": 0.0018,
+      "min": 0.0018,
+      "max": 0.0018,
+      "p99": 0.0018,
+      "count": 1
+    },
+    "prime_sieve_10K": {
+      "avg": 0.0246,
+      "min": 0.0246,
+      "max": 0.0246,
+      "p99": 0.0246,
+      "count": 1
+    },
+    "fibonacci_iter_100K": {
+      "avg": 0.1407,
+      "min": 0.1407,
+      "max": 0.1407,
+      "p99": 0.1407,
+      "count": 1
+    },
+    "gcc_compile_c": {
+      "avg": 0.0445,
+      "min": 0.0445,
+      "max": 0.0445,
+      "p99": 0.0445,
+      "count": 1
+    }
+  },
+  "results": [
+    {
+      "operation": "float_add_1M",
+      "iterations": 1,
+      "avg_time_s": 0.0918
+    },
+    {
+      "operation": "float_add_10M",
+      "iterations": 1,
+      "avg_time_s": 0.9165
+    },
+    {
+      "operation": "list_sort_100K",
+      "iterations": 1,
+      "avg_time_s": 0.0124
+    },
+    {
+      "operation": "list_sort_1M",
+      "iterations": 1,
+      "avg_time_s": 0.1289
+    },
+    {
+      "operation": "dict_create_100K",
+      "iterations": 1,
+      "avg_time_s": 0.0281
+    },
+    {
+      "operation": "set_membership_100K",
+      "iterations": 1,
+      "avg_time_s": 3.8315
+    },
+    {
+      "operation": "string_concat_10K",
+      "iterations": 1,
+      "avg_time_s": 0.0018
+    },
+    {
+      "operation": "prime_sieve_10K",
+      "iterations": 1,
+      "avg_time_s": 0.0246
+    },
+    {
+      "operation": "fibonacci_iter_100K",
+      "iterations": 1,
+      "avg_time_s": 0.1407
+    },
+    {
+      "operation": "gcc_compile_c",
+      "iterations": 1,
+      "avg_time_s": 0.0445,
+      "compile_success": false
+    }
+  ]
+}
