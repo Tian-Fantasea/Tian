@@ -1,0 +1,283 @@
+{
+  "software_name": "petsc",
+  "primary_benchmark": {
+    "benchmark": "container_performance",
+    "description": "petsc performance benchmark - real computational tests in container environment",
+    "reference": "https://github.com/erikbern/ann-benchmarks methodology",
+    "software": "petsc",
+    "version": "3.25.3",
+    "architecture": "aarch64",
+    "timestamp": "2026-07-01T09:55:56Z",
+    "performance_metrics": {
+      "float_add_1M": {
+        "unit": "seconds",
+        "avg_s": 0.0922,
+        "min_s": 0.0918,
+        "max_s": 0.0926,
+        "p99_s": 0.0926
+      },
+      "float_add_10M": {
+        "unit": "seconds",
+        "avg_s": 0.9196,
+        "min_s": 0.9181,
+        "max_s": 0.9226,
+        "p99_s": 0.9226
+      },
+      "list_sort_100K": {
+        "unit": "seconds",
+        "avg_s": 0.0109,
+        "min_s": 0.01,
+        "max_s": 0.0128,
+        "p99_s": 0.0128
+      },
+      "list_sort_1M": {
+        "unit": "seconds",
+        "avg_s": 0.1232,
+        "min_s": 0.1192,
+        "max_s": 0.1297,
+        "p99_s": 0.1297
+      },
+      "dict_create_100K": {
+        "unit": "seconds",
+        "avg_s": 0.0217,
+        "min_s": 0.0214,
+        "max_s": 0.0223,
+        "p99_s": 0.0223
+      },
+      "set_membership_100K": {
+        "unit": "seconds",
+        "avg_s": 3.9926,
+        "min_s": 3.9892,
+        "max_s": 3.9965,
+        "p99_s": 3.9965
+      },
+      "string_concat_10K": {
+        "unit": "seconds",
+        "avg_s": 0.0016,
+        "min_s": 0.0015,
+        "max_s": 0.0017,
+        "p99_s": 0.0017
+      },
+      "prime_sieve_10K": {
+        "unit": "seconds",
+        "avg_s": 0.0241,
+        "min_s": 0.024,
+        "max_s": 0.0241,
+        "p99_s": 0.0241
+      },
+      "fibonacci_iter_100K": {
+        "unit": "seconds",
+        "avg_s": 0.1405,
+        "min_s": 0.1403,
+        "max_s": 0.1411,
+        "p99_s": 0.1411
+      },
+      "gcc_compile_c": {
+        "unit": "seconds",
+        "avg_s": 0.0389,
+        "min_s": 0.0383,
+        "max_s": 0.0398,
+        "p99_s": 0.0398
+      }
+    },
+    "system_info": {
+      "architecture": "aarch64",
+      "cpu_cores": 32,
+      "platform": "linux",
+      "python_version": "3.11.6",
+      "kernel": "6.8.0-87-generic",
+      "cpu_model": "0x48",
+      "memory_mb": 63876
+    },
+    "parameters": {
+      "iterations": 5,
+      "software_specific": true
+    },
+    "container_environment": {
+      "python_packages": {
+        "sqlite3": "unknown"
+      },
+      "binaries": {
+        "gcc": "gcc (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)\nCopyright (C) 2022 Free Softwa",
+        "g++": "g++ (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)\nCopyright (C) 2022 Free Softwa",
+        "make": "GNU Make 4.4.1\nBuilt for aarch64-openEuler-linux-gnu\nCopyright (C) 1988-2023 Fre",
+        "java": "openjdk 11.0.29 2025-10-21\nOpenJDK Runtime Environment BiSheng (build 11.0.29+7)",
+        "javac": "javac 11.0.29",
+        "python3": "Python 3.11.6",
+        "curl": "curl 8.4.0 (aarch64-openEuler-linux-gnu) libcurl/8.4.0 OpenSSL/3.0.12 zlib/1.2.1",
+        "git": "git version 2.43.0"
+      }
+    },
+    "results_summary": {
+      "float_add_1M": {
+        "avg": 0.0922,
+        "min": 0.0918,
+        "max": 0.0926,
+        "p99": 0.0926,
+        "count": 5
+      },
+      "float_add_10M": {
+        "avg": 0.9196,
+        "min": 0.9181,
+        "max": 0.9226,
+        "p99": 0.9226,
+        "count": 5
+      },
+      "list_sort_100K": {
+        "avg": 0.0109,
+        "min": 0.01,
+        "max": 0.0128,
+        "p99": 0.0128,
+        "count": 5
+      },
+      "list_sort_1M": {
+        "avg": 0.1232,
+        "min": 0.1192,
+        "max": 0.1297,
+        "p99": 0.1297,
+        "count": 5
+      },
+      "dict_create_100K": {
+        "avg": 0.0217,
+        "min": 0.0214,
+        "max": 0.0223,
+        "p99": 0.0223,
+        "count": 5
+      },
+      "set_membership_100K": {
+        "avg": 3.9926,
+        "min": 3.9892,
+        "max": 3.9965,
+        "p99": 3.9965,
+        "count": 5
+      },
+      "string_concat_10K": {
+        "avg": 0.0016,
+        "min": 0.0015,
+        "max": 0.0017,
+        "p99": 0.0017,
+        "count": 5
+      },
+      "prime_sieve_10K": {
+        "avg": 0.0241,
+        "min": 0.024,
+        "max": 0.0241,
+        "p99": 0.0241,
+        "count": 5
+      },
+      "fibonacci_iter_100K": {
+        "avg": 0.1405,
+        "min": 0.1403,
+        "max": 0.1411,
+        "p99": 0.1411,
+        "count": 5
+      },
+      "gcc_compile_c": {
+        "avg": 0.0389,
+        "min": 0.0383,
+        "max": 0.0398,
+        "p99": 0.0398,
+        "count": 5
+      }
+    },
+    "results": [
+      {
+        "operation": "float_add_1M",
+        "iterations": 5,
+        "avg_time_s": 0.0922
+      },
+      {
+        "operation": "float_add_10M",
+        "iterations": 5,
+        "avg_time_s": 0.9196
+      },
+      {
+        "operation": "list_sort_100K",
+        "iterations": 5,
+        "avg_time_s": 0.0109
+      },
+      {
+        "operation": "list_sort_1M",
+        "iterations": 5,
+        "avg_time_s": 0.1232
+      },
+      {
+        "operation": "dict_create_100K",
+        "iterations": 5,
+        "avg_time_s": 0.0217
+      },
+      {
+        "operation": "set_membership_100K",
+        "iterations": 5,
+        "avg_time_s": 3.9926
+      },
+      {
+        "operation": "string_concat_10K",
+        "iterations": 5,
+        "avg_time_s": 0.0016
+      },
+      {
+        "operation": "prime_sieve_10K",
+        "iterations": 5,
+        "avg_time_s": 0.0241
+      },
+      {
+        "operation": "fibonacci_iter_100K",
+        "iterations": 5,
+        "avg_time_s": 0.1405
+      },
+      {
+        "operation": "gcc_compile_c",
+        "iterations": 5,
+        "avg_time_s": 0.0389,
+        "compile_success": false
+      }
+    ]
+  },
+  "micro_benchmark": {
+    "benchmark": "micro_operations",
+    "description": "petsc micro benchmark",
+    "reference": "SKILL.md",
+    "parameters": {
+      "iterations": 5
+    },
+    "performance_metrics": {
+      "operation_count": 3
+    },
+    "results": {
+      "which_java": {
+        "avg_time_s": 0.001,
+        "min_time_s": 0.001,
+        "max_time_s": 0.0011,
+        "iterations": 5
+      },
+      "which_python3": {
+        "avg_time_s": 0.001,
+        "min_time_s": 0.001,
+        "max_time_s": 0.001,
+        "iterations": 5
+      },
+      "system_info": {
+        "cpu_cores": 32,
+        "platform": "linux",
+        "python_version": "3.11.6"
+      }
+    },
+    "version": "3.25.3"
+  },
+  "environment": {
+    "test_time": "2026-07-01T09:55:29Z",
+    "Model": "Kunpeng-920",
+    "architecture": "aarch64",
+    "kernel": "6.8.0-87-generic",
+    "os": "openEuler 24.03 SP3",
+    "cpu_model": "ARM64 CPU (32 cores)",
+    "cpu_cores": 32,
+    "software_name": "petsc",
+    "software_version": "3.25.3",
+    "python_version": "Python 3.11.6",
+    "numpy_version": ""
+  },
+  "timestamp": "2026-07-01T09:55:56Z",
+  "test_time": "2026-07-01T09:55:29Z"
+}
