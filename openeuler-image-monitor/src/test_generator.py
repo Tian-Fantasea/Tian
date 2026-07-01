@@ -641,6 +641,937 @@ def benchmark_redis(iterations):
             summary["redis_server_available"] = "no"
     return summary, results_list
 
+def benchmark_rocksdb(iterations):
+    results_list = []
+    summary = {{}}
+    tmpdir = tempfile.mkdtemp(prefix="rocksdb_bench_")
+    db_bench_path = _find_binary("db_bench")
+    if os.path.exists(db_bench_path):
+        ops = ["fillseq", "fillrandom", "readrandom", "readseq", "deleterandom"]
+        for op in ops:
+            times = []
+            for i in range(iterations):
+                t0 = time.time()
+                r = subprocess.run(
+                    [db_bench_path, "--benchmarks=" + op, "--db=" + tmpdir + f"/db_{{i}}_{{op}}",
+                     "--num=10000", "--value_size=100", "--threads=1"],
+                    capture_output=True, text=True, timeout=120)
+                times.append(time.time() - t0)
+            summary[f"rocksdb_{{op}}"] = compute_stats(times)
+            results_list.append({{
+                "operation": f"rocksdb_{{op}}", "iterations": iterations,
+                "avg_time_s": compute_stats(times).get("avg", 0),
+            }})
+    else:
+        summary["rocksdb_db_bench"] = "not_found"
+    try:
+        shutil.rmtree(tmpdir)
+    except Exception:
+        pass
+    return summary, results_list
+
+def benchmark_mysql(iterations):
+    results_list = []
+    summary = {{}}
+    mysql_path = _find_binary("mysql")
+    mysqld_path = _find_binary("mysqld")
+    mysql_ver = subprocess.run([mysqld_path, "--version"], capture_output=True, text=True, timeout=10)
+    summary["mysql_version"] = mysql_ver.stdout.strip()[:200] if mysql_ver.returncode == 0 else "not_found"
+    try:
+        import mysql.connector as mc
+        conn_times = []
+        for i in range(iterations):
+            t0 = time.time()
+            try:
+                conn = mc.connect(host="localhost", user="root", connect_timeout=5)
+                conn.close()
+                conn_times.append(time.time() - t0)
+            except Exception:
+                conn_times.append(None)
+        conn_clean = [t for t in conn_times if t is not None]
+        if conn_clean:
+            summary["mysql_connect"] = compute_stats(conn_clean)
+        results_list.append({{"operation": "mysql_connect", "iterations": iterations,
+                              "avg_time_s": compute_stats(conn_clean).get("avg", 0) if conn_clean else None}})
+    except ImportError:
+        summary["mysql_connector"] = "not_available"
+    try:
+        r = subprocess.run([mysql_path, "-e", "SELECT 1+1;"],
+                           capture_output=True, text=True, timeout=10)
+        summary["mysql_cli_available"] = r.returncode == 0
+    except Exception:
+        summary["mysql_cli_available"] = False
+    return summary, results_list
+
+def benchmark_go(iterations):
+    results_list = []
+    summary = {{}}
+    tmpdir = tempfile.mkdtemp(prefix="go_bench_")
+    go_path = _find_binary("go")
+    go_ver = subprocess.run([go_path, "version"], capture_output=True, text=True, timeout=10)
+    summary["go_version"] = go_ver.stdout.strip()[:100] if go_ver.returncode == 0 else "not_found"
+
+    go_hello = """package main
+
+import "fmt"
+
+func main() {{
+    sum := 0.0
+    for i := 0; i < 1000000; i++ {{
+        sum += float64(i) * 0.0001
+    }}
+    fmt.Printf("sum = %f\\n", sum)
+}}
+"""
+    src_dir = os.path.join(tmpdir, "hello")
+    os.makedirs(src_dir, exist_ok=True)
+    with open(os.path.join(src_dir, "main.go"), "w") as f:
+        f.write(go_hello)
+
+    build_times = []
+    for i in range(iterations):
+        t0 = time.time()
+        r = subprocess.run([go_path, "build", "-o", os.path.join(tmpdir, f"gohello_{{i}}"), src_dir],
+                           capture_output=True, text=True, timeout=60)
+        build_times.append(time.time() - t0)
+    build_stats = compute_stats(build_times)
+    summary["go_build_hello"] = build_stats
+    results_list.append({{"operation": "go_build_hello", "iterations": iterations,
+                          "avg_time_s": build_stats.get("avg", 0), "compile_success": r.returncode == 0}})
+
+    run_times = []
+    for i in range(iterations):
+        exe = os.path.join(tmpdir, f"gohello_{{i}}")
+        if os.path.exists(exe):
+            t0 = time.time()
+            subprocess.run([exe], capture_output=True, timeout=30)
+            run_times.append(time.time() - t0)
+    if run_times:
+        run_stats = compute_stats(run_times)
+        summary["go_hello_run"] = run_stats
+        results_list.append({{"operation": "go_hello_run", "iterations": len(run_times),
+                              "avg_time_s": run_stats.get("avg", 0)}})
+
+    go_matmul = """package main
+
+import "fmt"
+
+func main() {{
+    n := 500
+    a := make([][]float64, n)
+    b := make([][]float64, n)
+    c := make([][]float64, n)
+    for i := 0; i < n; i++ {{
+        a[i] = make([]float64, n)
+        b[i] = make([]float64, n)
+        c[i] = make([]float64, n)
+        for j := 0; j < n; j++ {{
+            a[i][j] = float64(i*j) * 0.001
+            b[i][j] = float64(i+j) * 0.001
+        }}
+    }}
+    start := 0
+    fmt.Println(start)
+    for i := 0; i < n; i++ {{
+        for k := 0; k < n; k++ {{
+            aik := a[i][k]
+            for j := 0; j < n; j++ {{
+                c[i][j] += aik * b[k][j]
+            }}
+        }}
+    }}
+    fmt.Println(c[0][0])
+}}
+"""
+    src_dir2 = os.path.join(tmpdir, "matmul")
+    os.makedirs(src_dir2, exist_ok=True)
+    with open(os.path.join(src_dir2, "main.go"), "w") as f:
+        f.write(go_matmul)
+    matmul_build_times = []
+    for i in range(iterations):
+        t0 = time.time()
+        subprocess.run([go_path, "build", "-o", os.path.join(tmpdir, f"gomatmul_{{i}}"), src_dir2],
+                       capture_output=True, text=True, timeout=60)
+        matmul_build_times.append(time.time() - t0)
+    matmul_build_stats = compute_stats(matmul_build_times)
+    summary["go_build_matmul"] = matmul_build_stats
+    results_list.append({{"operation": "go_build_matmul", "iterations": iterations,
+                          "avg_time_s": matmul_build_stats.get("avg", 0)}})
+
+    matmul_run_times = []
+    for i in range(iterations):
+        exe = os.path.join(tmpdir, f"gomatmul_{{i}}")
+        if os.path.exists(exe):
+            t0 = time.time()
+            subprocess.run([exe], capture_output=True, timeout=60)
+            matmul_run_times.append(time.time() - t0)
+    if matmul_run_times:
+        matmul_run_stats = compute_stats(matmul_run_times)
+        summary["go_matmul_500x500"] = matmul_run_stats
+        results_list.append({{"operation": "go_matmul_500x500", "iterations": len(matmul_run_times),
+                              "avg_time_s": matmul_run_stats.get("avg", 0)}})
+
+    try:
+        shutil.rmtree(tmpdir)
+    except Exception:
+        pass
+    return summary, results_list
+
+def benchmark_llvm(iterations):
+    results_list = []
+    summary = {{}}
+    tmpdir = tempfile.mkdtemp(prefix="llvm_bench_")
+    clang_path = _find_binary("clang")
+    llc_path = _find_binary("llc")
+    opt_path = _find_binary("opt")
+    clang_ver = subprocess.run([clang_path, "--version"], capture_output=True, text=True, timeout=10)
+    summary["clang_version"] = clang_ver.stdout.strip()[:200] if clang_ver.returncode == 0 else "not_found"
+
+    c_code = """
+#include <stdio.h>
+#include <math.h>
+#define N 1000000
+int main() {{
+    double sum = 0.0;
+    for (int i = 0; i < N; i++) {{
+        sum += i * 0.0001;
+    }}
+    printf("sum = %f\\n", sum);
+    return 0;
+}}
+"""
+    c_path = os.path.join(tmpdir, "bench.c")
+    with open(c_path, "w") as f:
+        f.write(c_code)
+
+    clang_compile_times = []
+    for i in range(iterations):
+        t0 = time.time()
+        r = subprocess.run([clang_path, "-O2", c_path, "-o", os.path.join(tmpdir, f"clang_bench_{{i}}"), "-lm"],
+                           capture_output=True, text=True, timeout=30)
+        clang_compile_times.append(time.time() - t0)
+    clang_stats = compute_stats(clang_compile_times)
+    summary["clang_compile_O2"] = clang_stats
+    results_list.append({{"operation": "clang_compile_O2", "iterations": iterations,
+                          "avg_time_s": clang_stats.get("avg", 0), "compile_success": r.returncode == 0}})
+
+    clang_run_times = []
+    for i in range(iterations):
+        exe = os.path.join(tmpdir, f"clang_bench_{{i}}")
+        if os.path.exists(exe):
+            t0 = time.time()
+            subprocess.run([exe], capture_output=True, timeout=10)
+            clang_run_times.append(time.time() - t0)
+    if clang_run_times:
+        run_stats = compute_stats(clang_run_times)
+        summary["clang_float_add_1M_run"] = run_stats
+        results_list.append({{"operation": "clang_float_add_1M_run", "iterations": len(clang_run_times),
+                              "avg_time_s": run_stats.get("avg", 0)}})
+
+    c_matmul = """
+#include <stdio.h>
+#include <stdlib.h>
+#define N 500
+int main() {{
+    double *a = malloc(N*N*sizeof(double));
+    double *b = malloc(N*N*sizeof(double));
+    double *c = malloc(N*N*sizeof(double));
+    for (int i=0; i<N*N; i++) {{ a[i] = i*0.001; b[i] = (i/N+i%N)*0.001; c[i]=0; }}
+    for (int i=0; i<N; i++)
+        for (int k=0; k<N; k++)
+            for (int j=0; j<N; j++)
+                c[i*N+j] += a[i*N+k] * b[k*N+j];
+    printf("c[0]=%f\\n", c[0]);
+    free(a); free(b); free(c);
+    return 0;
+}}
+"""
+    c_path2 = os.path.join(tmpdir, "matmul.c")
+    with open(c_path2, "w") as f:
+        f.write(c_matmul)
+    matmul_times = []
+    for i in range(iterations):
+        t0 = time.time()
+        subprocess.run([clang_path, "-O2", c_path2, "-o", os.path.join(tmpdir, f"clang_matmul_{{i}}")],
+                       capture_output=True, text=True, timeout=30)
+        matmul_times.append(time.time() - t0)
+    matmul_stats = compute_stats(matmul_times)
+    summary["clang_compile_matmul_O2"] = matmul_stats
+    results_list.append({{"operation": "clang_compile_matmul_O2", "iterations": iterations,
+                          "avg_time_s": matmul_stats.get("avg", 0)}})
+    matmul_run_times = []
+    for i in range(iterations):
+        exe = os.path.join(tmpdir, f"clang_matmul_{{i}}")
+        if os.path.exists(exe):
+            t0 = time.time()
+            subprocess.run([exe], capture_output=True, timeout=30)
+            matmul_run_times.append(time.time() - t0)
+    if matmul_run_times:
+        mrun_stats = compute_stats(matmul_run_times)
+        summary["clang_matmul_500x500_run"] = mrun_stats
+        results_list.append({{"operation": "clang_matmul_500x500_run", "iterations": len(matmul_run_times),
+                              "avg_time_s": mrun_stats.get("avg", 0)}})
+
+    try:
+        shutil.rmtree(tmpdir)
+    except Exception:
+        pass
+    return summary, results_list
+
+def benchmark_java(iterations):
+    results_list = []
+    summary = {{}}
+    tmpdir = tempfile.mkdtemp(prefix="java_bench_")
+    java_path = _find_binary("java")
+    javac_path = _find_binary("javac")
+    java_ver = subprocess.run([java_path, "-version"], capture_output=True, text=True, timeout=10)
+    summary["java_version"] = (java_ver.stderr or java_ver.stdout).strip()[:100] if java_ver.returncode == 0 else "not_found"
+
+    java_code = """
+public class Bench {{
+    public static void main(String[] args) {{
+        double sum = 0.0;
+        for (int i = 0; i < 1000000; i++) {{
+            sum += i * 0.0001;
+        }}
+        System.out.println("sum = " + sum);
+    }}
+}}
+"""
+    with open(os.path.join(tmpdir, "Bench.java"), "w") as f:
+        f.write(java_code)
+
+    javac_times = []
+    for i in range(iterations):
+        t0 = time.time()
+        r = subprocess.run([javac_path, os.path.join(tmpdir, "Bench.java")],
+                           capture_output=True, text=True, timeout=30)
+        javac_times.append(time.time() - t0)
+    javac_stats = compute_stats(javac_times)
+    summary["javac_compile"] = javac_stats
+    results_list.append({{"operation": "javac_compile", "iterations": iterations,
+                          "avg_time_s": javac_stats.get("avg", 0), "compile_success": r.returncode == 0}})
+
+    jvm_start_times = []
+    java_run_times = []
+    for i in range(iterations):
+        t0 = time.time()
+        r2 = subprocess.run([java_path, "-cp", tmpdir, "Bench"],
+                            capture_output=True, text=True, timeout=30)
+        elapsed = time.time() - t0
+        java_run_times.append(elapsed)
+    run_stats = compute_stats(java_run_times)
+    summary["java_hello_run"] = run_stats
+    results_list.append({{"operation": "java_hello_run", "iterations": iterations,
+                          "avg_time_s": run_stats.get("avg", 0)}})
+
+    java_matmul = """
+public class MatMul {{
+    public static void main(String[] args) {{
+        int n = 500;
+        double[][] a = new double[n][n];
+        double[][] b = new double[n][n];
+        double[][] c = new double[n][n];
+        for (int i=0; i<n; i++) for (int j=0; j<n; j++) {{
+            a[i][j] = i*j*0.001; b[i][j] = (i+j)*0.001;
+        }}
+        long start = System.nanoTime();
+        for (int i=0; i<n; i++)
+            for (int k=0; k<n; k++)
+                for (int j=0; j<n; j++)
+                    c[i][j] += a[i][k]*b[k][j];
+        double elapsed = (System.nanoTime()-start)/1e9;
+        System.out.println("matmul " + n + "x" + n + " time: " + elapsed + "s");
+    }}
+}}
+"""
+    with open(os.path.join(tmpdir, "MatMul.java"), "w") as f:
+        f.write(java_matmul)
+    subprocess.run([javac_path, os.path.join(tmpdir, "MatMul.java")],
+                   capture_output=True, text=True, timeout=30)
+    matmul_run_times = []
+    for i in range(iterations):
+        t0 = time.time()
+        subprocess.run([java_path, "-cp", tmpdir, "MatMul"],
+                       capture_output=True, text=True, timeout=60)
+        matmul_run_times.append(time.time() - t0)
+    matmul_stats = compute_stats(matmul_run_times)
+    summary["java_matmul_500x500"] = matmul_stats
+    results_list.append({{"operation": "java_matmul_500x500", "iterations": iterations,
+                          "avg_time_s": matmul_stats.get("avg", 0)}})
+
+    try:
+        shutil.rmtree(tmpdir)
+    except Exception:
+        pass
+    return summary, results_list
+
+def benchmark_node(iterations):
+    results_list = []
+    summary = {{}}
+    node_path = _find_binary("node")
+    node_ver = subprocess.run([node_path, "--version"], capture_output=True, text=True, timeout=10)
+    summary["node_version"] = node_ver.stdout.strip()[:100] if node_ver.returncode == 0 else "not_found"
+
+    node_ops = {{
+        "float_add_1M": "let sum=0; for(let i=0;i<1000000;i++) sum+=i*0.0001; console.log(sum);",
+        "json_parse_10K": "let s=JSON.stringify(Array.from({{length:10000}},(_,i)=>({{id:i,val:i*0.1}}))); let d=JSON.parse(s); console.log(d.length);",
+        "array_sort_100K": "let a=Array.from({{length:100000}},(_,i)=>Math.random()); a.sort((x,y)=>x-y); console.log(a[0]);",
+        "promise_1K": "let ps=Array.from({{length:1000}},(_,i)=>Promise.resolve(i)); Promise.all(ps).then(r=>console.log(r.length));",
+    }}
+    for op_name, code in node_ops.items():
+        times = []
+        for i in range(iterations):
+            t0 = time.time()
+            subprocess.run([node_path, "-e", code], capture_output=True, text=True, timeout=30)
+            times.append(time.time() - t0)
+        stats = compute_stats(times)
+        summary[op_name] = stats
+        results_list.append({{"operation": op_name, "iterations": iterations,
+                              "avg_time_s": stats.get("avg", 0)}})
+
+    tmpdir = tempfile.mkdtemp(prefix="node_bench_")
+    node_matmul = """
+const n = 500;
+const a = Array.from({{length: n}}, (_, i) => Array.from({{length: n}}, (_, j) => i*j*0.001));
+const b = Array.from({{length: n}}, (_, i) => Array.from({{length: n}}, (_, j) => (i+j)*0.001));
+const c = Array.from({{length: n}}, () => new Float64Array(n));
+const start = Date.now();
+for (let i = 0; i < n; i++)
+    for (let k = 0; k < n; k++)
+        for (let j = 0; j < n; j++)
+            c[i][j] += a[i][k] * b[k][j];
+console.log("matmul " + n + "x" + n + " time: " + (Date.now()-start)/1000 + "s");
+"""
+    js_path = os.path.join(tmpdir, "matmul.js")
+    with open(js_path, "w") as f:
+        f.write(node_matmul)
+    matmul_times = []
+    for i in range(iterations):
+        t0 = time.time()
+        subprocess.run([node_path, js_path], capture_output=True, text=True, timeout=60)
+        matmul_times.append(time.time() - t0)
+    matmul_stats = compute_stats(matmul_times)
+    summary["node_matmul_500x500"] = matmul_stats
+    results_list.append({{"operation": "node_matmul_500x500", "iterations": iterations,
+                          "avg_time_s": matmul_stats.get("avg", 0)}})
+
+    try:
+        shutil.rmtree(tmpdir)
+    except Exception:
+        pass
+    return summary, results_list
+
+def benchmark_nginx(iterations):
+    results_list = []
+    summary = {{}}
+    nginx_path = _find_binary("nginx")
+    nginx_ver = subprocess.run([nginx_path, "-v"], capture_output=True, text=True, timeout=10)
+    summary["nginx_version"] = (nginx_ver.stderr or nginx_ver.stdout).strip()[:100] if nginx_ver.returncode == 0 else "not_found"
+    curl_path = _find_binary("curl")
+    tmpdir = tempfile.mkdtemp(prefix="nginx_bench_")
+    conf = """
+worker_processes 1;
+daemon off;
+events {{ worker_connections 1024; }}
+http {{
+    server {{
+        listen 18080;
+        server_name localhost;
+        location / {{
+            return 200 'hello benchmark';
+        }}
+    }}
+}}
+"""
+    conf_path = os.path.join(tmpdir, "nginx.conf")
+    with open(conf_path, "w") as f:
+        f.write(conf)
+
+    nginx_proc = None
+    try:
+        nginx_proc = subprocess.Popen([nginx_path, "-c", conf_path],
+                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(1)
+        if curl_path and os.path.exists(curl_path):
+            rps_times = []
+            req_count = 1000
+            for i in range(iterations):
+                t0 = time.time()
+                for j in range(req_count):
+                    subprocess.run([curl_path, "-s", "http://localhost:18080/"], capture_output=True, timeout=5)
+                elapsed = time.time() - t0
+                rps_times.append(elapsed)
+            rps_stats = compute_stats(rps_times)
+            qps = req_count / rps_stats.get("avg", 1) if rps_stats.get("avg", 0) > 0 else 0
+            summary["nginx_rps_1K"] = rps_stats
+            summary["nginx_qps"] = round(qps, 2)
+            results_list.append({{"operation": "nginx_rps_1K", "iterations": iterations,
+                                  "avg_time_s": rps_stats.get("avg", 0), "qps": round(qps, 2)}})
+    except Exception as e:
+        summary["nginx_benchmark_error"] = str(e)[:200]
+    finally:
+        if nginx_proc:
+            nginx_proc.terminate()
+            nginx_proc.wait(timeout=5)
+    try:
+        shutil.rmtree(tmpdir)
+    except Exception:
+        pass
+    return summary, results_list
+
+def benchmark_hnswlib(iterations):
+    results_list = []
+    summary = {{}}
+    try:
+        import numpy as np
+        import hnswlib
+        n = 100000
+        d = 128
+        k = 10
+        np.random.seed(42)
+        data = np.random.random((n, d)).astype("float32")
+        queries = np.random.random((100, d)).astype("float32")
+
+        build_times = []
+        for i in range(iterations):
+            t0 = time.time()
+            index = hnswlib.Index(space="l2", dim=d)
+            index.init_index(max_elements=n, ef_construction=200, M=32)
+            index.add_items(data)
+            build_times.append(time.time() - t0)
+        build_stats = compute_stats(build_times)
+        summary["hnswlib_build_100K"] = build_stats
+        results_list.append({{"operation": "hnswlib_build_100K", "iterations": iterations,
+                              "avg_time_s": build_stats.get("avg", 0)}})
+
+        search_times = []
+        for i in range(iterations):
+            t0 = time.time()
+            labels, distances = index.knn_query(queries, k=k)
+            search_times.append(time.time() - t0)
+        search_stats = compute_stats(search_times)
+        nq = queries.shape[0]
+        qps = nq / search_stats.get("avg", 1) if search_stats.get("avg", 0) > 0 else 0
+        summary["hnswlib_search_100queries"] = search_stats
+        summary["hnswlib_qps"] = round(qps, 2)
+        results_list.append({{"operation": "hnswlib_search_100q", "iterations": iterations,
+                              "avg_time_s": search_stats.get("avg", 0), "qps": round(qps, 2)}})
+    except ImportError as e:
+        summary["hnswlib_import_error"] = str(e)[:200]
+        try:
+            import numpy as np2
+            np = np2
+            has_np = True
+        except ImportError:
+            has_np = False
+        if has_np:
+            for sz in [10000, 100000]:
+                dot_times = []
+                for i in range(iterations):
+                    a = np.random.random(sz).astype("float32")
+                    b = np.random.random(sz).astype("float32")
+                    t0 = time.time()
+                    c = np.dot(a, b)
+                    dot_times.append(time.time() - t0)
+                stats = compute_stats(dot_times)
+                summary[f"numpy_dot_{{sz}}"] = stats
+                results_list.append({{"operation": f"numpy_dot_{{sz}}", "iterations": iterations,
+                                      "avg_time_s": stats.get("avg", 0)}})
+    return summary, results_list
+
+def benchmark_opencv(iterations):
+    results_list = []
+    summary = {{}}
+    try:
+        import cv2
+        import numpy as np
+        summary["opencv_version"] = getattr(cv2, "__version__", "unknown")
+
+        img_sizes = [(640, 480), (1920, 1080), (3840, 2160)]
+        for w, h in img_sizes:
+            gauss_times = []
+            resize_times = []
+            for i in range(iterations):
+                img = np.random.randint(0, 255, (h, w, 3), dtype=np.uint8)
+                t0 = time.time()
+                blurred = cv2.GaussianBlur(img, (15, 15), 0)
+                gauss_times.append(time.time() - t0)
+                t0 = time.time()
+                resized = cv2.resize(img, (w // 2, h // 2))
+                resize_times.append(time.time() - t0)
+            summary[f"opencv_gauss_{{w}}x{{h}}"] = compute_stats(gauss_times)
+            summary[f"opencv_resize_{{w}}x{{h}}"] = compute_stats(resize_times)
+            results_list.append({{"operation": f"opencv_gauss_{{w}}x{{h}}", "iterations": iterations,
+                                  "avg_time_s": compute_stats(gauss_times).get("avg", 0)}})
+            results_list.append({{"operation": f"opencv_resize_{{w}}x{{h}}", "iterations": iterations,
+                                  "avg_time_s": compute_stats(resize_times).get("avg", 0)}})
+
+        encode_times = []
+        for i in range(iterations):
+            img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
+            t0 = time.time()
+            _, encoded = cv2.imencode(".jpg", img)
+            encode_times.append(time.time() - t0)
+        summary["opencv_jpg_encode_640x480"] = compute_stats(encode_times)
+        results_list.append({{"operation": "opencv_jpg_encode_640x480", "iterations": iterations,
+                              "avg_time_s": compute_stats(encode_times).get("avg", 0)}})
+
+        detect_times = []
+        for i in range(iterations):
+            img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            t0 = time.time()
+            edges = cv2.Canny(gray, 50, 150)
+            detect_times.append(time.time() - t0)
+        summary["opencv_canny_640x480"] = compute_stats(detect_times)
+        results_list.append({{"operation": "opencv_canny_640x480", "iterations": iterations,
+                              "avg_time_s": compute_stats(detect_times).get("avg", 0)}})
+    except ImportError as e:
+        summary["opencv_import_error"] = str(e)[:200]
+    return summary, results_list
+
+def benchmark_protobuf(iterations):
+    results_list = []
+    summary = {{}}
+    try:
+        from google.protobuf import descriptor_pb2
+        import google.protobuf
+        summary["protobuf_version"] = getattr(google.protobuf, "__version__", "unknown")
+        msg = descriptor_pb2.FileDescriptorProto()
+        msg.name = "bench.proto"
+        msg.package = "bench"
+        msg.syntax = "proto3"
+
+        ser_times = []
+        de_times = []
+        for i in range(iterations):
+            msg_data = msg.SerializeToString()
+            t0 = time.time()
+            for j in range(10000):
+                msg_data = msg.SerializeToString()
+            ser_times.append(time.time() - t0)
+            t0 = time.time()
+            for j in range(10000):
+                msg2 = descriptor_pb2.FileDescriptorProto()
+                msg2.ParseFromString(msg_data)
+            de_times.append(time.time() - t0)
+        summary["protobuf_serialize_10K"] = compute_stats(ser_times)
+        summary["protobuf_deserialize_10K"] = compute_stats(de_times)
+        results_list.append({{"operation": "protobuf_serialize_10K", "iterations": iterations,
+                              "avg_time_s": compute_stats(ser_times).get("avg", 0)}})
+        results_list.append({{"operation": "protobuf_deserialize_10K", "iterations": iterations,
+                              "avg_time_s": compute_stats(de_times).get("avg", 0)}})
+
+        big_msg = descriptor_pb2.FileDescriptorProto()
+        big_msg.name = "big_bench.proto"
+        for idx in range(1000):
+            dep = big_msg.dependency.add()
+            dep = f"dep_{{idx}}.proto"
+        ser_big_times = []
+        de_big_times = []
+        for i in range(iterations):
+            t0 = time.time()
+            big_data = big_msg.SerializeToString()
+            ser_big_times.append(time.time() - t0)
+            t0 = time.time()
+            big_msg2 = descriptor_pb2.FileDescriptorProto()
+            big_msg2.ParseFromString(big_data)
+            de_big_times.append(time.time() - t0)
+        summary["protobuf_serialize_big_1K_deps"] = compute_stats(ser_big_times)
+        summary["protobuf_deserialize_big_1K_deps"] = compute_stats(de_big_times)
+        results_list.append({{"operation": "protobuf_serialize_big", "iterations": iterations,
+                              "avg_time_s": compute_stats(ser_big_times).get("avg", 0)}})
+        results_list.append({{"operation": "protobuf_deserialize_big", "iterations": iterations,
+                              "avg_time_s": compute_stats(de_big_times).get("avg", 0)}})
+    except ImportError as e:
+        summary["protobuf_import_error"] = str(e)[:200]
+    return summary, results_list
+
+def benchmark_rdkit(iterations):
+    results_list = []
+    summary = {{}}
+    try:
+        from rdkit import Chem
+        from rdkit import RDLogger
+        RDLogger.logger().setLevel(RDLogger.ERROR)
+        import rdkit
+        summary["rdkit_version"] = getattr(rdkit, "__version__", "unknown")
+
+        smiles_list = ["CCO", "c1ccccc1", "CC(=O)Oc1ccccc1C(=O)O",
+                       "CCCCCCCCCCCCCCCC", "C1CCCCC1", "CC(C)CC(C)C",
+                       "c1ccc2c(c1)ccc1ccccc2c1c", "CCN(CC)CC"]
+        mol_times = []
+        for i in range(iterations):
+            t0 = time.time()
+            mols = [Chem.MolFromSmiles(s) for s in smiles_list]
+            mol_times.append(time.time() - t0)
+        summary["rdkit_smiles_parse_8"] = compute_stats(mol_times)
+        results_list.append({{"operation": "rdkit_smiles_parse_8", "iterations": iterations,
+                              "avg_time_s": compute_stats(mol_times).get("avg", 0)}})
+
+        murcko_times = []
+        for i in range(iterations):
+            t0 = time.time()
+            scaffolds = [Chem.MolToSmiles(Chem.GetScaffoldForMol(m)) for m in mols if m]
+            murcko_times.append(time.time() - t0)
+        summary["rdkit_murcko_scaffold_8"] = compute_stats(murcko_times)
+        results_list.append({{"operation": "rdkit_murcko_scaffold_8", "iterations": iterations,
+                              "avg_time_s": compute_stats(murcko_times).get("avg", 0)}})
+
+        fp_times = []
+        for i in range(iterations):
+            t0 = time.time()
+            fps = [Chem.RDKFingerprint(m) for m in mols if m]
+            fp_times.append(time.time() - t0)
+        summary["rdkit_fingerprint_8"] = compute_stats(fp_times)
+        results_list.append({{"operation": "rdkit_fingerprint_8", "iterations": iterations,
+                              "avg_time_s": compute_stats(fp_times).get("avg", 0)}})
+
+        sim_times = []
+        for i in range(iterations):
+            from rdkit import DataStructs
+            t0 = time.time()
+            for fp1 in fps[:4]:
+                for fp2 in fps[:4]:
+                    DataStructs.FingerprintSimilarity(fp1, fp2)
+            sim_times.append(time.time() - t0)
+        summary["rdkit_similarity_4x4"] = compute_stats(sim_times)
+        results_list.append({{"operation": "rdkit_similarity_4x4", "iterations": iterations,
+                              "avg_time_s": compute_stats(sim_times).get("avg", 0)}})
+    except ImportError as e:
+        summary["rdkit_import_error"] = str(e)[:200]
+    return summary, results_list
+
+def benchmark_hadoop(iterations):
+    results_list = []
+    summary = {{}}
+    hadoop_path = _find_binary("hadoop")
+    hdfs_path = _find_binary("hdfs")
+    java_path = _find_binary("java")
+    if os.path.exists(hadoop_path):
+        r = subprocess.run([hadoop_path, "version"], capture_output=True, text=True, timeout=10)
+        summary["hadoop_version"] = r.stdout.strip()[:200] if r.returncode == 0 else "not_found"
+    else:
+        summary["hadoop_version"] = "not_found"
+    if os.path.exists(hdfs_path):
+        r2 = subprocess.run([hdfs_path, "version"], capture_output=True, text=True, timeout=10)
+        summary["hdfs_version"] = r2.stdout.strip()[:200] if r2.returncode == 0 else "not_found"
+    else:
+        summary["hdfs_version"] = "not_found"
+    try:
+        import subprocess
+        if os.path.exists(java_path):
+            tmpdir = tempfile.mkdtemp(prefix="hadoop_bench_")
+            java_wordcount = """
+import java.io.*;
+import java.util.*;
+public class WordCount {{
+    public static void main(String[] args) {{
+        Map<String, Integer> counts = new HashMap<>();
+        for (int i = 0; i < 1000000; i++) {{
+            String w = "word" + (i % 100);
+            counts.merge(w, 1, Integer::sum);
+        }}
+        System.out.println("unique words: " + counts.size());
+    }}
+}}
+"""
+            with open(os.path.join(tmpdir, "WordCount.java"), "w") as f:
+                f.write(java_wordcount)
+            javac_path = _find_binary("javac")
+            subprocess.run([javac_path, os.path.join(tmpdir, "WordCount.java")],
+                           capture_output=True, text=True, timeout=30)
+            wc_times = []
+            for i in range(iterations):
+                t0 = time.time()
+                subprocess.run([java_path, "-cp", tmpdir, "WordCount"],
+                               capture_output=True, text=True, timeout=30)
+                wc_times.append(time.time() - t0)
+            wc_stats = compute_stats(wc_times)
+            summary["java_wordcount_1M"] = wc_stats
+            results_list.append({{"operation": "java_wordcount_1M", "iterations": iterations,
+                                  "avg_time_s": wc_stats.get("avg", 0)}})
+            try:
+                shutil.rmtree(tmpdir)
+            except Exception:
+                pass
+    except Exception as e:
+        summary["hadoop_bench_error"] = str(e)[:200]
+    return summary, results_list
+
+def benchmark_kylin(iterations):
+    results_list = []
+    summary = {{}}
+    kylin_path = _find_binary("kylin")
+    if os.path.exists(kylin_path):
+        r = subprocess.run([kylin_path, "--version"], capture_output=True, text=True, timeout=10)
+        summary["kylin_version"] = (r.stdout or r.stderr).strip()[:200] if r.returncode == 0 else "not_found"
+    else:
+        summary["kylin_version"] = "not_found"
+    java_path = _find_binary("java")
+    javac_path = _find_binary("javac")
+    if os.path.exists(java_path) and os.path.exists(javac_path):
+        tmpdir = tempfile.mkdtemp(prefix="kylin_bench_")
+        java_cube = """
+import java.util.*;
+public class CubeAgg {{
+    public static void main(String[] args) {{
+        int n = 100000;
+        Map<String, Long> agg = new HashMap<>();
+        for (int i = 0; i < n; i++) {{
+            String dim1 = "dim" + (i % 10);
+            String dim2 = "dim" + (i % 5);
+            String key = dim1 + "|" + dim2;
+            agg.merge(key, (long)i, Long::sum);
+        }}
+        System.out.println("cube entries: " + agg.size());
+    }}
+}}
+"""
+        with open(os.path.join(tmpdir, "CubeAgg.java"), "w") as f:
+            f.write(java_cube)
+        subprocess.run([javac_path, os.path.join(tmpdir, "CubeAgg.java")],
+                       capture_output=True, text=True, timeout=30)
+        cube_times = []
+        for i in range(iterations):
+            t0 = time.time()
+            subprocess.run([java_path, "-cp", tmpdir, "CubeAgg"],
+                           capture_output=True, text=True, timeout=30)
+            cube_times.append(time.time() - t0)
+        cube_stats = compute_stats(cube_times)
+        summary["kylin_cube_agg_100K"] = cube_stats
+        results_list.append({{"operation": "kylin_cube_agg_100K", "iterations": iterations,
+                              "avg_time_s": cube_stats.get("avg", 0)}})
+        try:
+            shutil.rmtree(tmpdir)
+        except Exception:
+            pass
+    return summary, results_list
+
+def benchmark_mooncake(iterations):
+    results_list = []
+    summary = {{}}
+    mooncake_path = _find_binary("mooncake")
+    python3_path = _find_binary("python3")
+    try:
+        subprocess.run([python3_path, "-c", "import mooncake"],
+                       capture_output=True, text=True, timeout=10)
+        summary["mooncake_python"] = "available"
+    except Exception:
+        summary["mooncake_python"] = "not_available"
+    ops = [
+        ("float_add_1M", lambda: sum(j * 0.0001 for j in range(1000000))),
+        ("list_sort_100K", lambda: sorted([j * 0.001 for j in range(100000)])),
+        ("dict_create_100K", lambda: dict((j, j * 0.001) for j in range(100000))),
+    ]
+    for op_name, op_func in ops:
+        times = []
+        for i in range(iterations):
+            t0 = time.time()
+            op_func()
+            times.append(time.time() - t0)
+        summary[op_name] = compute_stats(times)
+        results_list.append({{"operation": op_name, "iterations": iterations,
+                              "avg_time_s": compute_stats(times).get("avg", 0)}})
+    return summary, results_list
+
+def benchmark_juicefs(iterations):
+    results_list = []
+    summary = {{}}
+    juicefs_path = _find_binary("juicefs")
+    if os.path.exists(juicefs_path):
+        r = subprocess.run([juicefs_path, "--version"], capture_output=True, text=True, timeout=10)
+        summary["juicefs_version"] = (r.stdout or r.stderr).strip()[:200] if r.returncode == 0 else "not_found"
+    else:
+        summary["juicefs_version"] = "not_found"
+
+    tmpdir = tempfile.mkdtemp(prefix="juicefs_io_bench_")
+    io_times = {{}}
+    for io_op in ["write_1MB", "write_10MB", "read_1MB"]:
+        sizes = {{\"write_1MB": 1048576, "write_10MB": 10485760, "read_1MB": 1048576}}
+        sz = sizes[io_op]
+        times = []
+        for i in range(iterations):
+            fpath = os.path.join(tmpdir, f"io_{{io_op}}_{{i}}")
+            t0 = time.time()
+            if io_op.startswith("write"):
+                with open(fpath, "wb") as f:
+                    f.write(os.urandom(sz))
+            else:
+                if os.path.exists(fpath.replace("read", "write")):
+                    with open(fpath.replace("read", "write"), "rb") as f:
+                        f.read()
+            times.append(time.time() - t0)
+        stats = compute_stats(times)
+        io_times[io_op] = stats
+        summary[io_op] = stats
+        results_list.append({{"operation": io_op, "size_bytes": sz, "iterations": iterations,
+                              "avg_time_s": stats.get("avg", 0)}})
+
+    try:
+        shutil.rmtree(tmpdir)
+    except Exception:
+        pass
+    return summary, results_list
+
+def benchmark_seissol(iterations):
+    results_list = []
+    summary = {{}}
+    seissol_path = _find_binary("SeisSol")
+    if os.path.exists(seissol_path):
+        r = subprocess.run([seissol_path, "--version"], capture_output=True, text=True, timeout=10)
+        summary["seissol_version"] = (r.stdout or r.stderr).strip()[:200] if r.returncode == 0 else "not_found"
+    else:
+        summary["seissol_version"] = "not_found"
+    try:
+        import numpy as np
+        has_np = True
+    except ImportError:
+        np = None
+        has_np = False
+    if has_np:
+        stencil_times = []
+        for i in range(iterations):
+            n = 10000
+            a = np.random.random(n).astype("float64")
+            b = np.zeros(n).astype("float64")
+            t0 = time.time()
+            for j in range(1, n - 1):
+                b[j] = (a[j-1] + a[j] + a[j+1]) / 3.0
+            stencil_times.append(time.time() - t0)
+        summary["numpy_stencil_10K"] = compute_stats(stencil_times)
+        results_list.append({{"operation": "numpy_stencil_10K", "iterations": iterations,
+                              "avg_time_s": compute_stats(stencil_times).get("avg", 0)}})
+
+        laplace_times = []
+        for i in range(iterations):
+            n = 100
+            A = np.eye(n) * 4 + np.roll(np.eye(n), 1, axis=1) * -1 + np.roll(np.eye(n), -1, axis=1) * -1
+            b_vec = np.random.random(n).astype("float64")
+            t0 = time.time()
+            x = np.linalg.solve(A, b_vec)
+            laplace_times.append(time.time() - t0)
+        summary["numpy_laplace_solve_100"] = compute_stats(laplace_times)
+        results_list.append({{"operation": "numpy_laplace_solve_100", "iterations": iterations,
+                              "avg_time_s": compute_stats(laplace_times).get("avg", 0)}})
+    else:
+        ops = [
+            ("float_add_1M", lambda: sum(j * 0.0001 for j in range(1000000))),
+            ("list_sort_100K", lambda: sorted([j * 0.001 for j in range(100000)])),
+            ("fibonacci_iter_100K", lambda: _fib_iter(100000)),
+        ]
+        for op_name, op_func in ops:
+            times = []
+            for i in range(iterations):
+                t0 = time.time()
+                op_func()
+                times.append(time.time() - t0)
+            summary[op_name] = compute_stats(times)
+            results_list.append({{"operation": op_name, "iterations": iterations,
+                                  "avg_time_s": compute_stats(times).get("avg", 0)}})
+    return summary, results_list
+
 def benchmark_generic_compute(iterations):
     results_list = []
     summary = {{}}
@@ -719,6 +1650,46 @@ SOFTWARE_BENCHMARKS = {{
     "faiss": benchmark_faiss,
     "numpy": benchmark_numpy,
     "redis": benchmark_redis,
+    "rocksdb": benchmark_rocksdb,
+    "mysql": benchmark_mysql,
+    "go": benchmark_go,
+    "llvm": benchmark_llvm,
+    "clang": benchmark_llvm,
+    "java": benchmark_java,
+    "node": benchmark_node,
+    "nginx": benchmark_nginx,
+    "hnswlib": benchmark_hnswlib,
+    "opencv": benchmark_opencv,
+    "protobuf": benchmark_protobuf,
+    "rdkit": benchmark_rdkit,
+    "hadoop": benchmark_hadoop,
+    "kylin": benchmark_kylin,
+    "mooncake": benchmark_mooncake,
+    "juicefs": benchmark_juicefs,
+    "seissol": benchmark_seissol,
+    "lucene": benchmark_hadoop,
+    "kibana": benchmark_java,
+    "mongoose": benchmark_generic_compute,
+    "xla": benchmark_generic_compute,
+    "tensorrt-llm": benchmark_generic_compute,
+    "fbthrift": benchmark_generic_compute,
+    "openvelinux": benchmark_generic_compute,
+    "openviking": benchmark_generic_compute,
+    "opencloudos": benchmark_generic_compute,
+    "cloudwego": benchmark_go,
+    "kata-containers": benchmark_generic_compute,
+    "kuberay": benchmark_generic_compute,
+    "kubeflow": benchmark_generic_compute,
+    "e2b": benchmark_generic_compute,
+    "sriov-network-operator": benchmark_generic_compute,
+    "deathstarbench": benchmark_generic_compute,
+    "reedsolomon": benchmark_generic_compute,
+    "circos": benchmark_generic_compute,
+    "ncl": benchmark_generic_compute,
+    "cactus": benchmark_generic_compute,
+    "tophat": benchmark_generic_compute,
+    "prottest3": benchmark_generic_compute,
+    "cufflinks": benchmark_generic_compute,
 }}
 
 def run_benchmark(output_file, version, iterations):
