@@ -1,0 +1,204 @@
+{
+  "software_name": "petsc",
+  "primary_benchmark": {
+    "benchmark": "generic_performance",
+    "description": "petsc performance benchmark (generic + software-specific mini-tests)",
+    "reference": "SKILL.md",
+    "software": "petsc",
+    "version": "3.25.3",
+    "parameters": {
+      "iterations": 1
+    },
+    "system_info": {
+      "architecture": "unknown",
+      "cpu_cores": 32,
+      "platform": "linux",
+      "python_version": "3.11.6",
+      "kernel": "6.8.0-87-generic",
+      "cpu_model": ""
+    },
+    "target_software": {
+      "name": "petsc",
+      "python_module": "not_found_in_container",
+      "import_benchmark": null,
+      "software_specific_minibench": {
+        "petsc_init_minibench": {
+          "error": "No module named 'petsc4py'"
+        }
+      }
+    },
+    "container_environment": {
+      "python_modules_available": [
+        {
+          "name": "sqlite3",
+          "module": "sqlite3",
+          "version": "unknown",
+          "import_time_ms": 3.9,
+          "importable": true
+        }
+      ],
+      "python_modules_not_available": [
+        "faiss",
+        "hnswlib",
+        "lz4",
+        "protobuf",
+        "pytorch",
+        "scann",
+        "openviking",
+        "numpy",
+        "pandas",
+        "scipy",
+        "sklearn",
+        "tensorflow",
+        "petsc",
+        "rust",
+        "mysql",
+        "redis",
+        "grpc",
+        "opencv",
+        "curl"
+      ],
+      "binaries_available": [
+        {
+          "name": "java",
+          "path": "/usr/bin/java",
+          "version_output": "openjdk 11.0.29 2025-10-21\nOpenJDK Runtime Environment BiSheng (build 11.0.29+7)\nOpenJDK 64-Bit Server VM BiSheng (build 11.0.29+7, mixed mode, sharing)",
+          "version_check_time_ms": 61.39,
+          "available": true
+        },
+        {
+          "name": "javac",
+          "path": "/usr/bin/javac",
+          "version_output": "javac 11.0.29",
+          "version_check_time_ms": 201.65,
+          "available": true
+        },
+        {
+          "name": "gcc",
+          "path": "/usr/bin/gcc",
+          "version_output": "gcc (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for ME",
+          "version_check_time_ms": 4.12,
+          "available": true
+        },
+        {
+          "name": "g++",
+          "path": "/usr/bin/g++",
+          "version_output": "g++ (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for ME",
+          "version_check_time_ms": 3.86,
+          "available": true
+        },
+        {
+          "name": "python3",
+          "path": "/usr/bin/python3",
+          "version_output": "Python 3.11.6",
+          "version_check_time_ms": 2.55,
+          "available": true
+        },
+        {
+          "name": "curl",
+          "path": "/usr/bin/curl",
+          "version_output": "curl 8.4.0 (aarch64-openEuler-linux-gnu) libcurl/8.4.0 OpenSSL/3.0.12 zlib/1.2.13 brotli/1.1.0 libidn2/2.3.4 libpsl/0.21.2 (+libidn2/2.3.4) libssh/0.10.5/openssl/zlib nghttp2/1.58.0 OpenLDAP/2.6.5\nRel",
+          "version_check_time_ms": 8.58,
+          "available": true
+        },
+        {
+          "name": "git",
+          "path": "/usr/bin/git",
+          "version_output": "git version 2.43.0",
+          "version_check_time_ms": 1.55,
+          "available": true
+        },
+        {
+          "name": "make",
+          "path": "/usr/bin/make",
+          "version_output": "GNU Make 4.4.1\nBuilt for aarch64-openEuler-linux-gnu\nCopyright (C) 1988-2023 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\nThis is free ",
+          "version_check_time_ms": 2.58,
+          "available": true
+        },
+        {
+          "name": "cc",
+          "path": "/usr/bin/cc",
+          "version_output": "cc (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MER",
+          "version_check_time_ms": 4.14,
+          "available": true
+        },
+        {
+          "name": "ld",
+          "path": "/usr/bin/ld",
+          "version_output": "GNU ld (GNU Binutils) 2.41\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at y",
+          "version_check_time_ms": 2.11,
+          "available": true
+        },
+        {
+          "name": "ar",
+          "path": "/usr/bin/ar",
+          "version_output": "GNU ar (GNU Binutils) 2.41\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at y",
+          "version_check_time_ms": 1.69,
+          "available": true
+        },
+        {
+          "name": "nm",
+          "path": "/usr/bin/nm",
+          "version_output": "GNU nm (GNU Binutils) 2.41\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at y",
+          "version_check_time_ms": 1.61,
+          "available": true
+        },
+        {
+          "name": "objdump",
+          "path": "/usr/bin/objdump",
+          "version_output": "GNU objdump (GNU Binutils) 2.41\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or ",
+          "version_check_time_ms": 2.78,
+          "available": true
+        }
+      ]
+    },
+    "performance_metrics": {},
+    "results_summary": {}
+  },
+  "micro_benchmark": {
+    "benchmark": "micro_operations",
+    "description": "petsc micro benchmark",
+    "reference": "SKILL.md",
+    "parameters": {
+      "iterations": 1
+    },
+    "performance_metrics": {
+      "operation_count": 3
+    },
+    "results": {
+      "which_java": {
+        "avg_time_s": 0.001,
+        "min_time_s": 0.001,
+        "max_time_s": 0.001,
+        "iterations": 1
+      },
+      "which_python3": {
+        "avg_time_s": 0.001,
+        "min_time_s": 0.001,
+        "max_time_s": 0.001,
+        "iterations": 1
+      },
+      "system_info": {
+        "cpu_cores": 32,
+        "platform": "linux",
+        "python_version": "3.11.6"
+      }
+    },
+    "version": "3.25.3"
+  },
+  "environment": {
+    "test_time": "2026-07-01T08:53:16Z",
+    "Model": "Kunpeng-920",
+    "architecture": "aarch64",
+    "kernel": "6.8.0-87-generic",
+    "os": "openEuler 24.03 SP3",
+    "cpu_model": "ARM64 CPU (32 cores)",
+    "cpu_cores": 32,
+    "software_name": "petsc",
+    "software_version": "3.25.3",
+    "python_version": "Python 3.11.6",
+    "numpy_version": ""
+  },
+  "timestamp": "2026-07-01T08:53:17Z",
+  "test_time": "2026-07-01T08:53:16Z"
+}
