@@ -1,0 +1,42 @@
+[
+  {
+    "software": "petsc",
+    "version": "3.25.3",
+    "category": "HPC",
+    "benchmark_type": "benchmark_generic",
+    "python_module": "petsc",
+    "docker_image": "openeuler/petsc",
+    "docker_tag": "3.25.3-oe2403sp3",
+    "status": "generated",
+    "path": "/home/runner/tantian/actions-runner/_work/Tian/Tian/tests/petsc",
+    "files": [
+      "petsc_test.sh",
+      "scripts/json_helper.py",
+      "scripts/aggregate_results.py",
+      "scripts/generate_summary.py",
+      "scripts/benchmark_generic.py",
+      "scripts/micro_benchmark.py"
+    ],
+    "docker_status": "not_checked"
+  },
+  {
+    "software": "rust",
+    "version": "1.96.0",
+    "category": "Others",
+    "benchmark_type": "benchmark_generic",
+    "python_module": "rust",
+    "docker_image": "openeuler/rust",
+    "docker_tag": "1.96.0-oe2403sp3",
+    "status": "generated",
+    "path": "/home/runner/tantian/actions-runner/_work/Tian/Tian/tests/rust",
+    "files": [
+      "rust_test.sh",
+      "scripts/json_helper.py",
+      "scripts/aggregate_results.py",
+      "scripts/generate_summary.py",
+      "scripts/benchmark_generic.py",
+      "scripts/micro_benchmark.py"
+    ],
+    "docker_status": "not_checked"
+  }
+]
