@@ -263,7 +263,7 @@ def run_benchmark(output_file, version, iterations):
             "name": SOFTWARE_NAME,
             "python_module": target_module if target_module else "not_found_in_container",
             "import_benchmark": import_bench,
-            "software_specific_minibench": mini_bench if mini_bench else {},
+            "software_specific_minibench": mini_bench if mini_bench else {{}},
         }},
         "container_environment": {{
             "python_modules_available": [m for m in all_py if m.get("importable")],
