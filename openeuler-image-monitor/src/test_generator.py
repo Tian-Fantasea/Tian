@@ -2141,7 +2141,7 @@ def build_test_sh(software, version, docker_namespace, docker_tag, benchmark_typ
         'DOCKER_CID=""',
         'SHUNIT2_PATH=""',
         'HAS_PYTHON3=0',
-        'ITERATIONS="${ITERATIONS:-1}"',
+        'ITERATIONS="${ITERATIONS:-5}"',
         '',
         'RESULTS_DIR="${SCRIPT_DIR}/results/${SOFTWARE_VERSION}"',
         'mkdir -p "${RESULTS_DIR}"',
