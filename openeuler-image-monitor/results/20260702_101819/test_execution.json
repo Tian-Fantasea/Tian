@@ -1,0 +1,44 @@
+[
+  {
+    "software": "faiss",
+    "version": "1.14.2",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  },
+  {
+    "software": "hnswlib",
+    "version": "0.8.0",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  },
+  {
+    "software": "openviking",
+    "version": "0.4.4",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  },
+  {
+    "software": "petsc",
+    "version": "3.25.3",
+    "status": "completed",
+    "returncode": 0,
+    "elapsed_seconds": 42.8,
+    "stdout_tail": "\ntestLogFileGenerated\ntestAggregatedResultsContainsAllBenchmarks\n[CLEANUP] Stopping container 9e89184bbde7ce42e1b141894bf0ffac4593a8d63330bfdebeb3d9730499de96\n\nRan \u001b[1;36m16\u001b[0m tests.\n\n\u001b[1;32mOK\u001b[0m\n",
+    "stderr_tail": ""
+  },
+  {
+    "software": "protobuf",
+    "version": "35.1",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  },
+  {
+    "software": "rust",
+    "version": "1.96.0",
+    "status": "completed",
+    "returncode": 0,
+    "elapsed_seconds": 47.2,
+    "stdout_tail": "\ntestLogFileGenerated\ntestAggregatedResultsContainsAllBenchmarks\n[CLEANUP] Stopping container 876886cc789a6286a72bc7fe0cc0b6041ec6907ad0be9f723d91e02073be07d1\n\nRan \u001b[1;36m16\u001b[0m tests.\n\n\u001b[1;32mOK\u001b[0m\n",
+    "stderr_tail": ""
+  }
+]
