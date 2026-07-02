@@ -121,15 +121,19 @@ jobs:
           mkdir -p "${HOME}/.ssh"
           if [ -n "${GITCODE_SSH_KEY}" ]; then
             echo "Using SSH key for Gitcode authentication"
-            echo "${GITCODE_SSH_KEY}" > "${HOME}/.ssh/gitcode_key"
+            printf '%s\n' "${GITCODE_SSH_KEY}" > "${HOME}/.ssh/gitcode_key"
             chmod 600 "${HOME}/.ssh/gitcode_key"
-            cat > "${HOME}/.ssh/config" << SSHCONF
+            cat > "${HOME}/.ssh/config" << 'SSHCONF'
           Host gitcode.com
-            IdentityFile ${HOME}/.ssh/gitcode_key
+            IdentityFile ~/.ssh/gitcode_key
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
+            IdentitiesOnly yes
           SSHCONF
             chmod 600 "${HOME}/.ssh/config"
+            ssh-keyscan gitcode.com >> "${HOME}/.ssh/known_hosts" 2>/dev/null
+            GIT_SSH_COMMAND="ssh -i ${HOME}/.ssh/gitcode_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+            export GIT_SSH_COMMAND
             GITCODE_REPO_URL="git@gitcode.com:Tian-Fantasea/openeuler-docker-images.git"
           else
             echo "No SSH key, trying HTTPS with various auth formats"
@@ -187,6 +191,8 @@ jobs:
             fi
             git commit -m "【自动测试】${SOFTWARE}容器镜像性能基准测试 v${VERSION}" 2>&1
             if [ -n "${GITCODE_SSH_KEY}" ]; then
+              GIT_SSH_COMMAND="ssh -i ${HOME}/.ssh/gitcode_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+              export GIT_SSH_COMMAND
               git remote set-url origin "git@gitcode.com:Tian-Fantasea/openeuler-docker-images.git" 2>&1
               git push origin "${BRANCH_NAME}" 2>&1 || {
                 echo "ERROR: SSH push failed for Gitcode"
