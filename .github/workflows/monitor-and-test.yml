@@ -117,18 +117,18 @@ jobs:
           fi
           echo "Newly generated software to push to Gitcode:"
           echo "${GENERATED_LIST}"
-          GITCODE_REPO_URL="https://oauth2:${GITCODE_ACCESS_TOKEN}@gitcode.com/openeuler/openeuler-docker-images.git"
+          GITCODE_REPO_URL="https://oauth2:${GITCODE_ACCESS_TOKEN}@gitcode.com/Tian-Fantasea/openeuler-docker-images.git"
           GITCODE_DIR="/tmp/gitcode-openeuler-docker-images"
           rm -rf "${GITCODE_DIR}"
           git clone --depth=1 "${GITCODE_REPO_URL}" "${GITCODE_DIR}" 2>&1 || {
             echo "oauth2 auth failed, trying username+token format"
-            GITCODE_REPO_URL="https://bot:${GITCODE_ACCESS_TOKEN}@gitcode.com/openeuler/openeuler-docker-images.git"
+            GITCODE_REPO_URL="https://bot:${GITCODE_ACCESS_TOKEN}@gitcode.com/Tian-Fantasea/openeuler-docker-images.git"
             git clone --depth=1 "${GITCODE_REPO_URL}" "${GITCODE_DIR}" 2>&1 || {
               echo "username+token failed, trying token-in-url format"
-              GITCODE_REPO_URL="https://${GITCODE_ACCESS_TOKEN}@gitcode.com/openeuler/openeuler-docker-images.git"
+              GITCODE_REPO_URL="https://${GITCODE_ACCESS_TOKEN}@gitcode.com/Tian-Fantasea/openeuler-docker-images.git"
               git clone --depth=1 "${GITCODE_REPO_URL}" "${GITCODE_DIR}" 2>&1 || {
-                echo "ERROR: All git clone auth methods failed for Gitcode repo"
-                echo "Hint: GITCODE_ACCESS_TOKEN needs push access to openeuler/openeuler-docker-images"
+                echo "ERROR: All git clone auth methods failed for Gitcode fork repo"
+                echo "Hint: GITCODE_ACCESS_TOKEN needs push access to Tian-Fantasea/openeuler-docker-images"
                 exit 1
               }
             }
@@ -166,13 +166,13 @@ jobs:
               continue
             fi
             git commit -m "【自动测试】${SOFTWARE}容器镜像性能基准测试 v${VERSION}" 2>&1
-            PUSH_URL="https://bot:${GITCODE_ACCESS_TOKEN}@gitcode.com/openeuler/openeuler-docker-images.git"
+            PUSH_URL="https://bot:${GITCODE_ACCESS_TOKEN}@gitcode.com/Tian-Fantasea/openeuler-docker-images.git"
             git remote set-url origin "${PUSH_URL}" 2>&1
             git push origin "${BRANCH_NAME}" 2>&1 || {
-              PUSH_URL2="https://oauth2:${GITCODE_ACCESS_TOKEN}@gitcode.com/openeuler/openeuler-docker-images.git"
+              PUSH_URL2="https://oauth2:${GITCODE_ACCESS_TOKEN}@gitcode.com/Tian-Fantasea/openeuler-docker-images.git"
               git remote set-url origin "${PUSH_URL2}" 2>&1
               git push origin "${BRANCH_NAME}" 2>&1 || {
-                PUSH_URL3="https://${GITCODE_ACCESS_TOKEN}@gitcode.com/openeuler/openeuler-docker-images.git"
+                PUSH_URL3="https://${GITCODE_ACCESS_TOKEN}@gitcode.com/Tian-Fantasea/openeuler-docker-images.git"
                 git remote set-url origin "${PUSH_URL3}" 2>&1
                 git push origin "${BRANCH_NAME}" 2>&1 || {
                   echo "ERROR: All push auth methods failed for Gitcode"
@@ -194,7 +194,7 @@ jobs:
           import json
           title = '【自动测试】${SOFTWARE}容器镜像性能基准测试 v${VERSION}'
           body = '${PR_BODY}'
-          data = {'access_token': '${GITCODE_ACCESS_TOKEN}', 'title': title, 'body': body, 'head': '${BRANCH_NAME}', 'base': '${DEFAULT_BRANCH}'}
+          data = {'access_token': '${GITCODE_ACCESS_TOKEN}', 'title': title, 'body': body, 'head': 'Tian-Fantasea:${BRANCH_NAME}', 'base': 'master'}
           print(json.dumps(data))
           ")" 2>&1 | python3 -c "
           import json, sys
