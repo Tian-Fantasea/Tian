@@ -1,0 +1,37 @@
+================================================================================
+  Test Scaffolding Generation Report
+  Generated: 2026-07-02T10:26:13.766013+00:00
+  Total: 2  |  New: 2  |  Existing: 0
+================================================================================
+
+================================================================================
+  NEWLY GENERATED (2 software)
+================================================================================
+  Software               Version            Benchmark          Build            Docker          
+  --------               -------            ---------          -----            -----           
+  petsc                  3.25.3             benchmark_generic  -                not_checked     
+  rust                   1.96.0             benchmark_generic  -                not_checked     
+
+  petsc files:
+    - petsc_test.sh
+    - scripts/json_helper.py
+    - scripts/aggregate_results.py
+    - scripts/generate_summary.py
+    - scripts/benchmark_generic.py
+    - scripts/micro_benchmark.py
+
+  rust files:
+    - rust_test.sh
+    - scripts/json_helper.py
+    - scripts/aggregate_results.py
+    - scripts/generate_summary.py
+    - scripts/benchmark_generic.py
+    - scripts/micro_benchmark.py
+
+
+================================================================================
+  ALREADY EXISTING (0 software)
+================================================================================
+  (none)
+
+================================================================================
