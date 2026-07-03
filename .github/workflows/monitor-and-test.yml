@@ -218,32 +218,13 @@ jobs:
               }
             fi
             RESULT_FILE="${WORK_DIR}/tests/${SOFTWARE}/results/${VERSION}/results.txt"
-            PR_BODY="# ${SOFTWARE} v${VERSION} 性能基准测试\n\n基于 ARM64 (Kunpeng-920, 32 cores) 环境的容器性能基准测试结果。\n\n## 测试环境\n- 架构: aarch64\n- CPU: Kunpeng-920 (32 cores)\n- OS: openEuler 24.03 SP3\n- Docker: openeuler/${SOFTWARE}:${DOCKER_TAG}\n\n## 测试内容\n包含 software-specific 性能基准测试，使用真实计算任务测量容器性能。\n\n"
-            if [ -f "${RESULT_FILE}" ]; then
-              PR_BODY="${PR_BODY}## 测试结果摘要\n\n$(cat "${RESULT_FILE}" | head -40)\n"
-            fi
-            PR_BODY="${PR_BODY}\n---\n自动生成于 $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            curl -s -X POST "https://gitcode.com/api/v5/repos/openeuler/openeuler-docker-images/pulls" \
-              -H "Private-Token: ${GITCODE_ACCESS_TOKEN}" \
-              -H "Content-Type: application/json" \
-              -d "$(python3 -c "
-          import json
-          title = '【自动测试】${SOFTWARE}容器镜像性能基准测试 v${VERSION}'
-          body = '${PR_BODY}'
-          data = {'access_token': '${GITCODE_ACCESS_TOKEN}', 'title': title, 'body': body, 'head': 'Tian-Fantasea:${BRANCH_NAME}', 'base': 'master'}
-          print(json.dumps(data))
-          ")" 2>&1 | python3 -c "
-          import json, sys
-          try:
-              resp = json.load(sys.stdin)
-              if 'id' in resp:
-                  print('PR created successfully: #' + str(resp.get('number', resp.get('id'))))
-                  print('URL: ' + resp.get('html_url', resp.get('web_url', '')))
-              else:
-                  print('PR creation response: ' + json.dumps(resp)[:300])
-          except:
-              print('Non-JSON response')
-          "
+            python3 "${WORK_DIR}/openeuler-image-monitor/src/create_gitcode_pr.py" \
+              --token "${GITCODE_ACCESS_TOKEN}" \
+              --software "${SOFTWARE}" \
+              --version "${VERSION}" \
+              --docker-tag "${DOCKER_TAG}" \
+              --branch "${BRANCH_NAME}" \
+              --result-file "${RESULT_FILE}" 2>&1
             git checkout "${DEFAULT_BRANCH}" 2>&1
           done
           cd "${WORK_DIR}"
