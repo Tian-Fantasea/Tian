@@ -194,7 +194,8 @@ jobs:
               GIT_SSH_COMMAND="ssh -i ${HOME}/.ssh/gitcode_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
               export GIT_SSH_COMMAND
               git remote set-url origin "git@gitcode.com:Tian-Fantasea/openeuler-docker-images.git" 2>&1
-              git push origin "${BRANCH_NAME}" 2>&1 || {
+              git push --force-with-lease origin "${BRANCH_NAME}" 2>&1 || \
+              git push --force origin "${BRANCH_NAME}" 2>&1 || {
                 echo "ERROR: SSH push failed for Gitcode"
                 git checkout "${DEFAULT_BRANCH}"
                 continue
