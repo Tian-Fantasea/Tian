@@ -158,8 +158,8 @@ jobs:
             fi
           }
           cd "${GITCODE_DIR}"
-          git config user.email "opencode-bot@gitcode.com"
-          git config user.name "opencode-bot"
+          git config user.email "Tian-Fantasea@noreply.gitcode.com"
+          git config user.name "Tian-Fantasea"
           DEFAULT_BRANCH=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
           if [ -z "${DEFAULT_BRANCH}" ]; then
             DEFAULT_BRANCH="master"
