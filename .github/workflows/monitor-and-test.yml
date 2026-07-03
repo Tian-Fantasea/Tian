@@ -158,7 +158,7 @@ jobs:
             fi
           }
           cd "${GITCODE_DIR}"
-          git config user.email "Tian-Fantasea@noreply.gitcode.com"
+          git config user.email "tt553093031@gmail.com"
           git config user.name "Tian-Fantasea"
           DEFAULT_BRANCH=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
           if [ -z "${DEFAULT_BRANCH}" ]; then
