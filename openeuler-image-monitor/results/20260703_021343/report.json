@@ -1,0 +1,32 @@
+[
+  {
+    "pr_number": 2807,
+    "merged_at": "2026-07-01T11:20:37+08:00",
+    "title": "【自动升级】petsc容器镜像升级至3.25.3版本.",
+    "software": "petsc",
+    "version": "3.25.3",
+    "os_version": "24.03-lts-sp3",
+    "category": "HPC",
+    "filepath": "HPC/petsc/3.25.3/24.03-lts-sp3/Dockerfile",
+    "dockerhub_pushed": true,
+    "dockerhub_tag": "3.25.3-oe2403sp3",
+    "dockerhub_reason": "",
+    "docker_verified": false,
+    "verification_reason": "verification_disabled"
+  },
+  {
+    "pr_number": 2806,
+    "merged_at": "2026-07-01T11:21:50+08:00",
+    "title": "【自动升级】rust容器镜像升级至1.96.0版本.",
+    "software": "rust",
+    "version": "1.96.0",
+    "os_version": "24.03-lts-sp3",
+    "category": "Others",
+    "filepath": "Others/rust/1.96.0/24.03-lts-sp3/Dockerfile",
+    "dockerhub_pushed": true,
+    "dockerhub_tag": "1.96.0-oe2403sp3",
+    "dockerhub_reason": "",
+    "docker_verified": false,
+    "verification_reason": "verification_disabled"
+  }
+]
