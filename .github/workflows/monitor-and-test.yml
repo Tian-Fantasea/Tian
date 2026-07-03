@@ -189,7 +189,7 @@ jobs:
               git branch -D "${BRANCH_NAME}" 2>/dev/null
               continue
             fi
-            git commit -m "【自动测试】${SOFTWARE}容器镜像性能基准测试 v${VERSION}" 2>&1
+            git commit -s -m "【自动测试】${SOFTWARE}容器镜像性能基准测试 v${VERSION}" 2>&1
             if [ -n "${GITCODE_SSH_KEY}" ]; then
               GIT_SSH_COMMAND="ssh -i ${HOME}/.ssh/gitcode_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
               export GIT_SSH_COMMAND
