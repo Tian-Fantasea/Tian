@@ -14,9 +14,11 @@ jobs:
       - name: Read allowed users
         run: |
           content=$(cat .github/workflows/matchers/allowed-users.json)
-          echo "users<<EOF" >> $GITHUB_ENV
-          echo "$content" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          {
+            echo "users<<EOF"
+            echo "$content"
+            echo "EOF"
+          } >> $GITHUB_ENV
       - uses: actions/github-script@v7
         with:
           script: |
