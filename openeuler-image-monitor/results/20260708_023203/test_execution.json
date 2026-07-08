@@ -1,0 +1,38 @@
+[
+  {
+    "software": "faiss",
+    "version": "1.14.2",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  },
+  {
+    "software": "hnswlib",
+    "version": "0.8.0",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  },
+  {
+    "software": "openviking",
+    "version": "0.4.4",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  },
+  {
+    "software": "petsc",
+    "version": "3.25.3",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  },
+  {
+    "software": "protobuf",
+    "version": "35.1",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  },
+  {
+    "software": "rust",
+    "version": "1.96.0",
+    "status": "already_completed",
+    "message": "All result files present, skipping"
+  }
+]
