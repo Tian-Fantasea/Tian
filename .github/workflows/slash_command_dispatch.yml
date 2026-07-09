@@ -23,7 +23,7 @@ on:
 
 jobs:
   slashCommandDispatch:
-    if: github.event.issue.pull_request != null && github.event.comment.user.type == 'User'
+    if: (github.event.issue.pull_request != null || startsWith(github.event.comment.body, '/wait-feedback')) && github.event.comment.user.type == 'User'
     runs-on: linux-amd64-cpu-2-hk
     steps:
       - name: Slash Command Dispatch
