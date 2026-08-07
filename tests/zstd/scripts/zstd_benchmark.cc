@@ -220,9 +220,9 @@ static MtResult run_mt_bench(size_t block_size, int level, int num_threads, int 
     double total_mb = mb_per_block * num_threads * iterations;
 
     r.compress_speed_mbs = (total_comp_wall > 0) ? total_mb / total_comp_wall : 0.0;
-    r.decompress_speed_mbs = (total_decomp_wall > 0) ? total_mb / total_decompress_wall : 0.0;
+    r.decompress_speed_mbs = (total_decomp_wall > 0) ? total_mb / total_decomp_wall : 0.0;
     r.total_compress_time_s = total_comp_wall / iterations;
-    r.total_decompress_time_s = total_decompress_wall / iterations;
+    r.total_decompress_time_s = total_decomp_wall / iterations;
     return r;
 }
 

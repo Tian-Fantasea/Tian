@@ -255,7 +255,7 @@ phase1_build() {
 
     if [ -n "${ZSTD_STATIC_LIB}" ]; then
         log "PHASE1" "Linking against static library: ${ZSTD_STATIC_LIB}"
-        g++ -O2 -std=c++11 \
+        g++ -O2 -std=c++17 \
             -I"${ZSTD_INC}" \
             "${BENCHMARK_SRC}" \
             "${ZSTD_STATIC_LIB}" \
@@ -266,7 +266,7 @@ phase1_build() {
         }
     else
         log "PHASE1" "Linking against shared library from ${ZSTD_LIB}"
-        g++ -O2 -std=c++11 \
+        g++ -O2 -std=c++17 \
             -I"${ZSTD_INC}" \
             "${BENCHMARK_SRC}" \
             -L"${ZSTD_LIB}" -lzstd \
