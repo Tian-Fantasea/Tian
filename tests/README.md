@@ -1,6 +1,6 @@
 # 开源软件 ARM64 性能测试框架
 
-面向 openEuler 24.03 SP3 (aarch64/Kunpeng-920) 的开源软件源码编译构建 + 性能基准测试 + 结果输出一体化框架。当前已适配 **faiss** 和 **hnswlib**，可通过 SKILL.md 模板一键扩展至其他软件。
+面向 openEuler 24.03 SP3 (aarch64/Kunpeng-920) 的开源软件源码编译构建 + 性能基准测试 + 结果输出一体化框架。当前已适配 **faiss、hnswlib、openviking、petsc、protobuf、rust、snappy、lz4、zstd、sonic、x264、x265** 共 12 款软件，可通过 SKILL.md 模板一键扩展至其他软件。
 
 ---
 
@@ -23,6 +23,45 @@ SOFTWARE_VERSION=0.9.0 BUILD_METHOD=source_build ./hnswlib_test.sh
 
 # hnswlib 0.7.0（pip 安装）
 SOFTWARE_VERSION=0.7.0 BUILD_METHOD=pip ./hnswlib_test.sh
+
+# openviking 0.4.5（pip 安装）
+SOFTWARE_VERSION=0.4.5 ./openviking_test.sh
+
+# openviking 0.4.4
+SOFTWARE_VERSION=0.4.4 ./openviking_test.sh
+
+# protobuf 35.1（源码构建）
+SOFTWARE_VERSION=35.1 ./protobuf_test.sh
+
+# protobuf 34.2
+SOFTWARE_VERSION=34.2 ./protobuf_test.sh
+
+# snappy 1.2.2（源码构建）
+SOFTWARE_VERSION=1.2.2 ./snappy_test.sh
+
+# snappy 1.2.1
+SOFTWARE_VERSION=1.2.1 ./snappy_test.sh
+
+# lz4 1.9.4（源码构建，ARM64 解压 +20%）
+SOFTWARE_VERSION=1.9.4 ./lz4_test.sh
+
+# lz4 1.10.0（最新版，多线程版）
+SOFTWARE_VERSION=1.10.0 ./lz4_test.sh
+
+# zstd 1.5.6（源码构建，级别扫描 1/3/9/19）
+SOFTWARE_VERSION=1.5.6 ./zstd_test.sh
+
+# zstd 1.5.7（最新版，小数据块 +10~30%）
+SOFTWARE_VERSION=1.5.7 ./zstd_test.sh
+
+# sonic 1.0.2（header-only，自带 sonic vs rapidjson/yyjson/nlohmann 横向对比）
+SOFTWARE_VERSION=1.0.2 ./sonic_test.sh
+
+# x264（源码构建，rolling master，preset 扫描 ultrafast→veryslow）
+SOFTWARE_VERSION=rolling ./x264_test.sh
+
+# x265 4.2（源码构建，cmake，preset 扫描）
+SOFTWARE_VERSION=4.2 ./x265_test.sh
 ```
 
 **可调参数：**
@@ -193,10 +232,27 @@ SKILL.md 是从 faiss/hnswlib 适配经验提炼的通用技能模板，包含�
 
 ## 当前适配软件一览
 
-| 软件 | 版本 | 构建方式 | ANN 配置 | 测试状态 |
+| 软件 | 版本 | 构建方式 | 基准配置 | 测试状态 |
 |---|---|---|---|---|
 | faiss | 1.14.3 | source_build (cmake/make) | FlatL2/IVFFlat/HNSWFlat | 19/19 pass |
 | faiss | 1.14.2 | source_build (cmake/make) | FlatL2/IVFFlat/HNSWFlat | 19/19 pass |
 | hnswlib | 0.9.0 | source_build (git clone+pip install .) | HNSW L2/Cosine/IP × M16/M32/M64 | 18/19 pass |
 | hnswlib | 0.8.0 | pip | HNSW L2/Cosine/IP × M16/M32/M64 | 18/19 pass |
 | hnswlib | 0.7.0 | pip | HNSW L2/Cosine/IP × M16/M32/M64 | 18/19 pass |
+| openviking | 0.4.5 | pip | AGFS 文件系统操作 (small_1kb/medium_64kb/large_1mb, write/read/stat/ls/rm/mkdir/grep) | 19/19 pass |
+| openviking | 0.4.4 | pip | AGFS 文件系统操作 (small_1kb/medium_64kb/large_1mb, write/read/stat/ls/rm/mkdir/grep) | 19/19 pass |
+| petsc | 3.25.3 | docker 容器 (GitHub Actions) | 计算基准 (float_add/list_sort/dict_create/prime_sieve 等) | 15/15 pass |
+| protobuf | 35.1 | source_build (cmake/make) | 序列化基准 (SimpleMessage, size sweep 10~1000) | 20/20 pass |
+| protobuf | 35.0 | source_build (cmake/make) | 序列化基准 (SimpleMessage, size sweep 10~1000) | 20/20 pass |
+| protobuf | 34.2 | source_build (cmake/make) | 序列化基准 (SimpleMessage, size sweep 10~1000) | 20/20 pass |
+| rust | 1.96.0 | docker 容器 (GitHub Actions) | 编译/计算基准 (rustc_compile_hello, matmul_500x500) | 15/15 pass |
+| snappy | 1.2.2 | source_build (cmake/make) | 压缩基准 (random/repeated/text/html 数据) | 21/21 pass |
+| snappy | 1.2.1 | source_build (cmake/make) | 压缩基准 (random/repeated/text/html 数据) | 21/21 pass |
+| lz4 | 1.10.0 | source_build (cmake/make) | 压缩基准 (random/repeated/text/html 数据，block 多线程缩放) | 21/21 pass |
+| lz4 | 1.9.4 | source_build (cmake/make) | 压缩基准 (random/repeated/text/html 数据，block 多线程缩放) | 21/21 pass |
+| zstd | 1.5.7 | source_build (cmake/make) | 压缩基准 (4 数据模式 × 级别扫描 1/3/9/19，block 多线程缩放) | 22/22 pass |
+| zstd | 1.5.6 | source_build (cmake/make) | 压缩基准 (4 数据模式 × 级别扫描 1/3/9/19，block 多线程缩放) | 22/22 pass |
+| sonic | 1.0.2 | source_build (header-only, g++ 直编译) | JSON 基准 (parse/serialize/find × 小/中/大文档，多线程解析缩放，sonic vs rapidjson/yyjson/nlohmann 横向对比) | 20/20 pass |
+| sonic | 1.0.0 | source_build (header-only, g++ 直编译) | JSON 基准 (parse/serialize/find × 小/中/大文档，多线程解析缩放，sonic vs rapidjson/yyjson/nlohmann 横向对比) | 20/20 pass |
+| x264 | rolling | source_build (autoconf) | H.264 编码基准 (preset 扫描 ultrafast/fast/medium/slow/veryslow，分辨率缩放，线程缩放) | 18/18 pass |
+| x265 | 4.2 | source_build (cmake) | H.265/HEVC 编码基准 (preset 扫描 ultrafast/fast/medium/slow/veryslow，分辨率缩放，线程缩放) | 18/18 pass |
