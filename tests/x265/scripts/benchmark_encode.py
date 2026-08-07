@@ -20,7 +20,7 @@ def run_encode(cli_bin, yuv_file, width, height, frames, preset, iterations):
         cmd = [
             cli_bin,
             "--input-res", f"{width}x{height}",
-            "--input-fps", "25",
+            "--fps", "25",
             "--frames", str(frames),
             "--preset", preset,
             "--psnr",

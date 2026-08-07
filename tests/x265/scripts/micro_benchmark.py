@@ -28,13 +28,13 @@ def run_encode(cli_bin, yuv_file, width, height, frames, preset, threads=None):
     cmd = [
         cli_bin,
         "--input-res", f"{width}x{height}",
-        "--input-fps", "25",
+        "--fps", "25",
         "--frames", str(frames),
         "--preset", preset,
         "-o", os.devnull,
     ]
     if threads is not None:
-        cmd.extend(["--threads", str(threads)])
+        cmd.extend(["--pools", str(threads)])
     cmd.append(yuv_file)
     result = subprocess.run(cmd, capture_output=True, text=True)
     text = result.stderr + "\n" + result.stdout
