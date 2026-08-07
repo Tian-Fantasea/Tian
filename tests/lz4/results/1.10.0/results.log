@@ -1,0 +1,184 @@
+[START] lz4 Source Build & Performance Benchmark v1.10.0
+[CHECK] Python3 OK: Python 3.11.6
+[CHECK] GCC OK: g++ (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)
+[CHECK] CMake OK: cmake version 3.27.9
+[CHECK] Git OK: git version 2.43.0
+[CHECK] json_helper.py OK
+[CHECK] OS: openEuler 24.03 SP3 (openEuler)
+[CHECK] Architecture: aarch64
+[CHECK] Build method: source_build
+[SETUP] Downloading shUnit2 to /tmp/shunit2_4bCq8u...
+[SETUP] shUnit2 downloaded successfully
+[START] lz4 Source Build & Performance Benchmark - v1.10.0
+[START] OS: openEuler 24.03 SP3 (openEuler), Build: source_build
+[CHECK] Python3 OK: Python 3.11.6
+[CHECK] GCC OK: g++ (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)
+[CHECK] CMake OK: cmake version 3.27.9
+[CHECK] Git OK: git version 2.43.0
+[CHECK] json_helper.py OK
+[CHECK] OS: openEuler 24.03 SP3 (openEuler)
+[CHECK] Architecture: aarch64
+[CHECK] Build method: source_build
+[PHASE1] === Phase 1: Source Build LZ4 v1.10.0 ===
+[BUILD] Created temp build directory: /tmp/lz4_build_jORjjN
+[PHASE1] Building LZ4 from source on openEuler...
+[PHASE1] Installing build dependencies (openEuler 24.03 SP3)...
+OS                                              1.1 kB/s | 1.8 kB     00:01    
+everything                                      1.4 kB/s | 1.8 kB     00:01    
+EPOL                                             16 kB/s | 1.8 kB     00:00    
+debuginfo                                       252  B/s | 1.8 kB     00:07    
+source                                          154  B/s | 1.8 kB     00:11    
+update                                          1.5 kB/s | 2.4 kB     00:01    
+update-source                                    11 kB/s | 1.8 kB     00:00    
+Package gcc-12.3.1-105.oe2403sp3.aarch64 is already installed.
+Package gcc-c++-12.3.1-105.oe2403sp3.aarch64 is already installed.
+Package cmake-3.27.9-8.oe2403sp3.aarch64 is already installed.
+Package make-1:4.4.1-2.oe2403sp3.aarch64 is already installed.
+Package git-2.43.0-11.oe2403sp3.aarch64 is already installed.
+Package wget-1.21.4-4.oe2403sp3.aarch64 is already installed.
+Package curl-8.4.0-33.oe2403sp3.aarch64 is already installed.
+Dependencies resolved.
+Nothing to do.
+Complete!
+[PHASE1] Cloning LZ4 tag v1.10.0...
+Cloning into '/tmp/lz4_build_jORjjN/lz4_src'...
+Note: switching to 'ebb370ca83af193212df4dcbadcc5d87bc0de2f0'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+[PHASE1] Configuring CMake...
+-- Creating build script for LZ4 version: 1.10.0
+-- The C compiler identification is GNU 12.3.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Performing Test CFLAG_pedantic_errors
+-- Performing Test CFLAG_pedantic_errors - Success
+-- Performing Test CFLAG_Wall
+-- Performing Test CFLAG_Wall - Success
+-- Performing Test CFLAG_Wextra
+-- Performing Test CFLAG_Wextra - Success
+-- Performing Test CFLAG_Wundef
+-- Performing Test CFLAG_Wundef - Success
+-- Performing Test CFLAG_Wcast_qual
+-- Performing Test CFLAG_Wcast_qual - Success
+-- Performing Test CFLAG_Wcast_align
+-- Performing Test CFLAG_Wcast_align - Success
+-- Performing Test CFLAG_Wshadow
+-- Performing Test CFLAG_Wshadow - Success
+-- Performing Test CFLAG_Wswitch_enum
+-- Performing Test CFLAG_Wswitch_enum - Success
+-- Performing Test CFLAG_Wdeclaration_after_statement
+-- Performing Test CFLAG_Wdeclaration_after_statement - Success
+-- Performing Test CFLAG_Wstrict_prototypes
+-- Performing Test CFLAG_Wstrict_prototypes - Success
+-- Performing Test CFLAG_Wpointer_arith
+-- Performing Test CFLAG_Wpointer_arith - Success
+-- Configuring done (1.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/lz4_build_jORjjN/build
+[PHASE1] Compiling LZ4...
+[ 11%] Building C object CMakeFiles/lz4_static.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4.c.o
+[ 11%] Building C object CMakeFiles/lz4_static.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4file.c.o
+[ 11%] Building C object CMakeFiles/lz4_static.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4frame.c.o
+[ 18%] Building C object CMakeFiles/lz4_shared.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4.c.o
+[ 18%] Building C object CMakeFiles/lz4_shared.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4file.c.o
+[ 25%] Building C object CMakeFiles/lz4_shared.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4hc.c.o
+[ 25%] Building C object CMakeFiles/lz4_shared.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4frame.c.o
+[ 29%] Building C object CMakeFiles/lz4_static.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4hc.c.o
+[ 40%] Building C object CMakeFiles/lz4_shared.dir/tmp/lz4_build_jORjjN/lz4_src/lib/xxhash.c.o
+[ 40%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/programs/lorem.c.o
+[ 40%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/programs/lz4cli.c.o
+[ 44%] Building C object CMakeFiles/lz4_static.dir/tmp/lz4_build_jORjjN/lz4_src/lib/xxhash.c.o
+[ 48%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/programs/bench.c.o
+[ 51%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/programs/threadpool.c.o
+[ 59%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/programs/lz4io.c.o
+[ 59%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/programs/timefn.c.o
+[ 62%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/programs/util.c.o
+[ 74%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4hc.c.o
+[ 74%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4file.c.o
+[ 66%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4.c.o
+[ 77%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/lib/lz4frame.c.o
+[ 81%] Building C object CMakeFiles/lz4cli.dir/tmp/lz4_build_jORjjN/lz4_src/lib/xxhash.c.o
+[ 85%] Linking C static library liblz4.a
+[ 85%] Built target lz4_static
+[ 88%] Linking C shared library liblz4.so
+[ 88%] Built target lz4_shared
+[ 92%] Linking C executable lz4
+[ 92%] Built target lz4cli
+[ 96%] Creating symlink for lz4cat
+[100%] Creating symlink for unlz4
+[100%] Built target create_lz4cat_symlink
+[100%] Built target create_unlz4_symlink
+[PHASE1] Installing LZ4...
+[ 22%] Built target lz4_shared
+[ 44%] Built target lz4_static
+[ 92%] Built target lz4cli
+[ 96%] Creating symlink for lz4cat
+[ 96%] Built target create_lz4cat_symlink
+[100%] Creating symlink for unlz4
+[100%] Built target create_unlz4_symlink
+Install the project...
+-- Install configuration: "Release"
+-- Installing: /tmp/lz4_build_jORjjN/install/bin/lz4
+-- Installing: /tmp/lz4_build_jORjjN/install/lib64/liblz4.so.1.10.0
+-- Installing: /tmp/lz4_build_jORjjN/install/lib64/liblz4.so.1
+-- Installing: /tmp/lz4_build_jORjjN/install/lib64/liblz4.so
+-- Installing: /tmp/lz4_build_jORjjN/install/lib64/liblz4.a
+-- Installing: /tmp/lz4_build_jORjjN/install/include/lz4.h
+-- Installing: /tmp/lz4_build_jORjjN/install/include/lz4hc.h
+-- Installing: /tmp/lz4_build_jORjjN/install/include/lz4frame.h
+-- Installing: /tmp/lz4_build_jORjjN/install/include/lz4file.h
+-- Installing: /tmp/lz4_build_jORjjN/install/share/man/man1/lz4.1
+-- Installing: /tmp/lz4_build_jORjjN/install/lib64/pkgconfig/liblz4.pc
+-- Installing: /tmp/lz4_build_jORjjN/install/lib64/cmake/lz4/lz4Targets.cmake
+-- Installing: /tmp/lz4_build_jORjjN/install/lib64/cmake/lz4/lz4Targets-release.cmake
+-- Installing: /tmp/lz4_build_jORjjN/install/lib64/cmake/lz4/lz4Config.cmake
+-- Installing: /tmp/lz4_build_jORjjN/install/lib64/cmake/lz4/lz4ConfigVersion.cmake
+-- Installing: /tmp/lz4_build_jORjjN/install/bin/lz4cat
+-- Installing: /tmp/lz4_build_jORjjN/install/bin/unlz4
+-- Installing: /tmp/lz4_build_jORjjN/install/share/man/man1/lz4cat.1
+-- Installing: /tmp/lz4_build_jORjjN/install/share/man/man1/unlz4.1
+[PHASE1] Compiling benchmark program...
+[PHASE1] Linking against static library: /tmp/lz4_build_jORjjN/install/lib64/liblz4.a
+/root/tian/Tian/tests/lz4/scripts/lz4_benchmark.cc: In function ‘int main(int, char**)’:
+/root/tian/Tian/tests/lz4/scripts/lz4_benchmark.cc:243:20: warning: structured bindings only available with ‘-std=c++17’ or ‘-std=gnu++17’ [-Wc++17-extensions]
+  243 |         for (auto& [name, data] : data_types) {
+      |                    ^
+[PHASE1] Verifying benchmark binary...
+[PHASE1] Benchmark binary verified successfully
+[PHASE1] LZ4 source build and benchmark compilation complete
+[PHASE2] === Phase 2: Collect Version Info ===
+[PHASE2] Version info saved (OS: openEuler 24.03 SP3, GCC: 12.3.1)
+[PHASE3] === Phase 3: Run Benchmarks ===
+[PHASE3A] Running compression benchmark...
+[BENCHMARK_COMPRESSION] Running: /tmp/lz4_build_jORjjN/lz4_benchmark compression 1 /root/tian/Tian/tests/lz4/results/1.10.0/benchmark_compression.json 1048576
+[BENCHMARK_COMPRESSION] Output written to /root/tian/Tian/tests/lz4/results/1.10.0/benchmark_compression.json
+[BENCHMARK_COMPRESSION] Validation: benchmark=compression, data_types=['random_data', 'repeated_data', 'text_data', 'html_data']
+[PHASE3B] Running micro benchmark...
+[BENCHMARK_MICRO] Running: /tmp/lz4_build_jORjjN/lz4_benchmark micro 1 /root/tian/Tian/tests/lz4/results/1.10.0/micro_benchmark.json
+[BENCHMARK_MICRO] Output written to /root/tian/Tian/tests/lz4/results/1.10.0/micro_benchmark.json
+[BENCHMARK_MICRO] Validation: benchmark=micro_operations, result_keys=['block_compress_decompress', 'multithread_scaling']
+[BENCHMARK_MICRO] Block sizes: ['1024', '4096', '16384', '65536', '262144', '1048576']
+[BENCHMARK_MICRO] Thread counts: ['threads_1', 'threads_2', 'threads_4', 'threads_8', 'threads_32']
+[PHASE4] === Phase 4: Aggregate & Report ===
+[PHASE4] Reports generated:
+[PHASE4]   JSON: /root/tian/Tian/tests/lz4/results/1.10.0/results.json
+[PHASE4]   TXT:  /root/tian/Tian/tests/lz4/results/1.10.0/results.txt
+[PHASE4]   LOG:  /root/tian/Tian/tests/lz4/results/1.10.0/results.log
+[BUILD] Cleaning up temp build directory: /tmp/lz4_build_jORjjN

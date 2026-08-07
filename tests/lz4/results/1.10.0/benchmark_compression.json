@@ -1,0 +1,56 @@
+{
+  "benchmark": "compression",
+  "description": "LZ4 compression/decompression speed across different data patterns on ARM64",
+  "reference": "https://github.com/lz4/lz4",
+  "software": "lz4",
+  "version": "1.10.0",
+  "architecture": "arm64",
+  "timestamp": "2026-08-07T07:20:16Z",
+  "performance_metrics": {
+    "compress_speed_mbs": {"unit": "MB/s", "description": "Compression throughput in megabytes per second"},
+    "decompress_speed_mbs": {"unit": "MB/s", "description": "Decompression throughput in megabytes per second"},
+    "compression_ratio": {"unit": "ratio", "description": "Original size divided by compressed size"}
+  },
+  "parameters": {
+    "data_size_bytes": 1048576,
+    "iterations": 1
+  },
+  "results_summary": {
+    "random_data": {
+      "original_size_bytes": 1048576,
+      "compressed_size_bytes": 1052690,
+      "compression_ratio": 0.9961,
+      "compress_speed_mbs": 5405.11,
+      "decompress_speed_mbs": 7619.05,
+      "compress_latency_us": 185.01,
+      "decompress_latency_us": 131.25
+    },
+    "repeated_data": {
+      "original_size_bytes": 1048576,
+      "compressed_size_bytes": 4131,
+      "compression_ratio": 253.8310,
+      "compress_speed_mbs": 5530.97,
+      "decompress_speed_mbs": 2767.02,
+      "compress_latency_us": 180.80,
+      "decompress_latency_us": 361.40
+    },
+    "text_data": {
+      "original_size_bytes": 1048576,
+      "compressed_size_bytes": 381673,
+      "compression_ratio": 2.7473,
+      "compress_speed_mbs": 497.46,
+      "decompress_speed_mbs": 1531.35,
+      "compress_latency_us": 2010.20,
+      "decompress_latency_us": 653.02
+    },
+    "html_data": {
+      "original_size_bytes": 1048576,
+      "compressed_size_bytes": 169494,
+      "compression_ratio": 6.1865,
+      "compress_speed_mbs": 944.29,
+      "decompress_speed_mbs": 2143.85,
+      "compress_latency_us": 1059.00,
+      "decompress_latency_us": 466.45
+    }
+  }
+}

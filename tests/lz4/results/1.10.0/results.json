@@ -1,0 +1,211 @@
+{
+  "test_time": "2026-08-07T07:20:16Z",
+  "environment": {
+    "test_time": "2026-08-07T07:20:16Z",
+    "Model": "Kunpeng-920",
+    "architecture": "aarch64",
+    "kernel": "6.6.0-132.0.0.111.oe2403sp3.aarch64",
+    "os": "openEuler 24.03 SP3",
+    "cpu_model": "ARM64 CPU (32 cores)",
+    "cpu_cores": 32,
+    "software_name": "lz4",
+    "software_version": "1.10.0",
+    "python_version": "Python 3.11.6",
+    "gcc_version": "12.3.1"
+  },
+  "benchmarks": {
+    "primary": {
+      "benchmark": "compression",
+      "description": "LZ4 compression/decompression speed across different data patterns on ARM64",
+      "reference": "https://github.com/lz4/lz4",
+      "software": "lz4",
+      "version": "1.10.0",
+      "architecture": "arm64",
+      "timestamp": "2026-08-07T07:20:16Z",
+      "performance_metrics": {
+        "compress_speed_mbs": {
+          "unit": "MB/s",
+          "description": "Compression throughput in megabytes per second"
+        },
+        "decompress_speed_mbs": {
+          "unit": "MB/s",
+          "description": "Decompression throughput in megabytes per second"
+        },
+        "compression_ratio": {
+          "unit": "ratio",
+          "description": "Original size divided by compressed size"
+        }
+      },
+      "parameters": {
+        "data_size_bytes": 1048576,
+        "iterations": 1
+      },
+      "results_summary": {
+        "random_data": {
+          "original_size_bytes": 1048576,
+          "compressed_size_bytes": 1052690,
+          "compression_ratio": 0.9961,
+          "compress_speed_mbs": 5405.11,
+          "decompress_speed_mbs": 7619.05,
+          "compress_latency_us": 185.01,
+          "decompress_latency_us": 131.25
+        },
+        "repeated_data": {
+          "original_size_bytes": 1048576,
+          "compressed_size_bytes": 4131,
+          "compression_ratio": 253.831,
+          "compress_speed_mbs": 5530.97,
+          "decompress_speed_mbs": 2767.02,
+          "compress_latency_us": 180.8,
+          "decompress_latency_us": 361.4
+        },
+        "text_data": {
+          "original_size_bytes": 1048576,
+          "compressed_size_bytes": 381673,
+          "compression_ratio": 2.7473,
+          "compress_speed_mbs": 497.46,
+          "decompress_speed_mbs": 1531.35,
+          "compress_latency_us": 2010.2,
+          "decompress_latency_us": 653.02
+        },
+        "html_data": {
+          "original_size_bytes": 1048576,
+          "compressed_size_bytes": 169494,
+          "compression_ratio": 6.1865,
+          "compress_speed_mbs": 944.29,
+          "decompress_speed_mbs": 2143.85,
+          "compress_latency_us": 1059.0,
+          "decompress_latency_us": 466.45
+        }
+      }
+    },
+    "micro": {
+      "benchmark": "micro_operations",
+      "description": "LZ4 micro benchmarks: block-level compress/decompress latency and multithread scaling on ARM64",
+      "reference": "https://github.com/lz4/lz4",
+      "software": "lz4",
+      "version": "1.10.0",
+      "architecture": "arm64",
+      "timestamp": "2026-08-07T07:20:16Z",
+      "performance_metrics": {
+        "compress_speed_mbs": {
+          "unit": "MB/s",
+          "description": "Block compression throughput"
+        },
+        "decompress_speed_mbs": {
+          "unit": "MB/s",
+          "description": "Block decompression throughput"
+        },
+        "compress_latency_us": {
+          "unit": "us",
+          "description": "Single block compress latency"
+        },
+        "decompress_latency_us": {
+          "unit": "us",
+          "description": "Single block decompress latency"
+        }
+      },
+      "parameters": {
+        "block_sizes": [
+          1024,
+          4096,
+          16384,
+          65536,
+          262144,
+          1048576
+        ],
+        "iterations": 1,
+        "max_threads": 32,
+        "data_size_bytes": 1048576
+      },
+      "results": {
+        "block_compress_decompress": {
+          "1024": {
+            "compress_speed_mbs": 92.3,
+            "decompress_speed_mbs": 375.6,
+            "compress_latency_us": 10.58,
+            "decompress_latency_us": 2.6,
+            "compression_ratio": 2.3486
+          },
+          "4096": {
+            "compress_speed_mbs": 420.03,
+            "decompress_speed_mbs": 1228.38,
+            "compress_latency_us": 9.3,
+            "decompress_latency_us": 3.18,
+            "compression_ratio": 2.4719
+          },
+          "16384": {
+            "compress_speed_mbs": 507.63,
+            "decompress_speed_mbs": 1280.74,
+            "compress_latency_us": 30.78,
+            "decompress_latency_us": 12.2,
+            "compression_ratio": 2.5492
+          },
+          "65536": {
+            "compress_speed_mbs": 538.42,
+            "decompress_speed_mbs": 1439.43,
+            "compress_latency_us": 116.08,
+            "decompress_latency_us": 43.42,
+            "compression_ratio": 2.5832
+          },
+          "262144": {
+            "compress_speed_mbs": 488.72,
+            "decompress_speed_mbs": 1565.14,
+            "compress_latency_us": 511.54,
+            "decompress_latency_us": 159.73,
+            "compression_ratio": 2.7512
+          },
+          "1048576": {
+            "compress_speed_mbs": 497.99,
+            "decompress_speed_mbs": 1558.87,
+            "compress_latency_us": 2008.06,
+            "decompress_latency_us": 641.49,
+            "compression_ratio": 2.7447
+          }
+        },
+        "multithread_scaling": {
+          "threads_1": {
+            "compress_speed_mbs": 218.46,
+            "decompress_speed_mbs": 561.14,
+            "total_compress_time_s": 0.000286,
+            "total_decompress_time_s": 0.000111
+          },
+          "threads_2": {
+            "compress_speed_mbs": 511.46,
+            "decompress_speed_mbs": 934.02,
+            "total_compress_time_s": 0.000244,
+            "total_decompress_time_s": 0.000134
+          },
+          "threads_4": {
+            "compress_speed_mbs": 869.93,
+            "decompress_speed_mbs": 1603.49,
+            "total_compress_time_s": 0.000287,
+            "total_decompress_time_s": 0.000156
+          },
+          "threads_8": {
+            "compress_speed_mbs": 1321.39,
+            "decompress_speed_mbs": 1558.75,
+            "total_compress_time_s": 0.000378,
+            "total_decompress_time_s": 0.000321
+          },
+          "threads_32": {
+            "compress_speed_mbs": 1601.0,
+            "decompress_speed_mbs": 1624.93,
+            "total_compress_time_s": 0.001249,
+            "total_decompress_time_s": 0.001231
+          }
+        }
+      }
+    }
+  },
+  "summary": {
+    "avg_compress_speed_mbs": 3094.46,
+    "max_compress_speed_mbs": 5530.97,
+    "avg_decompress_speed_mbs": 3515.32,
+    "max_decompress_speed_mbs": 7619.05,
+    "avg_compression_ratio": 65.9402,
+    "micro_avg_compress_speed_mbs": 424.18
+  },
+  "software": "lz4",
+  "version": "1.10.0"
+}
