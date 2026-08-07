@@ -30,6 +30,11 @@ def run_encode(cli_bin, yuv_file, width, height, frames, preset, iterations):
         result = subprocess.run(cmd, capture_output=True, text=True)
         text = result.stderr + "\n" + result.stdout
         m = STATS_RE.search(text)
+        if not m:
+            print(f"[BENCHMARK_ENCODE][DEBUG] preset={preset} returncode={result.returncode}")
+            print(f"[BENCHMARK_ENCODE][DEBUG] cmd: {' '.join(cmd)}")
+            print(f"[BENCHMARK_ENCODE][DEBUG] raw output (last 2500 chars):")
+            print(text[-2500:])
         fps = float(m.group(3)) if m else 0.0
         enc_time = float(m.group(2)) if m else 0.0
         enc_frames = int(m.group(1)) if m else 0

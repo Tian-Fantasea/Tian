@@ -37,7 +37,14 @@ def run_encode(cli_bin, yuv_file, width, height, frames, preset, threads=None):
         cmd.extend(["--threads", str(threads)])
     cmd.append(yuv_file)
     result = subprocess.run(cmd, capture_output=True, text=True)
-    return parse_fps(result.stderr + "\n" + result.stdout)
+    text = result.stderr + "\n" + result.stdout
+    fps = parse_fps(text)
+    if fps == 0.0:
+        print(f"[BENCHMARK_MICRO][DEBUG] threads={threads} returncode={result.returncode}")
+        print(f"[BENCHMARK_MICRO][DEBUG] cmd: {' '.join(cmd)}")
+        print(f"[BENCHMARK_MICRO][DEBUG] raw output (last 2500 chars):")
+        print(text[-2500:])
+    return fps
 
 
 def main():
