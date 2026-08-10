@@ -34,6 +34,11 @@ def create_database(host, port, user, password, db_name):
 
 
 def sysbench_prepare(host, port, user, password, db_name, tables, table_size):
+    reset_cmd = ["mysql", f"-h{host}", f"-P{port}", f"-u{user}"]
+    if password:
+        reset_cmd.append(f"-p{password}")
+    reset_cmd.extend(["-e", f"DROP DATABASE IF EXISTS `{db_name}`; CREATE DATABASE `{db_name}`; SET GLOBAL ob_query_timeout=100000000; SET GLOBAL ob_trx_timeout=200000000"])
+    subprocess.run(reset_cmd, capture_output=True, text=True, timeout=60)
     cmd = [
         "sysbench", WORKLOADS[0],
         f"--db-driver=mysql",
@@ -50,7 +55,7 @@ def sysbench_prepare(host, port, user, password, db_name, tables, table_size):
     print(f"[BENCHMARK_OB] Preparing data: {tables} tables × {table_size} rows...")
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
     if result.returncode != 0:
-        print(f"[BENCHMARK_OB] sysbench prepare failed: {result.stderr[:500]}")
+        print(f"[BENCHMARK_OB] sysbench prepare failed: {(result.stderr or result.stdout)[:500]}")
         return False
     print("[BENCHMARK_OB] Data prepared.")
     return True

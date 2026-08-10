@@ -80,11 +80,37 @@ phase1_deploy() {
     fi
     log "PHASE1" "Observer not running, trying obd..."
     if ! command -v obd >/dev/null 2>&1; then
-        log "PHASE1" "Installing obd via pip..."
-        pip3 install --break-system-packages obd 2>&1 | tee -a "${LOG_FILE}" || { log "WARN" "obd install failed"; return 1; }
+        log "PHASE1" "Installing ob-deploy via OceanBase repo..."
+        local os_id; os_id="$(detect_os_id)"
+        case "${os_id}" in
+            openeuler|centos|rhel|fedora)
+                cat > /etc/yum.repos.d/oceanbase.repo <<OBREPO
+[oceanbase]
+name=OceanBase Community el8
+baseurl=https://mirrors.oceanbase.com/community/stable/el/8/$(uname -m)/
+enabled=1
+gpgcheck=0
+OBREPO
+                sudo dnf install -y ob-deploy 2>&1 | tee -a "${LOG_FILE}" >/dev/null || { log "WARN" "ob-deploy install failed"; return 1; }
+                ;;
+            *)
+                pip3 install --break-system-packages ob-deploy 2>&1 | tee -a "${LOG_FILE}" >/dev/null || { log "WARN" "ob-deploy install failed"; return 1; }
+                ;;
+        esac
+        command -v obd >/dev/null 2>&1 || { log "ERROR" "obd not available after install"; return 1; }
     fi
-    log "PHASE1" "Deploying standalone observer via obd demo..."
-    obd demo 2>&1 | tee -a "${LOG_FILE}" || { log "ERROR" "obd deploy failed, please deploy manually"; return 1; }
+    log "PHASE1" "Deploying standalone observer via obd demo -c oceanbase-ce..."
+    local demo_log; demo_log="$(mktemp)"
+    obd demo -c oceanbase-ce 2>&1 | tee -a "${LOG_FILE}" | tee "${demo_log}" >/dev/null || { log "ERROR" "obd deploy failed, please deploy manually (e.g. obd demo -c oceanbase-ce)"; rm -f "${demo_log}"; return 1; }
+    if [ -z "${OB_PASSWORD}" ]; then
+        local parsed_pw; parsed_pw="$(grep -oE "\-p'[^']+'" "${demo_log}" | head -1 | sed "s/-p'//; s/'\$//")"
+        if [ -n "${parsed_pw}" ]; then
+            OB_PASSWORD="${parsed_pw}"
+            export OB_PASSWORD
+            log "PHASE1" "Parsed observer root password from obd demo output"
+        fi
+    fi
+    rm -f "${demo_log}"
     log "PHASE1" "Waiting for observer to be ready..."
     local retries=0
     while [ "${retries}" -lt 60 ]; do
