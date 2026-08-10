@@ -1,0 +1,1426 @@
+{
+  "benchmark": "micro_operations",
+  "description": "Go micro: GOMAXPROCS thread scaling (cpu=[1, 2, 4, 8, 'all']) on ARM64",
+  "reference": "https://github.com/golang/go",
+  "software": "golang",
+  "version": "go1.26.5",
+  "architecture": "arm64",
+  "timestamp": "2026-08-10T07:14:29Z",
+  "performance_metrics": {
+    "ns_per_op": {
+      "unit": "ns",
+      "description": "Nanoseconds per operation"
+    },
+    "ops_per_sec": {
+      "unit": "ops/sec",
+      "description": "Operations per second"
+    }
+  },
+  "parameters": {
+    "thread_levels": [
+      1,
+      2,
+      4,
+      8,
+      "all"
+    ],
+    "max_threads": 32,
+    "iterations": 1,
+    "packages": [
+      "encoding/json",
+      "strconv",
+      "crypto/sha256"
+    ],
+    "benchtime": "1x"
+  },
+  "results": {
+    "thread_scaling": {
+      "BenchmarkCodeEncoder": {
+        "cpu_1": {
+          "ns_per_op": 11189520.0,
+          "ops_per_sec": 89.37
+        },
+        "cpu_2": {
+          "ns_per_op": 11042450.0,
+          "ops_per_sec": 90.56
+        },
+        "cpu_4": {
+          "ns_per_op": 10964040.0,
+          "ops_per_sec": 91.21
+        },
+        "cpu_8": {
+          "ns_per_op": 10929380.0,
+          "ops_per_sec": 91.5
+        },
+        "cpu_32": {
+          "ns_per_op": 10556490.0,
+          "ops_per_sec": 94.73
+        }
+      },
+      "BenchmarkCodeEncoderError": {
+        "cpu_1": {
+          "ns_per_op": 12345160.0,
+          "ops_per_sec": 81.0
+        },
+        "cpu_2": {
+          "ns_per_op": 11830080.0,
+          "ops_per_sec": 84.53
+        },
+        "cpu_4": {
+          "ns_per_op": 11820470.0,
+          "ops_per_sec": 84.6
+        },
+        "cpu_8": {
+          "ns_per_op": 12024380.0,
+          "ops_per_sec": 83.16
+        },
+        "cpu_32": {
+          "ns_per_op": 12538560.0,
+          "ops_per_sec": 79.75
+        }
+      },
+      "BenchmarkCodeMarshal": {
+        "cpu_1": {
+          "ns_per_op": 11600500.0,
+          "ops_per_sec": 86.2
+        },
+        "cpu_2": {
+          "ns_per_op": 10889310.0,
+          "ops_per_sec": 91.83
+        },
+        "cpu_4": {
+          "ns_per_op": 10935990.0,
+          "ops_per_sec": 91.44
+        },
+        "cpu_8": {
+          "ns_per_op": 10886500.0,
+          "ops_per_sec": 91.86
+        },
+        "cpu_32": {
+          "ns_per_op": 10625700.0,
+          "ops_per_sec": 94.11
+        }
+      },
+      "BenchmarkCodeMarshalError": {
+        "cpu_1": {
+          "ns_per_op": 11564400.0,
+          "ops_per_sec": 86.47
+        },
+        "cpu_2": {
+          "ns_per_op": 13949800.0,
+          "ops_per_sec": 71.69
+        },
+        "cpu_4": {
+          "ns_per_op": 11803590.0,
+          "ops_per_sec": 84.72
+        },
+        "cpu_8": {
+          "ns_per_op": 13123360.0,
+          "ops_per_sec": 76.2
+        },
+        "cpu_32": {
+          "ns_per_op": 13155360.0,
+          "ops_per_sec": 76.01
+        }
+      },
+      "BenchmarkMarshalBytes/32": {
+        "cpu_1": {
+          "ns_per_op": 63330.0,
+          "ops_per_sec": 15790.3
+        },
+        "cpu_2": {
+          "ns_per_op": 21230.0,
+          "ops_per_sec": 47103.16
+        },
+        "cpu_4": {
+          "ns_per_op": 25070.0,
+          "ops_per_sec": 39888.31
+        },
+        "cpu_8": {
+          "ns_per_op": 23230.0,
+          "ops_per_sec": 43047.78
+        },
+        "cpu_32": {
+          "ns_per_op": 22510.0,
+          "ops_per_sec": 44424.7
+        }
+      },
+      "BenchmarkMarshalBytes/256": {
+        "cpu_1": {
+          "ns_per_op": 38500.0,
+          "ops_per_sec": 25974.03
+        },
+        "cpu_2": {
+          "ns_per_op": 24770.0,
+          "ops_per_sec": 40371.42
+        },
+        "cpu_4": {
+          "ns_per_op": 20840.0,
+          "ops_per_sec": 47984.64
+        },
+        "cpu_8": {
+          "ns_per_op": 23500.0,
+          "ops_per_sec": 42553.19
+        },
+        "cpu_32": {
+          "ns_per_op": 25690.0,
+          "ops_per_sec": 38925.65
+        }
+      },
+      "BenchmarkMarshalBytes/4096": {
+        "cpu_1": {
+          "ns_per_op": 42350.0,
+          "ops_per_sec": 23612.75
+        },
+        "cpu_2": {
+          "ns_per_op": 35870.0,
+          "ops_per_sec": 27878.45
+        },
+        "cpu_4": {
+          "ns_per_op": 29020.0,
+          "ops_per_sec": 34458.99
+        },
+        "cpu_8": {
+          "ns_per_op": 31570.0,
+          "ops_per_sec": 31675.64
+        },
+        "cpu_32": {
+          "ns_per_op": 34260.0,
+          "ops_per_sec": 29188.56
+        }
+      },
+      "BenchmarkMarshalBytesError/32": {
+        "cpu_1": {
+          "ns_per_op": 1968850.0,
+          "ops_per_sec": 507.91
+        },
+        "cpu_2": {
+          "ns_per_op": 1597650.0,
+          "ops_per_sec": 625.92
+        },
+        "cpu_4": {
+          "ns_per_op": 2065060.0,
+          "ops_per_sec": 484.25
+        },
+        "cpu_8": {
+          "ns_per_op": 1580030.0,
+          "ops_per_sec": 632.9
+        },
+        "cpu_32": {
+          "ns_per_op": 1792850.0,
+          "ops_per_sec": 557.77
+        }
+      },
+      "BenchmarkMarshalBytesError/256": {
+        "cpu_1": {
+          "ns_per_op": 1924270.0,
+          "ops_per_sec": 519.68
+        },
+        "cpu_2": {
+          "ns_per_op": 1581560.0,
+          "ops_per_sec": 632.29
+        },
+        "cpu_4": {
+          "ns_per_op": 1800270.0,
+          "ops_per_sec": 555.47
+        },
+        "cpu_8": {
+          "ns_per_op": 1340450.0,
+          "ops_per_sec": 746.02
+        },
+        "cpu_32": {
+          "ns_per_op": 1961540.0,
+          "ops_per_sec": 509.8
+        }
+      },
+      "BenchmarkMarshalBytesError/4096": {
+        "cpu_1": {
+          "ns_per_op": 1511330.0,
+          "ops_per_sec": 661.67
+        },
+        "cpu_2": {
+          "ns_per_op": 1747950.0,
+          "ops_per_sec": 572.1
+        },
+        "cpu_4": {
+          "ns_per_op": 1879340.0,
+          "ops_per_sec": 532.1
+        },
+        "cpu_8": {
+          "ns_per_op": 1935430.0,
+          "ops_per_sec": 516.68
+        },
+        "cpu_32": {
+          "ns_per_op": 1564680.0,
+          "ops_per_sec": 639.11
+        }
+      },
+      "BenchmarkMarshalMap": {
+        "cpu_1": {
+          "ns_per_op": 124910.0,
+          "ops_per_sec": 8005.76
+        },
+        "cpu_2": {
+          "ns_per_op": 56610.0,
+          "ops_per_sec": 17664.72
+        },
+        "cpu_4": {
+          "ns_per_op": 64530.0,
+          "ops_per_sec": 15496.67
+        },
+        "cpu_8": {
+          "ns_per_op": 88310.0,
+          "ops_per_sec": 11323.75
+        },
+        "cpu_32": {
+          "ns_per_op": 93230.0,
+          "ops_per_sec": 10726.16
+        }
+      },
+      "BenchmarkCodeDecoder": {
+        "cpu_1": {
+          "ns_per_op": 59136660.0,
+          "ops_per_sec": 16.91
+        },
+        "cpu_2": {
+          "ns_per_op": 58615360.0,
+          "ops_per_sec": 17.06
+        },
+        "cpu_4": {
+          "ns_per_op": 58440110.0,
+          "ops_per_sec": 17.11
+        },
+        "cpu_8": {
+          "ns_per_op": 57663110.0,
+          "ops_per_sec": 17.34
+        },
+        "cpu_32": {
+          "ns_per_op": 57909720.0,
+          "ops_per_sec": 17.27
+        }
+      },
+      "BenchmarkUnicodeDecoder": {
+        "cpu_1": {
+          "ns_per_op": 27160.0,
+          "ops_per_sec": 36818.85
+        },
+        "cpu_2": {
+          "ns_per_op": 22300.0,
+          "ops_per_sec": 44843.05
+        },
+        "cpu_4": {
+          "ns_per_op": 26510.0,
+          "ops_per_sec": 37721.61
+        },
+        "cpu_8": {
+          "ns_per_op": 26790.0,
+          "ops_per_sec": 37327.36
+        },
+        "cpu_32": {
+          "ns_per_op": 27690.0,
+          "ops_per_sec": 36114.12
+        }
+      },
+      "BenchmarkDecoderStream": {
+        "cpu_1": {
+          "ns_per_op": 382300.0,
+          "ops_per_sec": 2615.75
+        },
+        "cpu_2": {
+          "ns_per_op": 348140.0,
+          "ops_per_sec": 2872.41
+        },
+        "cpu_4": {
+          "ns_per_op": 299290.0,
+          "ops_per_sec": 3341.24
+        },
+        "cpu_8": {
+          "ns_per_op": 323270.0,
+          "ops_per_sec": 3093.39
+        },
+        "cpu_32": {
+          "ns_per_op": 337540.0,
+          "ops_per_sec": 2962.61
+        }
+      },
+      "BenchmarkCodeUnmarshal": {
+        "cpu_1": {
+          "ns_per_op": 55677480.0,
+          "ops_per_sec": 17.96
+        },
+        "cpu_2": {
+          "ns_per_op": 55434870.0,
+          "ops_per_sec": 18.04
+        },
+        "cpu_4": {
+          "ns_per_op": 54848320.0,
+          "ops_per_sec": 18.23
+        },
+        "cpu_8": {
+          "ns_per_op": 54378090.0,
+          "ops_per_sec": 18.39
+        },
+        "cpu_32": {
+          "ns_per_op": 55322920.0,
+          "ops_per_sec": 18.08
+        }
+      },
+      "BenchmarkCodeUnmarshalReuse": {
+        "cpu_1": {
+          "ns_per_op": 58233360.0,
+          "ops_per_sec": 17.17
+        },
+        "cpu_2": {
+          "ns_per_op": 57123040.0,
+          "ops_per_sec": 17.51
+        },
+        "cpu_4": {
+          "ns_per_op": 68517910.0,
+          "ops_per_sec": 14.59
+        },
+        "cpu_8": {
+          "ns_per_op": 57660240.0,
+          "ops_per_sec": 17.34
+        },
+        "cpu_32": {
+          "ns_per_op": 57893200.0,
+          "ops_per_sec": 17.27
+        }
+      },
+      "BenchmarkUnmarshalString": {
+        "cpu_1": {
+          "ns_per_op": 104830.0,
+          "ops_per_sec": 9539.25
+        },
+        "cpu_2": {
+          "ns_per_op": 63820.0,
+          "ops_per_sec": 15669.07
+        },
+        "cpu_4": {
+          "ns_per_op": 54680.0,
+          "ops_per_sec": 18288.22
+        },
+        "cpu_8": {
+          "ns_per_op": 60660.0,
+          "ops_per_sec": 16485.33
+        },
+        "cpu_32": {
+          "ns_per_op": 108540.0,
+          "ops_per_sec": 9213.19
+        }
+      },
+      "BenchmarkUnmarshalFloat64": {
+        "cpu_1": {
+          "ns_per_op": 89620.0,
+          "ops_per_sec": 11158.22
+        },
+        "cpu_2": {
+          "ns_per_op": 59760.0,
+          "ops_per_sec": 16733.6
+        },
+        "cpu_4": {
+          "ns_per_op": 63270.0,
+          "ops_per_sec": 15805.28
+        },
+        "cpu_8": {
+          "ns_per_op": 56990.0,
+          "ops_per_sec": 17546.94
+        },
+        "cpu_32": {
+          "ns_per_op": 106660.0,
+          "ops_per_sec": 9375.59
+        }
+      },
+      "BenchmarkUnmarshalInt64": {
+        "cpu_1": {
+          "ns_per_op": 67540.0,
+          "ops_per_sec": 14806.04
+        },
+        "cpu_2": {
+          "ns_per_op": 68520.0,
+          "ops_per_sec": 14594.28
+        },
+        "cpu_4": {
+          "ns_per_op": 52980.0,
+          "ops_per_sec": 18875.05
+        },
+        "cpu_8": {
+          "ns_per_op": 50250.0,
+          "ops_per_sec": 19900.5
+        },
+        "cpu_32": {
+          "ns_per_op": 120000.0,
+          "ops_per_sec": 8333.33
+        }
+      },
+      "BenchmarkUnmarshalMap": {
+        "cpu_1": {
+          "ns_per_op": 94820.0,
+          "ops_per_sec": 10546.3
+        },
+        "cpu_2": {
+          "ns_per_op": 65860.0,
+          "ops_per_sec": 15183.72
+        },
+        "cpu_4": {
+          "ns_per_op": 58970.0,
+          "ops_per_sec": 16957.78
+        },
+        "cpu_8": {
+          "ns_per_op": 78720.0,
+          "ops_per_sec": 12703.25
+        },
+        "cpu_32": {
+          "ns_per_op": 80440.0,
+          "ops_per_sec": 12431.63
+        }
+      },
+      "BenchmarkIssue10335": {
+        "cpu_1": {
+          "ns_per_op": 104630.0,
+          "ops_per_sec": 9557.49
+        },
+        "cpu_2": {
+          "ns_per_op": 75190.0,
+          "ops_per_sec": 13299.64
+        },
+        "cpu_4": {
+          "ns_per_op": 67090.0,
+          "ops_per_sec": 14905.35
+        },
+        "cpu_8": {
+          "ns_per_op": 59360.0,
+          "ops_per_sec": 16846.36
+        },
+        "cpu_32": {
+          "ns_per_op": 89130.0,
+          "ops_per_sec": 11219.57
+        }
+      },
+      "BenchmarkIssue34127": {
+        "cpu_1": {
+          "ns_per_op": 152090.0,
+          "ops_per_sec": 6575.05
+        },
+        "cpu_2": {
+          "ns_per_op": 63530.0,
+          "ops_per_sec": 15740.59
+        },
+        "cpu_4": {
+          "ns_per_op": 64250.0,
+          "ops_per_sec": 15564.2
+        },
+        "cpu_8": {
+          "ns_per_op": 67980.0,
+          "ops_per_sec": 14710.21
+        },
+        "cpu_32": {
+          "ns_per_op": 64720.0,
+          "ops_per_sec": 15451.17
+        }
+      },
+      "BenchmarkUnmapped": {
+        "cpu_1": {
+          "ns_per_op": 98240.0,
+          "ops_per_sec": 10179.15
+        },
+        "cpu_2": {
+          "ns_per_op": 64230.0,
+          "ops_per_sec": 15569.05
+        },
+        "cpu_4": {
+          "ns_per_op": 72240.0,
+          "ops_per_sec": 13842.75
+        },
+        "cpu_8": {
+          "ns_per_op": 66350.0,
+          "ops_per_sec": 15071.59
+        },
+        "cpu_32": {
+          "ns_per_op": 123320.0,
+          "ops_per_sec": 8108.98
+        }
+      },
+      "BenchmarkTypeFieldsCache/MissTypes1": {
+        "cpu_1": {
+          "ns_per_op": 133960.0,
+          "ops_per_sec": 7464.91
+        },
+        "cpu_2": {
+          "ns_per_op": 159400.0,
+          "ops_per_sec": 6273.53
+        },
+        "cpu_4": {
+          "ns_per_op": 100360.0,
+          "ops_per_sec": 9964.13
+        },
+        "cpu_8": {
+          "ns_per_op": 95750.0,
+          "ops_per_sec": 10443.86
+        },
+        "cpu_32": {
+          "ns_per_op": 158080.0,
+          "ops_per_sec": 6325.91
+        }
+      },
+      "BenchmarkTypeFieldsCache/MissTypes10": {
+        "cpu_1": {
+          "ns_per_op": 263330.0,
+          "ops_per_sec": 3797.52
+        },
+        "cpu_2": {
+          "ns_per_op": 231420.0,
+          "ops_per_sec": 4321.15
+        },
+        "cpu_4": {
+          "ns_per_op": 244090.0,
+          "ops_per_sec": 4096.85
+        },
+        "cpu_8": {
+          "ns_per_op": 166010.0,
+          "ops_per_sec": 6023.73
+        },
+        "cpu_32": {
+          "ns_per_op": 191960.0,
+          "ops_per_sec": 5209.42
+        }
+      },
+      "BenchmarkTypeFieldsCache/MissTypes100": {
+        "cpu_1": {
+          "ns_per_op": 618940.0,
+          "ops_per_sec": 1615.67
+        },
+        "cpu_2": {
+          "ns_per_op": 529860.0,
+          "ops_per_sec": 1887.29
+        },
+        "cpu_4": {
+          "ns_per_op": 749680.0,
+          "ops_per_sec": 1333.9
+        },
+        "cpu_8": {
+          "ns_per_op": 396720.0,
+          "ops_per_sec": 2520.67
+        },
+        "cpu_32": {
+          "ns_per_op": 545020.0,
+          "ops_per_sec": 1834.8
+        }
+      },
+      "BenchmarkTypeFieldsCache/MissTypes1000": {
+        "cpu_1": {
+          "ns_per_op": 863480.0,
+          "ops_per_sec": 1158.1
+        },
+        "cpu_2": {
+          "ns_per_op": 3341160.0,
+          "ops_per_sec": 299.3
+        },
+        "cpu_4": {
+          "ns_per_op": 2356110.0,
+          "ops_per_sec": 424.43
+        },
+        "cpu_8": {
+          "ns_per_op": 1980090.0,
+          "ops_per_sec": 505.03
+        },
+        "cpu_32": {
+          "ns_per_op": 3359860.0,
+          "ops_per_sec": 297.63
+        }
+      },
+      "BenchmarkTypeFieldsCache/MissTypes10000": {
+        "cpu_1": {
+          "ns_per_op": 19086510.0,
+          "ops_per_sec": 52.39
+        },
+        "cpu_2": {
+          "ns_per_op": 21076180.0,
+          "ops_per_sec": 47.45
+        },
+        "cpu_4": {
+          "ns_per_op": 9395740.0,
+          "ops_per_sec": 106.43
+        },
+        "cpu_8": {
+          "ns_per_op": 4856580.0,
+          "ops_per_sec": 205.91
+        },
+        "cpu_32": {
+          "ns_per_op": 3024470.0,
+          "ops_per_sec": 330.64
+        }
+      },
+      "BenchmarkTypeFieldsCache/MissTypes100000": {
+        "cpu_1": {
+          "ns_per_op": 21104620.0,
+          "ops_per_sec": 47.38
+        },
+        "cpu_2": {
+          "ns_per_op": 156131830.0,
+          "ops_per_sec": 6.4
+        },
+        "cpu_4": {
+          "ns_per_op": 78282180.0,
+          "ops_per_sec": 12.77
+        },
+        "cpu_8": {
+          "ns_per_op": 81983500.0,
+          "ops_per_sec": 12.2
+        },
+        "cpu_32": {
+          "ns_per_op": 80241780.0,
+          "ops_per_sec": 12.46
+        }
+      },
+      "BenchmarkTypeFieldsCache/MissTypes1000000": {
+        "cpu_1": {
+          "ns_per_op": 1193628300.0,
+          "ops_per_sec": 0.84
+        },
+        "cpu_2": {
+          "ns_per_op": 1535276460.0,
+          "ops_per_sec": 0.65
+        },
+        "cpu_4": {
+          "ns_per_op": 945553830.0,
+          "ops_per_sec": 1.06
+        },
+        "cpu_8": {
+          "ns_per_op": 450625720.0,
+          "ops_per_sec": 2.22
+        },
+        "cpu_32": {
+          "ns_per_op": 134074160.0,
+          "ops_per_sec": 7.46
+        }
+      },
+      "BenchmarkTypeFieldsCache/HitTypes1": {
+        "cpu_1": {
+          "ns_per_op": 72240.0,
+          "ops_per_sec": 13842.75
+        },
+        "cpu_2": {
+          "ns_per_op": 30150.0,
+          "ops_per_sec": 33167.5
+        },
+        "cpu_4": {
+          "ns_per_op": 137450.0,
+          "ops_per_sec": 7275.37
+        },
+        "cpu_8": {
+          "ns_per_op": 60080.0,
+          "ops_per_sec": 16644.47
+        },
+        "cpu_32": {
+          "ns_per_op": 79420.0,
+          "ops_per_sec": 12591.29
+        }
+      },
+      "BenchmarkTypeFieldsCache/HitTypes10": {
+        "cpu_1": {
+          "ns_per_op": 78460.0,
+          "ops_per_sec": 12745.35
+        },
+        "cpu_2": {
+          "ns_per_op": 47480.0,
+          "ops_per_sec": 21061.5
+        },
+        "cpu_4": {
+          "ns_per_op": 55680.0,
+          "ops_per_sec": 17959.77
+        },
+        "cpu_8": {
+          "ns_per_op": 78150.0,
+          "ops_per_sec": 12795.91
+        },
+        "cpu_32": {
+          "ns_per_op": 112730.0,
+          "ops_per_sec": 8870.75
+        }
+      },
+      "BenchmarkTypeFieldsCache/HitTypes100": {
+        "cpu_1": {
+          "ns_per_op": 61490.0,
+          "ops_per_sec": 16262.81
+        },
+        "cpu_2": {
+          "ns_per_op": 18000.0,
+          "ops_per_sec": 55555.56
+        },
+        "cpu_4": {
+          "ns_per_op": 37470.0,
+          "ops_per_sec": 26688.02
+        },
+        "cpu_8": {
+          "ns_per_op": 106350.0,
+          "ops_per_sec": 9402.91
+        },
+        "cpu_32": {
+          "ns_per_op": 190520.0,
+          "ops_per_sec": 5248.79
+        }
+      },
+      "BenchmarkTypeFieldsCache/HitTypes1000": {
+        "cpu_1": {
+          "ns_per_op": 120360.0,
+          "ops_per_sec": 8308.41
+        },
+        "cpu_2": {
+          "ns_per_op": 45580.0,
+          "ops_per_sec": 21939.45
+        },
+        "cpu_4": {
+          "ns_per_op": 50130.0,
+          "ops_per_sec": 19948.13
+        },
+        "cpu_8": {
+          "ns_per_op": 60200.0,
+          "ops_per_sec": 16611.3
+        },
+        "cpu_32": {
+          "ns_per_op": 93840.0,
+          "ops_per_sec": 10656.44
+        }
+      },
+      "BenchmarkTypeFieldsCache/HitTypes10000": {
+        "cpu_1": {
+          "ns_per_op": 110450.0,
+          "ops_per_sec": 9053.87
+        },
+        "cpu_2": {
+          "ns_per_op": 48190.0,
+          "ops_per_sec": 20751.19
+        },
+        "cpu_4": {
+          "ns_per_op": 62030.0,
+          "ops_per_sec": 16121.23
+        },
+        "cpu_8": {
+          "ns_per_op": 63670.0,
+          "ops_per_sec": 15705.98
+        },
+        "cpu_32": {
+          "ns_per_op": 308320.0,
+          "ops_per_sec": 3243.38
+        }
+      },
+      "BenchmarkTypeFieldsCache/HitTypes100000": {
+        "cpu_1": {
+          "ns_per_op": 72060.0,
+          "ops_per_sec": 13877.32
+        },
+        "cpu_2": {
+          "ns_per_op": 53020.0,
+          "ops_per_sec": 18860.81
+        },
+        "cpu_4": {
+          "ns_per_op": 77610.0,
+          "ops_per_sec": 12884.94
+        },
+        "cpu_8": {
+          "ns_per_op": 77960.0,
+          "ops_per_sec": 12827.09
+        },
+        "cpu_32": {
+          "ns_per_op": 149130.0,
+          "ops_per_sec": 6705.56
+        }
+      },
+      "BenchmarkTypeFieldsCache/HitTypes1000000": {
+        "cpu_1": {
+          "ns_per_op": 124620.0,
+          "ops_per_sec": 8024.39
+        },
+        "cpu_2": {
+          "ns_per_op": 72980.0,
+          "ops_per_sec": 13702.38
+        },
+        "cpu_4": {
+          "ns_per_op": 55110.0,
+          "ops_per_sec": 18145.53
+        },
+        "cpu_8": {
+          "ns_per_op": 47160.0,
+          "ops_per_sec": 21204.41
+        },
+        "cpu_32": {
+          "ns_per_op": 99040.0,
+          "ops_per_sec": 10096.93
+        }
+      },
+      "BenchmarkEncodeMarshaler": {
+        "cpu_1": {
+          "ns_per_op": 226060.0,
+          "ops_per_sec": 4423.6
+        },
+        "cpu_2": {
+          "ns_per_op": 186620.0,
+          "ops_per_sec": 5358.48
+        },
+        "cpu_4": {
+          "ns_per_op": 155320.0,
+          "ops_per_sec": 6438.32
+        },
+        "cpu_8": {
+          "ns_per_op": 118190.0,
+          "ops_per_sec": 8460.95
+        },
+        "cpu_32": {
+          "ns_per_op": 109140.0,
+          "ops_per_sec": 9162.54
+        }
+      },
+      "BenchmarkEncoderEncode": {
+        "cpu_1": {
+          "ns_per_op": 265960.0,
+          "ops_per_sec": 3759.96
+        },
+        "cpu_2": {
+          "ns_per_op": 90650.0,
+          "ops_per_sec": 11031.44
+        },
+        "cpu_4": {
+          "ns_per_op": 66310.0,
+          "ops_per_sec": 15080.68
+        },
+        "cpu_8": {
+          "ns_per_op": 90210.0,
+          "ops_per_sec": 11085.25
+        },
+        "cpu_32": {
+          "ns_per_op": 90590.0,
+          "ops_per_sec": 11038.75
+        }
+      },
+      "BenchmarkNumberIsValid": {
+        "cpu_1": {
+          "ns_per_op": 1300.0,
+          "ops_per_sec": 769230.77
+        },
+        "cpu_2": {
+          "ns_per_op": 1050.0,
+          "ops_per_sec": 952380.95
+        },
+        "cpu_4": {
+          "ns_per_op": 1360.0,
+          "ops_per_sec": 735294.12
+        },
+        "cpu_8": {
+          "ns_per_op": 1170.0,
+          "ops_per_sec": 854700.85
+        },
+        "cpu_32": {
+          "ns_per_op": 1110.0,
+          "ops_per_sec": 900900.9
+        }
+      },
+      "BenchmarkNumberIsValidRegexp": {
+        "cpu_1": {
+          "ns_per_op": 102320.0,
+          "ops_per_sec": 9773.26
+        },
+        "cpu_2": {
+          "ns_per_op": 163710.0,
+          "ops_per_sec": 6108.36
+        },
+        "cpu_4": {
+          "ns_per_op": 134430.0,
+          "ops_per_sec": 7438.82
+        },
+        "cpu_8": {
+          "ns_per_op": 98600.0,
+          "ops_per_sec": 10141.99
+        },
+        "cpu_32": {
+          "ns_per_op": 155220.0,
+          "ops_per_sec": 6442.47
+        }
+      },
+      "BenchmarkUnmarshalNumber": {
+        "cpu_1": {
+          "ns_per_op": 114050.0,
+          "ops_per_sec": 8768.08
+        },
+        "cpu_2": {
+          "ns_per_op": 47820.0,
+          "ops_per_sec": 20911.75
+        },
+        "cpu_4": {
+          "ns_per_op": 31710.0,
+          "ops_per_sec": 31535.79
+        },
+        "cpu_8": {
+          "ns_per_op": 31020.0,
+          "ops_per_sec": 32237.27
+        },
+        "cpu_32": {
+          "ns_per_op": 31700.0,
+          "ops_per_sec": 31545.74
+        }
+      },
+      "BenchmarkQuote": {
+        "cpu_1": {
+          "ns_per_op": 17890.0,
+          "ops_per_sec": 55897.15
+        },
+        "cpu_2": {
+          "ns_per_op": 12360.0,
+          "ops_per_sec": 80906.15
+        },
+        "cpu_4": {
+          "ns_per_op": 13500.0,
+          "ops_per_sec": 74074.07
+        },
+        "cpu_8": {
+          "ns_per_op": 12310.0,
+          "ops_per_sec": 81234.77
+        },
+        "cpu_32": {
+          "ns_per_op": 16180.0,
+          "ops_per_sec": 61804.7
+        }
+      },
+      "BenchmarkQuoteRune": {
+        "cpu_1": {
+          "ns_per_op": 3310.0,
+          "ops_per_sec": 302114.8
+        },
+        "cpu_2": {
+          "ns_per_op": 2280.0,
+          "ops_per_sec": 438596.49
+        },
+        "cpu_4": {
+          "ns_per_op": 1940.0,
+          "ops_per_sec": 515463.92
+        },
+        "cpu_8": {
+          "ns_per_op": 2400.0,
+          "ops_per_sec": 416666.67
+        },
+        "cpu_32": {
+          "ns_per_op": 2640.0,
+          "ops_per_sec": 378787.88
+        }
+      },
+      "BenchmarkAppendQuote": {
+        "cpu_1": {
+          "ns_per_op": 11640.0,
+          "ops_per_sec": 85910.65
+        },
+        "cpu_2": {
+          "ns_per_op": 1140.0,
+          "ops_per_sec": 877192.98
+        },
+        "cpu_4": {
+          "ns_per_op": 1690.0,
+          "ops_per_sec": 591715.98
+        },
+        "cpu_8": {
+          "ns_per_op": 1430.0,
+          "ops_per_sec": 699300.7
+        },
+        "cpu_32": {
+          "ns_per_op": 1240.0,
+          "ops_per_sec": 806451.61
+        }
+      },
+      "BenchmarkAppendQuoteRune": {
+        "cpu_1": {
+          "ns_per_op": 2130.0,
+          "ops_per_sec": 469483.57
+        },
+        "cpu_2": {
+          "ns_per_op": 740.0,
+          "ops_per_sec": 1351351.35
+        },
+        "cpu_4": {
+          "ns_per_op": 670.0,
+          "ops_per_sec": 1492537.31
+        },
+        "cpu_8": {
+          "ns_per_op": 680.0,
+          "ops_per_sec": 1470588.24
+        },
+        "cpu_32": {
+          "ns_per_op": 690.0,
+          "ops_per_sec": 1449275.36
+        }
+      },
+      "BenchmarkUnquoteEasy": {
+        "cpu_1": {
+          "ns_per_op": 1630.0,
+          "ops_per_sec": 613496.93
+        },
+        "cpu_2": {
+          "ns_per_op": 950.0,
+          "ops_per_sec": 1052631.58
+        },
+        "cpu_4": {
+          "ns_per_op": 1000.0,
+          "ops_per_sec": 1000000.0
+        },
+        "cpu_8": {
+          "ns_per_op": 1350.0,
+          "ops_per_sec": 740740.74
+        },
+        "cpu_32": {
+          "ns_per_op": 880.0,
+          "ops_per_sec": 1136363.64
+        }
+      },
+      "BenchmarkUnquoteHard": {
+        "cpu_1": {
+          "ns_per_op": 16170.0,
+          "ops_per_sec": 61842.92
+        },
+        "cpu_2": {
+          "ns_per_op": 11170.0,
+          "ops_per_sec": 89525.51
+        },
+        "cpu_4": {
+          "ns_per_op": 13370.0,
+          "ops_per_sec": 74794.32
+        },
+        "cpu_8": {
+          "ns_per_op": 11220.0,
+          "ops_per_sec": 89126.56
+        },
+        "cpu_32": {
+          "ns_per_op": 16580.0,
+          "ops_per_sec": 60313.63
+        }
+      },
+      "BenchmarkHash8Bytes/New": {
+        "cpu_1": {
+          "ns_per_op": 2280.0,
+          "ops_per_sec": 438596.49
+        },
+        "cpu_2": {
+          "ns_per_op": 1250.0,
+          "ops_per_sec": 800000.0
+        },
+        "cpu_4": {
+          "ns_per_op": 2030.0,
+          "ops_per_sec": 492610.84
+        },
+        "cpu_8": {
+          "ns_per_op": 1230.0,
+          "ops_per_sec": 813008.13
+        },
+        "cpu_32": {
+          "ns_per_op": 1460.0,
+          "ops_per_sec": 684931.51
+        }
+      },
+      "BenchmarkHash8Bytes/Sum224": {
+        "cpu_1": {
+          "ns_per_op": 1460.0,
+          "ops_per_sec": 684931.51
+        },
+        "cpu_2": {
+          "ns_per_op": 1210.0,
+          "ops_per_sec": 826446.28
+        },
+        "cpu_4": {
+          "ns_per_op": 2080.0,
+          "ops_per_sec": 480769.23
+        },
+        "cpu_8": {
+          "ns_per_op": 1340.0,
+          "ops_per_sec": 746268.66
+        },
+        "cpu_32": {
+          "ns_per_op": 1610.0,
+          "ops_per_sec": 621118.01
+        }
+      },
+      "BenchmarkHash8Bytes/Sum256": {
+        "cpu_1": {
+          "ns_per_op": 2000.0,
+          "ops_per_sec": 500000.0
+        },
+        "cpu_2": {
+          "ns_per_op": 1300.0,
+          "ops_per_sec": 769230.77
+        },
+        "cpu_4": {
+          "ns_per_op": 1130.0,
+          "ops_per_sec": 884955.75
+        },
+        "cpu_8": {
+          "ns_per_op": 1170.0,
+          "ops_per_sec": 854700.85
+        },
+        "cpu_32": {
+          "ns_per_op": 1740.0,
+          "ops_per_sec": 574712.64
+        }
+      },
+      "BenchmarkHash1K/New": {
+        "cpu_1": {
+          "ns_per_op": 3180.0,
+          "ops_per_sec": 314465.41
+        },
+        "cpu_2": {
+          "ns_per_op": 2280.0,
+          "ops_per_sec": 438596.49
+        },
+        "cpu_4": {
+          "ns_per_op": 2860.0,
+          "ops_per_sec": 349650.35
+        },
+        "cpu_8": {
+          "ns_per_op": 2450.0,
+          "ops_per_sec": 408163.27
+        },
+        "cpu_32": {
+          "ns_per_op": 2430.0,
+          "ops_per_sec": 411522.63
+        }
+      },
+      "BenchmarkHash1K/Sum224": {
+        "cpu_1": {
+          "ns_per_op": 2580.0,
+          "ops_per_sec": 387596.9
+        },
+        "cpu_2": {
+          "ns_per_op": 2240.0,
+          "ops_per_sec": 446428.57
+        },
+        "cpu_4": {
+          "ns_per_op": 2550.0,
+          "ops_per_sec": 392156.86
+        },
+        "cpu_8": {
+          "ns_per_op": 1930.0,
+          "ops_per_sec": 518134.72
+        },
+        "cpu_32": {
+          "ns_per_op": 2450.0,
+          "ops_per_sec": 408163.27
+        }
+      },
+      "BenchmarkHash1K/Sum256": {
+        "cpu_1": {
+          "ns_per_op": 2730.0,
+          "ops_per_sec": 366300.37
+        },
+        "cpu_2": {
+          "ns_per_op": 2100.0,
+          "ops_per_sec": 476190.48
+        },
+        "cpu_4": {
+          "ns_per_op": 1990.0,
+          "ops_per_sec": 502512.56
+        },
+        "cpu_8": {
+          "ns_per_op": 2580.0,
+          "ops_per_sec": 387596.9
+        },
+        "cpu_32": {
+          "ns_per_op": 2220.0,
+          "ops_per_sec": 450450.45
+        }
+      },
+      "BenchmarkHash8K/New": {
+        "cpu_1": {
+          "ns_per_op": 9070.0,
+          "ops_per_sec": 110253.58
+        },
+        "cpu_2": {
+          "ns_per_op": 6540.0,
+          "ops_per_sec": 152905.2
+        },
+        "cpu_4": {
+          "ns_per_op": 6060.0,
+          "ops_per_sec": 165016.5
+        },
+        "cpu_8": {
+          "ns_per_op": 7450.0,
+          "ops_per_sec": 134228.19
+        },
+        "cpu_32": {
+          "ns_per_op": 8930.0,
+          "ops_per_sec": 111982.08
+        }
+      },
+      "BenchmarkHash8K/Sum224": {
+        "cpu_1": {
+          "ns_per_op": 39730.0,
+          "ops_per_sec": 25169.9
+        },
+        "cpu_2": {
+          "ns_per_op": 6630.0,
+          "ops_per_sec": 150829.56
+        },
+        "cpu_4": {
+          "ns_per_op": 6620.0,
+          "ops_per_sec": 151057.4
+        },
+        "cpu_8": {
+          "ns_per_op": 7090.0,
+          "ops_per_sec": 141043.72
+        },
+        "cpu_32": {
+          "ns_per_op": 7760.0,
+          "ops_per_sec": 128865.98
+        }
+      },
+      "BenchmarkHash8K/Sum256": {
+        "cpu_1": {
+          "ns_per_op": 6220.0,
+          "ops_per_sec": 160771.7
+        },
+        "cpu_2": {
+          "ns_per_op": 6290.0,
+          "ops_per_sec": 158982.51
+        },
+        "cpu_4": {
+          "ns_per_op": 7190.0,
+          "ops_per_sec": 139082.06
+        },
+        "cpu_8": {
+          "ns_per_op": 6640.0,
+          "ops_per_sec": 150602.41
+        },
+        "cpu_32": {
+          "ns_per_op": 9020.0,
+          "ops_per_sec": 110864.75
+        }
+      },
+      "BenchmarkHash256K/New": {
+        "cpu_1": {
+          "ns_per_op": 188880.0,
+          "ops_per_sec": 5294.37
+        },
+        "cpu_2": {
+          "ns_per_op": 162090.0,
+          "ops_per_sec": 6169.41
+        },
+        "cpu_4": {
+          "ns_per_op": 162830.0,
+          "ops_per_sec": 6141.37
+        },
+        "cpu_8": {
+          "ns_per_op": 163680.0,
+          "ops_per_sec": 6109.48
+        },
+        "cpu_32": {
+          "ns_per_op": 162680.0,
+          "ops_per_sec": 6147.04
+        }
+      },
+      "BenchmarkHash256K/Sum224": {
+        "cpu_1": {
+          "ns_per_op": 162740.0,
+          "ops_per_sec": 6144.77
+        },
+        "cpu_2": {
+          "ns_per_op": 162070.0,
+          "ops_per_sec": 6170.17
+        },
+        "cpu_4": {
+          "ns_per_op": 161960.0,
+          "ops_per_sec": 6174.36
+        },
+        "cpu_8": {
+          "ns_per_op": 161480.0,
+          "ops_per_sec": 6192.72
+        },
+        "cpu_32": {
+          "ns_per_op": 162810.0,
+          "ops_per_sec": 6142.13
+        }
+      },
+      "BenchmarkHash256K/Sum256": {
+        "cpu_1": {
+          "ns_per_op": 162830.0,
+          "ops_per_sec": 6141.37
+        },
+        "cpu_2": {
+          "ns_per_op": 162470.0,
+          "ops_per_sec": 6154.98
+        },
+        "cpu_4": {
+          "ns_per_op": 161710.0,
+          "ops_per_sec": 6183.91
+        },
+        "cpu_8": {
+          "ns_per_op": 161750.0,
+          "ops_per_sec": 6182.38
+        },
+        "cpu_32": {
+          "ns_per_op": 163770.0,
+          "ops_per_sec": 6106.12
+        }
+      },
+      "BenchmarkHash1M/New": {
+        "cpu_1": {
+          "ns_per_op": 661800.0,
+          "ops_per_sec": 1511.03
+        },
+        "cpu_2": {
+          "ns_per_op": 884440.0,
+          "ops_per_sec": 1130.66
+        },
+        "cpu_4": {
+          "ns_per_op": 726320.0,
+          "ops_per_sec": 1376.8
+        },
+        "cpu_8": {
+          "ns_per_op": 714460.0,
+          "ops_per_sec": 1399.66
+        },
+        "cpu_32": {
+          "ns_per_op": 676790.0,
+          "ops_per_sec": 1477.56
+        }
+      },
+      "BenchmarkHash1M/Sum224": {
+        "cpu_1": {
+          "ns_per_op": 696550.0,
+          "ops_per_sec": 1435.65
+        },
+        "cpu_2": {
+          "ns_per_op": 668880.0,
+          "ops_per_sec": 1495.04
+        },
+        "cpu_4": {
+          "ns_per_op": 665530.0,
+          "ops_per_sec": 1502.56
+        },
+        "cpu_8": {
+          "ns_per_op": 684440.0,
+          "ops_per_sec": 1461.05
+        },
+        "cpu_32": {
+          "ns_per_op": 680920.0,
+          "ops_per_sec": 1468.6
+        }
+      },
+      "BenchmarkHash1M/Sum256": {
+        "cpu_1": {
+          "ns_per_op": 654330.0,
+          "ops_per_sec": 1528.28
+        },
+        "cpu_2": {
+          "ns_per_op": 649810.0,
+          "ops_per_sec": 1538.91
+        },
+        "cpu_4": {
+          "ns_per_op": 690560.0,
+          "ops_per_sec": 1448.1
+        },
+        "cpu_8": {
+          "ns_per_op": 649560.0,
+          "ops_per_sec": 1539.5
+        },
+        "cpu_32": {
+          "ns_per_op": 703240.0,
+          "ops_per_sec": 1421.99
+        }
+      }
+    }
+  }
+}

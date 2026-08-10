@@ -15,6 +15,7 @@ SHUNIT2_PATH=""
 GOROOT=""
 ITERATIONS="${ITERATIONS:-1}"
 MINIMUM_OPS_PER_SEC="${MINIMUM_OPS_PER_SEC:-1000}"
+export BENCH_TIME="${BENCH_TIME:-1x}"
 log() { local tag="$1"; shift; printf '[%s] %s\n' "$tag" "$*" | tee -a "${LOG_FILE}"; }
 json_get()              { python3 "${JSON_HELPER}" "$1" get "${@:2}"; }
 json_field_exists()     { python3 "${JSON_HELPER}" "$1" field_exists "$2"; }
@@ -132,6 +133,7 @@ usage() {
     echo "Options: --check (prerequisites), -h|--help"
     echo "Env: SOFTWARE_VERSION (default: go1.26.5), ITERATIONS (default: 1)"
     echo "      MINIMUM_OPS_PER_SEC (default: 1000)"
+    echo "      BENCH_TIME (default: 1x, e.g. 100ms, 1s)"
     echo "Note: Downloads prebuilt Go binary from go.dev/dl (no source build)"
 }
 main() {

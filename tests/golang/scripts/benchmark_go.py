@@ -16,10 +16,11 @@ PACKAGES = [
 ]
 
 BENCH_RE = re.compile(
-    r"^(Benchmark\w+)-\d+\s+(\d+)\s+([\d.]+)\s+ns/op"
+    r"^(Benchmark[\w/]+)(?:-\d+)?\s+(\d+)\s+([\d.]+)\s+ns/op"
     r"(?:\s+([\d.]+)\s+MB/s)?"
     r"(?:\s+([\d.]+)\s+B/op)?"
-    r"(?:\s+([\d.]+)\s+allocs/op)?"
+    r"(?:\s+([\d.]+)\s+allocs/op)?",
+    re.MULTILINE
 )
 
 
@@ -35,6 +36,7 @@ def run_go_bench(goroot, pkg, cpu_list="1"):
     env["CGO_ENABLED"] = "0"
     env["GOPATH"] = "/tmp/go_bench_gopath"
 
+    benchtime = os.environ.get("BENCH_TIME", "1x")
     cmd = [
         os.path.join(goroot, "bin", "go"),
         "test",
@@ -43,18 +45,25 @@ def run_go_bench(goroot, pkg, cpu_list="1"):
         f"-count=1",
         "-run=^$",
         "-timeout=300s",
+        f"-benchtime={benchtime}",
     ]
     if cpu_list:
         cmd.append(f"-cpu={cpu_list}")
 
-    print(f"[BENCHMARK_GO] Running go test -bench in {pkg} (cpu={cpu_list})...")
-    result = subprocess.run(
-        cmd, capture_output=True, text=True, timeout=360,
-        cwd=src_dir, env=env,
+    print(f"[BENCHMARK_GO] Running go test -bench in {pkg} (cpu={cpu_list}, benchtime={benchtime})...")
+    proc = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=True, cwd=src_dir, env=env,
     )
-    text = result.stdout + "\n" + result.stderr
-    if result.returncode != 0:
-        print(f"[BENCHMARK_GO][DEBUG] go test failed for {pkg}: {result.stderr[:500]}")
+    try:
+        stdout_data, stderr_data = proc.communicate(timeout=360)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        stdout_data, stderr_data = proc.communicate()
+        print(f"[BENCHMARK_GO][WARN] go test timed out for {pkg}, using partial output")
+    text = stdout_data + "\n" + stderr_data
+    if proc.returncode != 0:
+        print(f"[BENCHMARK_GO][DEBUG] go test failed for {pkg}: {stderr_data[:500]}")
 
     benchmarks = []
     for m in BENCH_RE.finditer(text):
@@ -126,6 +135,7 @@ def main():
             "iterations": iterations,
             "cpu": 1,
             "cgo_enabled": False,
+            "benchtime": os.environ.get("BENCH_TIME", "1x"),
         },
         "results_summary": all_results,
     }

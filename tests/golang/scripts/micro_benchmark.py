@@ -10,7 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from benchmark_go import run_go_bench, PACKAGES
 
 BENCH_RE = re.compile(
-    r"^(Benchmark\w+)-(\d+)\s+(\d+)\s+([\d.]+)\s+ns/op"
+    r"^(Benchmark[\w/]+)(?:-(\d+))?\s+(\d+)\s+([\d.]+)\s+ns/op",
+    re.MULTILINE
 )
 
 THREAD_LEVELS = [1, 2, 4, 8, "all"]
@@ -26,9 +27,9 @@ def get_max_threads():
 def bench_thread_scaling(goroot, iterations):
     max_threads = get_max_threads()
     cpu_list = ",".join(str(t if t != "all" else max_threads) for t in THREAD_LEVELS)
+    benchtime = os.environ.get("BENCH_TIME", "1x")
     results = {}
     for pkg in ["encoding/json", "strconv", "crypto/sha256"]:
-        runs = []
         for _ in range(iterations):
             env = os.environ.copy()
             env["GOROOT"] = goroot
@@ -43,15 +44,22 @@ def bench_thread_scaling(goroot, iterations):
                 os.path.join(goroot, "bin", "go"),
                 "test", "-bench=.", "-benchmem", "-count=1",
                 "-run=^$", "-timeout=300s", f"-cpu={cpu_list}",
+                f"-benchtime={benchtime}",
             ]
-            result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=600,
-                cwd=src_dir, env=env,
+            proc = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                text=True, cwd=src_dir, env=env,
             )
-            text = result.stdout + "\n" + result.stderr
+            try:
+                stdout_data, stderr_data = proc.communicate(timeout=600)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                stdout_data, stderr_data = proc.communicate()
+                print(f"[MICRO][WARN] timeout for {pkg}, using partial output")
+            text = stdout_data + "\n" + stderr_data
             for m in BENCH_RE.finditer(text):
                 name = m.group(1)
-                cpu = int(m.group(2))
+                cpu = int(m.group(2)) if m.group(2) else 1
                 ns = float(m.group(4))
                 ops = round(1e9 / ns, 2) if ns > 0 else 0
                 key = f"{name}"
@@ -93,6 +101,7 @@ def main():
             "max_threads": max_threads,
             "iterations": iterations,
             "packages": ["encoding/json", "strconv", "crypto/sha256"],
+            "benchtime": os.environ.get("BENCH_TIME", "1x"),
         },
         "results": {
             "thread_scaling": ts_results,

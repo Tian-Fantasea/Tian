@@ -1,0 +1,880 @@
+======================================================================
+  Golang Performance Benchmark Report
+======================================================================
+  Generated: 2026-08-10 07:14:29 UTC
+  Test Time: 2026-08-10T07:11:46Z
+
+  --- Environment ---
+  Architecture:      aarch64
+  Model:             Kunpeng-920
+  CPU Model:         ARM64 CPU (32 cores)
+  CPU Cores:         32
+  Go Version:        go version go1.26.5 linux/arm64
+  OS:                openEuler 24.03 SP3
+  Kernel:           6.6.0-132.0.0.111.oe2403sp3.aarch64
+
+  --- Go stdlib Benchmarks (Primary) ---
+  Description:       Go stdlib benchmarks (go test -bench) across 6 packages on ARM64
+  Packages:          ['encoding/json', 'strconv', 'crypto/sha256', 'bytes', 'strings', 'math']
+  CGO:               False
+
+    benchmark                                ns/op      ops/sec     allocs
+    ----------------------------------------------------------------------
+    BenchmarkAbs                            260.00   3846153.85       0.00
+    BenchmarkAcos                         30220.00     33090.67       0.00
+    BenchmarkAcosh                         1200.00    833333.33       0.00
+    BenchmarkAppendQuote                  12010.00     83263.95       2.00
+    BenchmarkAppendQuoteRune               1020.00    980392.16       1.00
+    BenchmarkAsin                           360.00   2777777.78       0.00
+    BenchmarkAsinh                          590.00   1694915.25       0.00
+    BenchmarkAtan                           380.00   2631578.95       0.00
+    BenchmarkAtan2                          470.00   2127659.57       0.00
+    BenchmarkAtanh                          490.00   2040816.33       0.00
+    BenchmarkBufferAppendNoCopy         6568630.00       152.24       1.00
+    BenchmarkBufferFullSmallReads         64320.00     15547.26       2.00
+    BenchmarkBufferNotEmptyWriteRead     577550.00      1731.45       3.00
+    BenchmarkBufferWriteBlock/N1048576  1087460.00       919.57      11.00
+    BenchmarkBufferWriteBlock/N4096       11930.00     83822.30       3.00
+    BenchmarkBufferWriteBlock/N65536      61760.00     16191.71       7.00
+    BenchmarkBuildString_Builder/1Write    1540.00    649350.65       1.00
+    BenchmarkBuildString_Builder/3Write    1500.00    666666.67       1.00
+    BenchmarkBuildString_Builder/3Write    3890.00    257069.41       3.00
+    BenchmarkBuildString_ByteBuffer/1Wr    1870.00    534759.36       2.00
+    BenchmarkBuildString_ByteBuffer/3Wr   18260.00     54764.51       2.00
+    BenchmarkBuildString_ByteBuffer/3Wr   12140.00     82372.32       3.00
+    BenchmarkBuildString_WriteString/1W    1130.00    884955.75       1.00
+    BenchmarkBuildString_WriteString/3W     940.00   1063829.79       1.00
+    BenchmarkBuildString_WriteString/3W    3420.00    292397.66       3.00
+    BenchmarkByteByteMap                   4220.00    236966.82       4.00
+    BenchmarkByteByteMatch                 2890.00    346020.76       5.00
+    BenchmarkByteByteNoMatch              12750.00     78431.37       4.00
+    BenchmarkByteByteReplaces             14560.00     68681.32       5.00
+    BenchmarkByteReplacerWriteString      22550.00     44345.90       9.00
+    BenchmarkByteStringMatch              23370.00     42789.90      12.00
+    BenchmarkByteStringReplacerWriteStr   41790.00     23929.17      10.00
+    BenchmarkBytesCompare/1                 390.00   2564102.56       0.00
+    BenchmarkBytesCompare/1024              350.00   2857142.86       0.00
+    BenchmarkBytesCompare/128               300.00   3333333.33       0.00
+    BenchmarkBytesCompare/16                320.00   3125000.00       0.00
+    BenchmarkBytesCompare/2                 250.00   4000000.00       0.00
+    BenchmarkBytesCompare/2048              470.00   2127659.57       0.00
+    BenchmarkBytesCompare/256               300.00   3333333.33       0.00
+    BenchmarkBytesCompare/32                300.00   3333333.33       0.00
+    BenchmarkBytesCompare/4                 390.00   2564102.56       0.00
+    BenchmarkBytesCompare/512               390.00   2564102.56       0.00
+    BenchmarkBytesCompare/64                240.00   4166666.67       0.00
+    BenchmarkBytesCompare/8                 300.00   3333333.33       0.00
+    BenchmarkCbrt                           520.00   1923076.92       0.00
+    BenchmarkCeil                           220.00   4545454.55       0.00
+    BenchmarkClone                         1510.00    662251.66       2.00
+    BenchmarkCodeDecoder                64572620.00        15.49   40017.00
+    BenchmarkCodeEncoder                12620080.00        79.24       8.00
+    BenchmarkCodeEncoderError           10917830.00        91.59      50.00
+    BenchmarkCodeMarshal                10337220.00        96.74       9.00
+    BenchmarkCodeMarshalError           11673160.00        85.67      52.00
+    BenchmarkCodeUnmarshal              54715170.00        18.28   39996.00
+    BenchmarkCodeUnmarshalReuse         53662870.00        18.63   39996.00
+    BenchmarkCompareBytesBig             164930.00      6063.18       0.00
+    BenchmarkCompareBytesBigIdentical       450.00   2222222.22       0.00
+    BenchmarkCompareBytesDifferentLengt     430.00   2325581.40       0.00
+    BenchmarkCompareBytesEmpty              330.00   3030303.03       0.00
+    BenchmarkCompareBytesEqual              640.00   1562500.00       0.00
+    BenchmarkCompareBytesIdentical          950.00   1052631.58       0.00
+    BenchmarkCompareBytesSameLength         370.00   2702702.70       0.00
+    BenchmarkCompareBytesToNil              460.00   2173913.04       0.00
+    BenchmarkCopysign                       170.00   5882352.94       0.00
+    BenchmarkCos                            530.00   1886792.45       0.00
+    BenchmarkCosh                           560.00   1785714.29       0.00
+    BenchmarkCount/10                      1140.00    877192.98       0.00
+    BenchmarkCount/32                       920.00   1086956.52       0.00
+    BenchmarkCount/4K                      5660.00    176678.45       0.00
+    BenchmarkCount/4M                   4507670.00       221.84       0.00
+    BenchmarkCount/64M                  71533620.00        13.98       0.00
+    BenchmarkCountByte/10                   480.00   2083333.33       0.00
+    BenchmarkCountByte/32                   370.00   2702702.70       0.00
+    BenchmarkCountByte/4096                1000.00   1000000.00       0.00
+    BenchmarkCountByte/4194304           720620.00      1387.69       0.00
+    BenchmarkCountByte/67108864         11281600.00        88.64       0.00
+    BenchmarkCountEasy/10                  1300.00    769230.77       0.00
+    BenchmarkCountEasy/32                   830.00   1204819.28       0.00
+    BenchmarkCountEasy/4K                  2020.00    495049.50       0.00
+    BenchmarkCountEasy/4M                388460.00      2574.27       0.00
+    BenchmarkCountEasy/64M              6212220.00       160.97       0.00
+    BenchmarkCountHard1                  859120.00      1164.36       0.00
+    BenchmarkCountHard2                  880565.00      1138.12       0.00
+    BenchmarkCountHard3                  839470.00      1191.23       0.00
+    BenchmarkCountSingle/10                 670.00   1492537.31       0.00
+    BenchmarkCountSingle/32                 460.00   2173913.04       0.00
+    BenchmarkCountSingle/4K                1590.00    628930.82       0.00
+    BenchmarkCountSingle/4M             3942750.00       253.63       0.00
+    BenchmarkCountSingle/64M            65738020.00        15.21       0.00
+    BenchmarkCountTorture                 13700.00     72992.70       0.00
+    BenchmarkCountTortureOverlapping    1763440.00       567.07       2.00
+    BenchmarkDecoderStream               304060.00      3288.82       1.00
+    BenchmarkDim                            160.00   6250000.00       0.00
+    BenchmarkEncodeMarshaler             126880.00      7881.46      56.00
+    BenchmarkEncoderEncode               124420.00      8037.29      43.00
+    BenchmarkEqual/0                        340.00   2941176.47       0.00
+    BenchmarkEqual/1                       3570.00    280112.04       0.00
+    BenchmarkEqual/15                       960.00   1041666.67       0.00
+    BenchmarkEqual/16                       610.00   1639344.26       0.00
+    BenchmarkEqual/20                       600.00   1666666.67       0.00
+    BenchmarkEqual/32                       450.00   2222222.22       0.00
+    BenchmarkEqual/4K                      6210.00    161030.60       0.00
+    BenchmarkEqual/4M                   1611360.00       620.59       0.00
+    BenchmarkEqual/6                        890.00   1123595.51       0.00
+    BenchmarkEqual/64M                  23506060.00        42.54       0.00
+    BenchmarkEqual/9                        830.00   1204819.28       0.00
+    BenchmarkEqual/same/1                   910.00   1098901.10       0.00
+    BenchmarkEqual/same/15                  300.00   3333333.33       0.00
+    BenchmarkEqual/same/16                  240.00   4166666.67       0.00
+    BenchmarkEqual/same/20                  430.00   2325581.40       0.00
+    BenchmarkEqual/same/32                  230.00   4347826.09       0.00
+    BenchmarkEqual/same/4K                  290.00   3448275.86       0.00
+    BenchmarkEqual/same/4M                  480.00   2083333.33       0.00
+    BenchmarkEqual/same/6                   410.00   2439024.39       0.00
+    BenchmarkEqual/same/64M              182880.00      5468.07       1.00
+    BenchmarkEqual/same/9                   310.00   3225806.45       0.00
+    BenchmarkEqualBothUnaligned/4096_0     1420.00    704225.35       0.00
+    BenchmarkEqualBothUnaligned/4096_1     1010.00    990099.01       0.00
+    BenchmarkEqualBothUnaligned/4096_4      990.00   1010101.01       0.00
+    BenchmarkEqualBothUnaligned/4096_7      990.00   1010101.01       0.00
+    BenchmarkEqualBothUnaligned/4194304 1461310.00       684.32       0.00
+    BenchmarkEqualBothUnaligned/4194304  505560.00      1978.00       0.00
+    BenchmarkEqualBothUnaligned/4194304  497570.00      2009.77       0.00
+    BenchmarkEqualBothUnaligned/4194304  494410.00      2022.61       0.00
+    BenchmarkEqualBothUnaligned/64_0        480.00   2083333.33       0.00
+    BenchmarkEqualBothUnaligned/64_1        260.00   3846153.85       0.00
+    BenchmarkEqualBothUnaligned/64_4        570.00   1754385.96       0.00
+    BenchmarkEqualBothUnaligned/64_7        250.00   4000000.00       0.00
+    BenchmarkEqualBothUnaligned/6710886 22305270.00        44.83       0.00
+    BenchmarkEqualBothUnaligned/6710886 8498040.00       117.67       0.00
+    BenchmarkEqualBothUnaligned/6710886 8206320.00       121.86       0.00
+    BenchmarkEqualBothUnaligned/6710886 8364410.00       119.55       0.00
+    BenchmarkEqualFold/ASCII                380.00   2631578.95       0.00
+    BenchmarkEqualFold/Tests               2830.00    353356.89       0.00
+    BenchmarkEqualFold/UnicodePrefix       1420.00    704225.35       0.00
+    BenchmarkEqualFold/UnicodeSuffix       1100.00    909090.91       0.00
+    BenchmarkErf                            480.00   2083333.33       0.00
+    BenchmarkErfc                           350.00   2857142.86       0.00
+    BenchmarkErfcinv                        300.00   3333333.33       0.00
+    BenchmarkErfinv                         450.00   2222222.22       0.00
+    BenchmarkExp                            440.00   2272727.27       0.00
+    BenchmarkExp2                           270.00   3703703.70       0.00
+    BenchmarkExp2Go                         520.00   1923076.92       0.00
+    BenchmarkExpGo                          670.00   1492537.31       0.00
+    BenchmarkExpm1                          510.00   1960784.31       0.00
+    BenchmarkFMA                            190.00   5263157.89       0.00
+    BenchmarkFields/ASCII/1048576       4553025.00       221.39       1.00
+    BenchmarkFields/ASCII/16               1625.00    629698.52       1.00
+    BenchmarkFields/ASCII/256              2570.00    399266.71       1.00
+    BenchmarkFields/ASCII/4096            20920.00     48592.68       1.00
+    BenchmarkFields/ASCII/65536          302865.00      3362.81       1.00
+    BenchmarkFields/Mixed/1048576       15777595.00        63.52      24.00
+    BenchmarkFields/Mixed/16               9005.00    111321.27       1.00
+    BenchmarkFields/Mixed/256             10445.00     98329.02       1.00
+    BenchmarkFields/Mixed/4096            57970.00     17278.22       5.00
+    BenchmarkFields/Mixed/65536          895300.00      1118.93      12.00
+    BenchmarkFieldsFunc/ASCII/1048576   12432370.00        81.73      24.00
+    BenchmarkFieldsFunc/ASCII/16           6820.00    146875.14       1.00
+    BenchmarkFieldsFunc/ASCII/256          8445.00    118476.43       1.00
+    BenchmarkFieldsFunc/ASCII/4096        51975.00     19263.51       5.00
+    BenchmarkFieldsFunc/ASCII/65536      681585.00      1472.43      12.00
+    BenchmarkFieldsFunc/Mixed/1048576   13538645.00        74.58      24.00
+    BenchmarkFieldsFunc/Mixed/16           7750.00    129311.28       1.00
+    BenchmarkFieldsFunc/Mixed/256          9130.00    109913.53       1.00
+    BenchmarkFieldsFunc/Mixed/4096        62670.00     16122.11       5.00
+    BenchmarkFieldsFunc/Mixed/65536      761365.00      1314.15      12.00
+    BenchmarkFloat32bits                    200.00   5000000.00       0.00
+    BenchmarkFloat32frombits                170.00   5882352.94       0.00
+    BenchmarkFloat64bits                    240.00   4166666.67       0.00
+    BenchmarkFloat64frombits                260.00   3846153.85       0.00
+    BenchmarkFloor                          170.00   5882352.94       0.00
+    BenchmarkFrexp                          240.00   4166666.67       0.00
+    BenchmarkGamma                          630.00   1587301.59       0.00
+    BenchmarkGenericMatch1                28800.00     34722.22      14.00
+    BenchmarkGenericMatch2                52250.00     19138.76      20.00
+    BenchmarkGenericNoMatch               45910.00     21781.75      14.00
+    BenchmarkHTMLEscapeNew                 1520.00    657894.74       2.00
+    BenchmarkHTMLEscapeOld                12500.00     80000.00       2.00
+    BenchmarkHash1K/New                    2000.00    500000.00       0.00
+    BenchmarkHash1K/Sum224                 1620.00    617283.95       0.00
+    BenchmarkHash1K/Sum256                 1630.00    613496.93       0.00
+    BenchmarkHash1M/New                  774330.00      1291.44       0.00
+    BenchmarkHash1M/Sum224               672850.00      1486.22       0.00
+    BenchmarkHash1M/Sum256               642200.00      1557.15       0.00
+    BenchmarkHash256K/New                168330.00      5940.71       0.00
+    BenchmarkHash256K/Sum224             180650.00      5535.57       0.00
+    BenchmarkHash256K/Sum256             169400.00      5903.19       0.00
+    BenchmarkHash8Bytes/New                2110.00    473933.65       0.00
+    BenchmarkHash8Bytes/Sum224             2000.00    500000.00       0.00
+    BenchmarkHash8Bytes/Sum256             1210.00    826446.28       0.00
+    BenchmarkHash8K/New                    8530.00    117233.29       0.00
+    BenchmarkHash8K/Sum224                 6140.00    162866.45       0.00
+    BenchmarkHash8K/Sum256                 6070.00    164744.65       0.00
+    BenchmarkHypot                          330.00   3030303.03       0.00
+    BenchmarkHypotGo                        340.00   2941176.47       0.00
+    BenchmarkIlogb                          250.00   4000000.00       0.00
+    BenchmarkIndex                          480.00   2083333.33       0.00
+    BenchmarkIndex/10                      1250.00    800000.00       0.00
+    BenchmarkIndex/32                       980.00   1020408.16       0.00
+    BenchmarkIndex/4K                      5270.00    189753.32       0.00
+    BenchmarkIndex/4M                   4525350.00       220.98       0.00
+    BenchmarkIndex/64M                  72996130.00        13.70       0.00
+    BenchmarkIndexByte                      420.00   2380952.38       0.00
+    BenchmarkIndexByte/10                  1940.00    515463.92       1.00
+    BenchmarkIndexByte/32                  1340.00    746268.66       1.00
+    BenchmarkIndexByte/4K                  1840.00    543478.26       1.00
+    BenchmarkIndexByte/4M                880950.00      1135.14       1.00
+    BenchmarkIndexByte/64M              14081580.00        71.01       1.00
+    BenchmarkIndexBytePortable/10         11020.00     90744.10       0.00
+    BenchmarkIndexBytePortable/32           390.00   2564102.56       0.00
+    BenchmarkIndexBytePortable/4K          4500.00    222222.22       0.00
+    BenchmarkIndexBytePortable/4M       3300480.00       302.99       0.00
+    BenchmarkIndexBytePortable/64M      52727440.00        18.97       0.00
+    BenchmarkIndexEasy/10                   990.00   1010101.01       0.00
+    BenchmarkIndexEasy/32                   670.00   1492537.31       0.00
+    BenchmarkIndexEasy/4K                  2230.00    448430.49       0.00
+    BenchmarkIndexEasy/4M                404640.00      2471.33       0.00
+    BenchmarkIndexEasy/64M              6223510.00       160.68       0.00
+    BenchmarkIndexHard1                 1516200.00       793.98       0.00
+    BenchmarkIndexHard2                 1256630.00       892.95       0.00
+    BenchmarkIndexHard3                 1271435.00       888.38       0.00
+    BenchmarkIndexHard4                 2454855.00       457.75       0.00
+    BenchmarkIndexPeriodic/IndexPeriodi   71890.00     13943.19       0.00
+    BenchmarkIndexPeriodic/IndexPeriodi   91330.00     12598.06       0.00
+    BenchmarkIndexPeriodic/IndexPeriodi   40245.00     24928.88       0.00
+    BenchmarkIndexPeriodic/IndexPeriodi   65595.00     15472.62       0.00
+    BenchmarkIndexPeriodic/IndexPeriodi   26060.00     38446.56       0.00
+    BenchmarkIndexPeriodic/IndexPeriodi   62170.00     16163.69       0.00
+    BenchmarkIndexRune                      880.00   1136363.64       0.00
+    BenchmarkIndexRune/10                  1510.00    662251.66       0.00
+    BenchmarkIndexRune/32                   640.00   1562500.00       0.00
+    BenchmarkIndexRune/4K                  2500.00    400000.00       0.00
+    BenchmarkIndexRune/4M                392280.00      2549.20       0.00
+    BenchmarkIndexRune/64M              6308290.00       158.52       0.00
+    BenchmarkIndexRuneASCII/10              820.00   1219512.20       0.00
+    BenchmarkIndexRuneASCII/32              430.00   2325581.40       0.00
+    BenchmarkIndexRuneASCII/4K             1290.00    775193.80       0.00
+    BenchmarkIndexRuneASCII/4M           391930.00      2551.48       0.00
+    BenchmarkIndexRuneASCII/64M         6311130.00       158.45       0.00
+    BenchmarkIndexRuneFastPath              450.00   2222222.22       0.00
+    BenchmarkIndexRuneLongString            810.00   1234567.90       0.00
+    BenchmarkIndexRuneUnicode/Cyrillic/    2870.00    348432.06       0.00
+    BenchmarkIndexRuneUnicode/Cyrillic/     980.00   1020408.16       0.00
+    BenchmarkIndexRuneUnicode/Cyrillic/    4490.00    222717.15       0.00
+    BenchmarkIndexRuneUnicode/Cyrillic/ 2987980.00       334.67       0.00
+    BenchmarkIndexRuneUnicode/Cyrillic/ 52706260.00        18.97       0.00
+    BenchmarkIndexRuneUnicode/Han/10       2770.00    361010.83       0.00
+    BenchmarkIndexRuneUnicode/Han/32       1220.00    819672.13       0.00
+    BenchmarkIndexRuneUnicode/Han/4K       4680.00    213675.21       0.00
+    BenchmarkIndexRuneUnicode/Han/4M    2362920.00       423.21       0.00
+    BenchmarkIndexRuneUnicode/Han/64M   39665560.00        25.21       0.00
+    BenchmarkIndexRuneUnicode/Latin/10     2280.00    438596.49       0.00
+    BenchmarkIndexRuneUnicode/Latin/32     1110.00    900900.90       0.00
+    BenchmarkIndexRuneUnicode/Latin/4K     2860.00    349650.35       0.00
+    BenchmarkIndexRuneUnicode/Latin/4M  4176140.00       239.46       0.00
+    BenchmarkIndexRuneUnicode/Latin/64M 69507470.00        14.39       0.00
+    BenchmarkIndexTorture                 16270.00     61462.81       0.00
+    BenchmarkIssue10335                   27040.00     36982.25      15.00
+    BenchmarkIssue34127                   53830.00     18577.00      43.00
+    BenchmarkJ0                            1190.00    840336.13       0.00
+    BenchmarkJ1                            1210.00    826446.28       0.00
+    BenchmarkJn                            1340.00    746268.66       0.00
+    BenchmarkJoin/0                         340.00   2941176.47       0.00
+    BenchmarkJoin/1                         220.00   4545454.55       0.00
+    BenchmarkJoin/2                        1250.00    800000.00       1.00
+    BenchmarkJoin/3                        1090.00    917431.19       1.00
+    BenchmarkJoin/4                         950.00   1052631.58       1.00
+    BenchmarkJoin/5                        1090.00    917431.19       1.00
+    BenchmarkJoin/6                        1110.00    900900.90       1.00
+    BenchmarkJoin/7                        1130.00    884955.75       1.00
+    BenchmarkLastIndex                      530.00   1886792.45       0.00
+    BenchmarkLastIndexHard1             1631110.00       613.08       0.00
+    BenchmarkLastIndexHard2             1637585.00       610.66       0.00
+    BenchmarkLastIndexHard3             1638120.00       610.46       0.00
+    BenchmarkLdexp                          360.00   2777777.78       0.00
+    BenchmarkLgamma                         790.00   1265822.78       0.00
+    BenchmarkLog                            500.00   2000000.00       0.00
+    BenchmarkLog10                          340.00   2941176.47       0.00
+    BenchmarkLog1p                          310.00   3225806.45       0.00
+    BenchmarkLog2                           330.00   3030303.03       0.00
+    BenchmarkLogb                           320.00   3125000.00       0.00
+    BenchmarkMap/change/ASCII              2340.00    427350.43       1.00
+    BenchmarkMap/change/Greek             12620.00     79239.30       1.00
+    BenchmarkMap/identity/ASCII             950.00   1052631.58       0.00
+    BenchmarkMap/identity/Greek             910.00   1098901.10       0.00
+    BenchmarkMapNoChanges                   740.00   1351351.35       0.00
+    BenchmarkMarshalBytes/256             22050.00     45351.47       5.00
+    BenchmarkMarshalBytes/32              40970.00     24408.10      41.00
+    BenchmarkMarshalBytes/4096            23810.00     41999.16       5.00
+    BenchmarkMarshalBytesError/256      1291890.00       774.06       9.00
+    BenchmarkMarshalBytesError/32       1900450.00       526.19      62.00
+    BenchmarkMarshalBytesError/4096     1665310.00       600.49       9.00
+    BenchmarkMarshalMap                   39880.00     25075.23      31.00
+    BenchmarkMax                            270.00   3703703.70       0.00
+    BenchmarkMin                            280.00   3571428.57       0.00
+    BenchmarkMod                            590.00   1694915.25       0.00
+    BenchmarkModf                           190.00   5263157.89       0.00
+    BenchmarkNextafter32                    400.00   2500000.00       0.00
+    BenchmarkNextafter64                    260.00   3846153.85       0.00
+    BenchmarkNumberIsValid                 1090.00    917431.19       0.00
+    BenchmarkNumberIsValidRegexp         121640.00      8220.98     134.00
+    BenchmarkPow10Neg                       320.00   3125000.00       0.00
+    BenchmarkPow10Pos                       260.00   3846153.85       0.00
+    BenchmarkPowFrac                        660.00   1515151.52       0.00
+    BenchmarkPowInt                         760.00   1315789.47       0.00
+    BenchmarkQuote                        11000.00     90909.09       2.00
+    BenchmarkQuoteRune                     1630.00    613496.93       1.00
+    BenchmarkReadString                   20240.00     49407.11       1.00
+    BenchmarkRemainder                      540.00   1851851.85       0.00
+    BenchmarkRepeat                        2350.00    425531.91       1.00
+    BenchmarkRepeat/10x0                    260.00   3846153.85       0.00
+    BenchmarkRepeat/10x1                    230.00   4347826.09       0.00
+    BenchmarkRepeat/10x2                   1190.00    840336.13       1.00
+    BenchmarkRepeat/10x6                    970.00   1030927.84       1.00
+    BenchmarkRepeat/5x0                     710.00   1408450.70       0.00
+    BenchmarkRepeat/5x1                     230.00   4347826.09       0.00
+    BenchmarkRepeat/5x2                    1360.00    735294.12       1.00
+    BenchmarkRepeat/5x6                    1180.00    847457.63       1.00
+    BenchmarkRepeatLarge/1024/1            1230.00    828840.97       1.00
+    BenchmarkRepeatLarge/1024/16            975.00   1026964.40       1.00
+    BenchmarkRepeatLarge/1048576/1       171650.00      6580.21       1.00
+    BenchmarkRepeatLarge/1048576/16       80605.00     13029.86       1.00
+    BenchmarkRepeatLarge/1048576/4097    111300.00      9731.40       1.00
+    BenchmarkRepeatLarge/1073741824/1   242934350.00         4.13       1.00
+    BenchmarkRepeatLarge/1073741824/16  61783860.00        16.36       1.00
+    BenchmarkRepeatLarge/1073741824/409 150782015.00         6.67       1.00
+    BenchmarkRepeatLarge/131072/1         30615.00     36883.22       1.00
+    BenchmarkRepeatLarge/131072/16        18540.00     73251.33       1.00
+    BenchmarkRepeatLarge/131072/4097      21050.00     53604.29       1.00
+    BenchmarkRepeatLarge/134217728/1    32986180.00        30.32       1.00
+    BenchmarkRepeatLarge/134217728/16   11809170.00        84.72       1.00
+    BenchmarkRepeatLarge/134217728/4097 18872870.00        53.52       1.00
+    BenchmarkRepeatLarge/16384/1           4400.00    227895.43       1.00
+    BenchmarkRepeatLarge/16384/16          3655.00    274156.53       1.00
+    BenchmarkRepeatLarge/16384/4097        3535.00    283185.13       1.00
+    BenchmarkRepeatLarge/16777216/1     3631545.00       276.92       1.00
+    BenchmarkRepeatLarge/16777216/16    1904205.00       558.36       1.00
+    BenchmarkRepeatLarge/16777216/4097  2343750.00       435.14       1.00
+    BenchmarkRepeatLarge/2048/1            1235.00    815612.21       1.00
+    BenchmarkRepeatLarge/2048/16           1145.00    874179.27       1.00
+    BenchmarkRepeatLarge/2097152/1       502130.00      3135.74       1.00
+    BenchmarkRepeatLarge/2097152/16      141360.00      7088.49       1.00
+    BenchmarkRepeatLarge/2097152/4097    171185.00      5881.79       1.00
+    BenchmarkRepeatLarge/256/1             1710.00    663819.88       1.00
+    BenchmarkRepeatLarge/256/16            1225.00    905797.10       1.00
+    BenchmarkRepeatLarge/262144/1         74540.00     18668.60       1.00
+    BenchmarkRepeatLarge/262144/16        17495.00     57767.30       1.00
+    BenchmarkRepeatLarge/262144/4097      28980.00     34511.31       1.00
+    BenchmarkRepeatLarge/268435456/1    89716645.00        12.37       1.00
+    BenchmarkRepeatLarge/268435456/16   18751165.00        53.41       1.00
+    BenchmarkRepeatLarge/268435456/4097 38366210.00        26.60       1.00
+    BenchmarkRepeatLarge/32768/1           5445.00    187254.97       1.00
+    BenchmarkRepeatLarge/32768/16          4405.00    227029.09       1.00
+    BenchmarkRepeatLarge/32768/4097       14920.00    138548.40       1.00
+    BenchmarkRepeatLarge/33554432/1     8471580.00       118.61       1.00
+    BenchmarkRepeatLarge/33554432/16    3544170.00       284.69       1.00
+    BenchmarkRepeatLarge/33554432/4097  4756045.00       213.50       1.00
+    BenchmarkRepeatLarge/4096/1            1580.00    636583.40       1.00
+    BenchmarkRepeatLarge/4096/16           1335.00    749578.89       1.00
+    BenchmarkRepeatLarge/4194304/1      1021005.00      1369.54       1.00
+    BenchmarkRepeatLarge/4194304/16      341720.00      2927.66       1.00
+    BenchmarkRepeatLarge/4194304/4097    413060.00      2421.38       1.00
+    BenchmarkRepeatLarge/512/1             1205.00    830004.13       1.00
+    BenchmarkRepeatLarge/512/16            1075.00    942982.46       1.00
+    BenchmarkRepeatLarge/524288/1         96385.00     13922.92       1.00
+    BenchmarkRepeatLarge/524288/16        27360.00     36717.58       1.00
+    BenchmarkRepeatLarge/524288/4097      50360.00     20403.27       1.00
+    BenchmarkRepeatLarge/536870912/1    132596285.00         7.55       1.00
+    BenchmarkRepeatLarge/536870912/16   39616275.00        26.02       1.00
+    BenchmarkRepeatLarge/536870912/4097 74287025.00        13.74       1.00
+    BenchmarkRepeatLarge/65536/1          19230.00     90369.94       1.00
+    BenchmarkRepeatLarge/65536/16          6240.00    160289.76       1.00
+    BenchmarkRepeatLarge/65536/4097        7385.00    137712.54       1.00
+    BenchmarkRepeatLarge/67108864/1     17651335.00        56.67       1.00
+    BenchmarkRepeatLarge/67108864/16    6700935.00       149.32       1.00
+    BenchmarkRepeatLarge/67108864/4097  9657000.00       105.19       1.00
+    BenchmarkRepeatLarge/8192/1            7705.00    208543.10       1.00
+    BenchmarkRepeatLarge/8192/16           2775.00    362745.09       1.00
+    BenchmarkRepeatLarge/8192/4097         1380.00   1926567.08       1.00
+    BenchmarkRepeatLarge/8388608/1      1335535.00       888.13       1.00
+    BenchmarkRepeatLarge/8388608/16      795160.00      1268.80       1.00
+    BenchmarkRepeatLarge/8388608/4097   1065740.00       948.65       1.00
+    BenchmarkRepeatSpaces                   670.00   1492537.31       0.00
+    BenchmarkReplaceAll                    9740.00    102669.40       1.00
+    BenchmarkRound                          190.00   5263157.89       0.00
+    BenchmarkRoundToEven                    150.00   6666666.67       0.00
+    BenchmarkSignbit                        190.00   5263157.89       0.00
+    BenchmarkSin                            450.00   2222222.22       0.00
+    BenchmarkSincos                         440.00   2272727.27       0.00
+    BenchmarkSingleLongSuffixFail        239630.00      4173.10       3.00
+    BenchmarkSingleMatch                  53220.00     18789.93      13.00
+    BenchmarkSingleMaxSkipping            16780.00     59594.76       3.00
+    BenchmarkSinh                           500.00   2000000.00       0.00
+    BenchmarkSplitAfterSeqEmptySeparato 7255375.00       148.38       0.00
+    BenchmarkSplitAfterSeqMultiByteSepa  770645.00      1298.66       0.00
+    BenchmarkSplitAfterSeqSingleByteSep 1857035.00       538.72       0.00
+    BenchmarkSplitAndSplitSeq/bySplitSe     670.00   1492537.31       0.00
+    BenchmarkSplitAndSplitSeq/bySplitSe     540.00   1851851.85       0.00
+    BenchmarkSplitAndSplitSeq/bySplit_K    1610.00    621118.01       1.00
+    BenchmarkSplitAndSplitSeq/bySplit_K    1060.00    943396.23       1.00
+    BenchmarkSplitEmptySeparator        20027130.00        58.03       1.00
+    BenchmarkSplitMultiByteSeparator    1544770.00       647.35       1.00
+    BenchmarkSplitNMultiByteSeparator      2235.00    537518.04       1.00
+    BenchmarkSplitNSingleByteSeparator     2430.00    512820.51       1.00
+    BenchmarkSplitSeqEmptySeparator     7559245.00       141.07       0.00
+    BenchmarkSplitSeqMultiByteSeparator  774520.00      1291.42       0.00
+    BenchmarkSplitSeqSingleByteSeparato 1851080.00       540.80       0.00
+    BenchmarkSplitSingleByteSeparator   2171665.00       461.05       1.00
+    BenchmarkSqrtGoLatency                  650.00   1538461.54       0.00
+    BenchmarkSqrtIndirect                   170.00   5882352.94       0.00
+    BenchmarkSqrtIndirectLatency            110.00   9090909.09       0.00
+    BenchmarkSqrtLatency                    170.00   5882352.94       0.00
+    BenchmarkSqrtPrime                      890.00   1123595.51       0.00
+    BenchmarkTan                            380.00   2631578.95       0.00
+    BenchmarkTanh                           500.00   2000000.00       0.00
+    BenchmarkToLower/AbC123                5390.00    631798.57       1.00
+    BenchmarkToLower/LONGⱯSTRINGⱯWITHⱯN    9345.00    107200.62       1.00
+    BenchmarkToLower/abc                    700.00   1657196.97       1.00
+    BenchmarkToLower/azAZ09_               4780.00    741556.65       1.00
+    BenchmarkToLower/longStrinGwitHmixo    4935.00    576950.06       1.00
+    BenchmarkToLower/renan_bastos_93_AO    8600.00    116279.07       1.00
+    BenchmarkToLower/ⱭⱭⱭⱭⱭ                 8370.00    119671.78       1.00
+    BenchmarkToUpper/AbC123                4640.00    782844.90       1.00
+    BenchmarkToUpper/ONLYUPPER              635.00   1824712.65       1.00
+    BenchmarkToUpper/RENAN_BASTOS_93_AO    8950.00    111731.84       1.00
+    BenchmarkToUpper/abc                   5330.00    625785.17       1.00
+    BenchmarkToUpper/azAZ09_               4565.00    717631.89       1.00
+    BenchmarkToUpper/longStrinGwitHmixo    4970.00    617046.38       1.00
+    BenchmarkToUpper/longɐstringɐwithɐn   13520.00     77903.16       2.00
+    BenchmarkToUpper/ɐɐɐɐɐ                 8860.00    113014.24       2.00
+    BenchmarkToValidUTF8/InvalidASCII      5675.00    603402.45       1.00
+    BenchmarkToValidUTF8/InvalidNonASCI    4840.00    618680.57       1.00
+    BenchmarkToValidUTF8/Valid              850.00   1252948.11       1.00
+    BenchmarkTrim                          5260.00    190114.07       0.00
+    BenchmarkTrimByte                       765.00   1485436.90       0.00
+    BenchmarkTrimSpace/ASCII                325.00   3077651.51       0.00
+    BenchmarkTrimSpace/JustNonASCII        1300.00    769412.88       0.00
+    BenchmarkTrimSpace/NoTrim               630.00   1593726.28       0.00
+    BenchmarkTrimSpace/SomeNonASCII        2040.00    490207.86       0.00
+    BenchmarkTrunc                          170.00   5882352.94       0.00
+    BenchmarkTypeFieldsCache/HitTypes1    19950.00     50125.31       6.00
+    BenchmarkTypeFieldsCache/HitTypes10   15130.00     66093.85       6.00
+    BenchmarkTypeFieldsCache/HitTypes10   14850.00     67340.07       6.00
+    BenchmarkTypeFieldsCache/HitTypes10   15630.00     63979.53       6.00
+    BenchmarkTypeFieldsCache/HitTypes10   19380.00     51599.59       6.00
+    BenchmarkTypeFieldsCache/HitTypes10   15950.00     62695.92       6.00
+    BenchmarkTypeFieldsCache/HitTypes10   16740.00     59737.16       6.00
+    BenchmarkTypeFieldsCache/MissTypes1   77740.00     12863.39      20.00
+    BenchmarkTypeFieldsCache/MissTypes1   99600.00     10040.16     148.00
+    BenchmarkTypeFieldsCache/MissTypes1  330430.00      3026.36    1437.00
+    BenchmarkTypeFieldsCache/MissTypes1 2669890.00       374.55   14361.00
+    BenchmarkTypeFieldsCache/MissTypes1 29029580.00        34.45  143897.00
+    BenchmarkTypeFieldsCache/MissTypes1 277701050.00         3.60 1438741.00
+    BenchmarkTypeFieldsCache/MissTypes1 5758775040.00         0.17 14359417.00
+    BenchmarkUnicodeDecoder               15370.00     65061.81       4.00
+    BenchmarkUnmapped                     23300.00     42918.45      11.00
+    BenchmarkUnmarshalFloat64             24380.00     41017.23       9.00
+    BenchmarkUnmarshalInt64               16310.00     61312.08       9.00
+    BenchmarkUnmarshalMap                 25630.00     39016.78      22.00
+    BenchmarkUnmarshalNumber              51330.00     19481.78       4.00
+    BenchmarkUnmarshalString              22230.00     44984.26      10.00
+    BenchmarkUnquoteEasy                   1100.00    909090.91       0.00
+    BenchmarkUnquoteHard                  11820.00     84602.37       2.00
+    BenchmarkWriteByte                    23570.00     42426.81       0.00
+    BenchmarkWriteRune                    39020.00     25627.88       1.00
+    BenchmarkY0                             780.00   1282051.28       0.00
+    BenchmarkY1                             920.00   1086956.52       0.00
+    BenchmarkYn                            1060.00    943396.23       0.00
+
+  --- Micro Benchmarks ---
+  Thread scaling (GOMAXPROCS):
+    [BenchmarkAppendQuote]
+      cpu_1     : 11640.0 ns/op, 85910.65 ops/sec
+      cpu_2     : 1140.0 ns/op, 877192.98 ops/sec
+      cpu_4     : 1690.0 ns/op, 591715.98 ops/sec
+      cpu_8     : 1430.0 ns/op, 699300.7 ops/sec
+      cpu_32    : 1240.0 ns/op, 806451.61 ops/sec
+    [BenchmarkAppendQuoteRune]
+      cpu_1     : 2130.0 ns/op, 469483.57 ops/sec
+      cpu_2     : 740.0 ns/op, 1351351.35 ops/sec
+      cpu_4     : 670.0 ns/op, 1492537.31 ops/sec
+      cpu_8     : 680.0 ns/op, 1470588.24 ops/sec
+      cpu_32    : 690.0 ns/op, 1449275.36 ops/sec
+    [BenchmarkCodeDecoder]
+      cpu_1     : 59136660.0 ns/op, 16.91 ops/sec
+      cpu_2     : 58615360.0 ns/op, 17.06 ops/sec
+      cpu_4     : 58440110.0 ns/op, 17.11 ops/sec
+      cpu_8     : 57663110.0 ns/op, 17.34 ops/sec
+      cpu_32    : 57909720.0 ns/op, 17.27 ops/sec
+    [BenchmarkCodeEncoder]
+      cpu_1     : 11189520.0 ns/op, 89.37 ops/sec
+      cpu_2     : 11042450.0 ns/op, 90.56 ops/sec
+      cpu_4     : 10964040.0 ns/op, 91.21 ops/sec
+      cpu_8     : 10929380.0 ns/op, 91.5 ops/sec
+      cpu_32    : 10556490.0 ns/op, 94.73 ops/sec
+    [BenchmarkCodeEncoderError]
+      cpu_1     : 12345160.0 ns/op, 81.0 ops/sec
+      cpu_2     : 11830080.0 ns/op, 84.53 ops/sec
+      cpu_4     : 11820470.0 ns/op, 84.6 ops/sec
+      cpu_8     : 12024380.0 ns/op, 83.16 ops/sec
+      cpu_32    : 12538560.0 ns/op, 79.75 ops/sec
+    [BenchmarkCodeMarshal]
+      cpu_1     : 11600500.0 ns/op, 86.2 ops/sec
+      cpu_2     : 10889310.0 ns/op, 91.83 ops/sec
+      cpu_4     : 10935990.0 ns/op, 91.44 ops/sec
+      cpu_8     : 10886500.0 ns/op, 91.86 ops/sec
+      cpu_32    : 10625700.0 ns/op, 94.11 ops/sec
+    [BenchmarkCodeMarshalError]
+      cpu_1     : 11564400.0 ns/op, 86.47 ops/sec
+      cpu_2     : 13949800.0 ns/op, 71.69 ops/sec
+      cpu_4     : 11803590.0 ns/op, 84.72 ops/sec
+      cpu_8     : 13123360.0 ns/op, 76.2 ops/sec
+      cpu_32    : 13155360.0 ns/op, 76.01 ops/sec
+    [BenchmarkCodeUnmarshal]
+      cpu_1     : 55677480.0 ns/op, 17.96 ops/sec
+      cpu_2     : 55434870.0 ns/op, 18.04 ops/sec
+      cpu_4     : 54848320.0 ns/op, 18.23 ops/sec
+      cpu_8     : 54378090.0 ns/op, 18.39 ops/sec
+      cpu_32    : 55322920.0 ns/op, 18.08 ops/sec
+    [BenchmarkCodeUnmarshalReuse]
+      cpu_1     : 58233360.0 ns/op, 17.17 ops/sec
+      cpu_2     : 57123040.0 ns/op, 17.51 ops/sec
+      cpu_4     : 68517910.0 ns/op, 14.59 ops/sec
+      cpu_8     : 57660240.0 ns/op, 17.34 ops/sec
+      cpu_32    : 57893200.0 ns/op, 17.27 ops/sec
+    [BenchmarkDecoderStream]
+      cpu_1     : 382300.0 ns/op, 2615.75 ops/sec
+      cpu_2     : 348140.0 ns/op, 2872.41 ops/sec
+      cpu_4     : 299290.0 ns/op, 3341.24 ops/sec
+      cpu_8     : 323270.0 ns/op, 3093.39 ops/sec
+      cpu_32    : 337540.0 ns/op, 2962.61 ops/sec
+    [BenchmarkEncodeMarshaler]
+      cpu_1     : 226060.0 ns/op, 4423.6 ops/sec
+      cpu_2     : 186620.0 ns/op, 5358.48 ops/sec
+      cpu_4     : 155320.0 ns/op, 6438.32 ops/sec
+      cpu_8     : 118190.0 ns/op, 8460.95 ops/sec
+      cpu_32    : 109140.0 ns/op, 9162.54 ops/sec
+    [BenchmarkEncoderEncode]
+      cpu_1     : 265960.0 ns/op, 3759.96 ops/sec
+      cpu_2     : 90650.0 ns/op, 11031.44 ops/sec
+      cpu_4     : 66310.0 ns/op, 15080.68 ops/sec
+      cpu_8     : 90210.0 ns/op, 11085.25 ops/sec
+      cpu_32    : 90590.0 ns/op, 11038.75 ops/sec
+    [BenchmarkHash1K/New]
+      cpu_1     : 3180.0 ns/op, 314465.41 ops/sec
+      cpu_2     : 2280.0 ns/op, 438596.49 ops/sec
+      cpu_4     : 2860.0 ns/op, 349650.35 ops/sec
+      cpu_8     : 2450.0 ns/op, 408163.27 ops/sec
+      cpu_32    : 2430.0 ns/op, 411522.63 ops/sec
+    [BenchmarkHash1K/Sum224]
+      cpu_1     : 2580.0 ns/op, 387596.9 ops/sec
+      cpu_2     : 2240.0 ns/op, 446428.57 ops/sec
+      cpu_4     : 2550.0 ns/op, 392156.86 ops/sec
+      cpu_8     : 1930.0 ns/op, 518134.72 ops/sec
+      cpu_32    : 2450.0 ns/op, 408163.27 ops/sec
+    [BenchmarkHash1K/Sum256]
+      cpu_1     : 2730.0 ns/op, 366300.37 ops/sec
+      cpu_2     : 2100.0 ns/op, 476190.48 ops/sec
+      cpu_4     : 1990.0 ns/op, 502512.56 ops/sec
+      cpu_8     : 2580.0 ns/op, 387596.9 ops/sec
+      cpu_32    : 2220.0 ns/op, 450450.45 ops/sec
+    [BenchmarkHash1M/New]
+      cpu_1     : 661800.0 ns/op, 1511.03 ops/sec
+      cpu_2     : 884440.0 ns/op, 1130.66 ops/sec
+      cpu_4     : 726320.0 ns/op, 1376.8 ops/sec
+      cpu_8     : 714460.0 ns/op, 1399.66 ops/sec
+      cpu_32    : 676790.0 ns/op, 1477.56 ops/sec
+    [BenchmarkHash1M/Sum224]
+      cpu_1     : 696550.0 ns/op, 1435.65 ops/sec
+      cpu_2     : 668880.0 ns/op, 1495.04 ops/sec
+      cpu_4     : 665530.0 ns/op, 1502.56 ops/sec
+      cpu_8     : 684440.0 ns/op, 1461.05 ops/sec
+      cpu_32    : 680920.0 ns/op, 1468.6 ops/sec
+    [BenchmarkHash1M/Sum256]
+      cpu_1     : 654330.0 ns/op, 1528.28 ops/sec
+      cpu_2     : 649810.0 ns/op, 1538.91 ops/sec
+      cpu_4     : 690560.0 ns/op, 1448.1 ops/sec
+      cpu_8     : 649560.0 ns/op, 1539.5 ops/sec
+      cpu_32    : 703240.0 ns/op, 1421.99 ops/sec
+    [BenchmarkHash256K/New]
+      cpu_1     : 188880.0 ns/op, 5294.37 ops/sec
+      cpu_2     : 162090.0 ns/op, 6169.41 ops/sec
+      cpu_4     : 162830.0 ns/op, 6141.37 ops/sec
+      cpu_8     : 163680.0 ns/op, 6109.48 ops/sec
+      cpu_32    : 162680.0 ns/op, 6147.04 ops/sec
+    [BenchmarkHash256K/Sum224]
+      cpu_1     : 162740.0 ns/op, 6144.77 ops/sec
+      cpu_2     : 162070.0 ns/op, 6170.17 ops/sec
+      cpu_4     : 161960.0 ns/op, 6174.36 ops/sec
+      cpu_8     : 161480.0 ns/op, 6192.72 ops/sec
+      cpu_32    : 162810.0 ns/op, 6142.13 ops/sec
+    [BenchmarkHash256K/Sum256]
+      cpu_1     : 162830.0 ns/op, 6141.37 ops/sec
+      cpu_2     : 162470.0 ns/op, 6154.98 ops/sec
+      cpu_4     : 161710.0 ns/op, 6183.91 ops/sec
+      cpu_8     : 161750.0 ns/op, 6182.38 ops/sec
+      cpu_32    : 163770.0 ns/op, 6106.12 ops/sec
+    [BenchmarkHash8Bytes/New]
+      cpu_1     : 2280.0 ns/op, 438596.49 ops/sec
+      cpu_2     : 1250.0 ns/op, 800000.0 ops/sec
+      cpu_4     : 2030.0 ns/op, 492610.84 ops/sec
+      cpu_8     : 1230.0 ns/op, 813008.13 ops/sec
+      cpu_32    : 1460.0 ns/op, 684931.51 ops/sec
+    [BenchmarkHash8Bytes/Sum224]
+      cpu_1     : 1460.0 ns/op, 684931.51 ops/sec
+      cpu_2     : 1210.0 ns/op, 826446.28 ops/sec
+      cpu_4     : 2080.0 ns/op, 480769.23 ops/sec
+      cpu_8     : 1340.0 ns/op, 746268.66 ops/sec
+      cpu_32    : 1610.0 ns/op, 621118.01 ops/sec
+    [BenchmarkHash8Bytes/Sum256]
+      cpu_1     : 2000.0 ns/op, 500000.0 ops/sec
+      cpu_2     : 1300.0 ns/op, 769230.77 ops/sec
+      cpu_4     : 1130.0 ns/op, 884955.75 ops/sec
+      cpu_8     : 1170.0 ns/op, 854700.85 ops/sec
+      cpu_32    : 1740.0 ns/op, 574712.64 ops/sec
+    [BenchmarkHash8K/New]
+      cpu_1     : 9070.0 ns/op, 110253.58 ops/sec
+      cpu_2     : 6540.0 ns/op, 152905.2 ops/sec
+      cpu_4     : 6060.0 ns/op, 165016.5 ops/sec
+      cpu_8     : 7450.0 ns/op, 134228.19 ops/sec
+      cpu_32    : 8930.0 ns/op, 111982.08 ops/sec
+    [BenchmarkHash8K/Sum224]
+      cpu_1     : 39730.0 ns/op, 25169.9 ops/sec
+      cpu_2     : 6630.0 ns/op, 150829.56 ops/sec
+      cpu_4     : 6620.0 ns/op, 151057.4 ops/sec
+      cpu_8     : 7090.0 ns/op, 141043.72 ops/sec
+      cpu_32    : 7760.0 ns/op, 128865.98 ops/sec
+    [BenchmarkHash8K/Sum256]
+      cpu_1     : 6220.0 ns/op, 160771.7 ops/sec
+      cpu_2     : 6290.0 ns/op, 158982.51 ops/sec
+      cpu_4     : 7190.0 ns/op, 139082.06 ops/sec
+      cpu_8     : 6640.0 ns/op, 150602.41 ops/sec
+      cpu_32    : 9020.0 ns/op, 110864.75 ops/sec
+    [BenchmarkIssue10335]
+      cpu_1     : 104630.0 ns/op, 9557.49 ops/sec
+      cpu_2     : 75190.0 ns/op, 13299.64 ops/sec
+      cpu_4     : 67090.0 ns/op, 14905.35 ops/sec
+      cpu_8     : 59360.0 ns/op, 16846.36 ops/sec
+      cpu_32    : 89130.0 ns/op, 11219.57 ops/sec
+    [BenchmarkIssue34127]
+      cpu_1     : 152090.0 ns/op, 6575.05 ops/sec
+      cpu_2     : 63530.0 ns/op, 15740.59 ops/sec
+      cpu_4     : 64250.0 ns/op, 15564.2 ops/sec
+      cpu_8     : 67980.0 ns/op, 14710.21 ops/sec
+      cpu_32    : 64720.0 ns/op, 15451.17 ops/sec
+    [BenchmarkMarshalBytes/256]
+      cpu_1     : 38500.0 ns/op, 25974.03 ops/sec
+      cpu_2     : 24770.0 ns/op, 40371.42 ops/sec
+      cpu_4     : 20840.0 ns/op, 47984.64 ops/sec
+      cpu_8     : 23500.0 ns/op, 42553.19 ops/sec
+      cpu_32    : 25690.0 ns/op, 38925.65 ops/sec
+    [BenchmarkMarshalBytes/32]
+      cpu_1     : 63330.0 ns/op, 15790.3 ops/sec
+      cpu_2     : 21230.0 ns/op, 47103.16 ops/sec
+      cpu_4     : 25070.0 ns/op, 39888.31 ops/sec
+      cpu_8     : 23230.0 ns/op, 43047.78 ops/sec
+      cpu_32    : 22510.0 ns/op, 44424.7 ops/sec
+    [BenchmarkMarshalBytes/4096]
+      cpu_1     : 42350.0 ns/op, 23612.75 ops/sec
+      cpu_2     : 35870.0 ns/op, 27878.45 ops/sec
+      cpu_4     : 29020.0 ns/op, 34458.99 ops/sec
+      cpu_8     : 31570.0 ns/op, 31675.64 ops/sec
+      cpu_32    : 34260.0 ns/op, 29188.56 ops/sec
+    [BenchmarkMarshalBytesError/256]
+      cpu_1     : 1924270.0 ns/op, 519.68 ops/sec
+      cpu_2     : 1581560.0 ns/op, 632.29 ops/sec
+      cpu_4     : 1800270.0 ns/op, 555.47 ops/sec
+      cpu_8     : 1340450.0 ns/op, 746.02 ops/sec
+      cpu_32    : 1961540.0 ns/op, 509.8 ops/sec
+    [BenchmarkMarshalBytesError/32]
+      cpu_1     : 1968850.0 ns/op, 507.91 ops/sec
+      cpu_2     : 1597650.0 ns/op, 625.92 ops/sec
+      cpu_4     : 2065060.0 ns/op, 484.25 ops/sec
+      cpu_8     : 1580030.0 ns/op, 632.9 ops/sec
+      cpu_32    : 1792850.0 ns/op, 557.77 ops/sec
+    [BenchmarkMarshalBytesError/4096]
+      cpu_1     : 1511330.0 ns/op, 661.67 ops/sec
+      cpu_2     : 1747950.0 ns/op, 572.1 ops/sec
+      cpu_4     : 1879340.0 ns/op, 532.1 ops/sec
+      cpu_8     : 1935430.0 ns/op, 516.68 ops/sec
+      cpu_32    : 1564680.0 ns/op, 639.11 ops/sec
+    [BenchmarkMarshalMap]
+      cpu_1     : 124910.0 ns/op, 8005.76 ops/sec
+      cpu_2     : 56610.0 ns/op, 17664.72 ops/sec
+      cpu_4     : 64530.0 ns/op, 15496.67 ops/sec
+      cpu_8     : 88310.0 ns/op, 11323.75 ops/sec
+      cpu_32    : 93230.0 ns/op, 10726.16 ops/sec
+    [BenchmarkNumberIsValid]
+      cpu_1     : 1300.0 ns/op, 769230.77 ops/sec
+      cpu_2     : 1050.0 ns/op, 952380.95 ops/sec
+      cpu_4     : 1360.0 ns/op, 735294.12 ops/sec
+      cpu_8     : 1170.0 ns/op, 854700.85 ops/sec
+      cpu_32    : 1110.0 ns/op, 900900.9 ops/sec
+    [BenchmarkNumberIsValidRegexp]
+      cpu_1     : 102320.0 ns/op, 9773.26 ops/sec
+      cpu_2     : 163710.0 ns/op, 6108.36 ops/sec
+      cpu_4     : 134430.0 ns/op, 7438.82 ops/sec
+      cpu_8     : 98600.0 ns/op, 10141.99 ops/sec
+      cpu_32    : 155220.0 ns/op, 6442.47 ops/sec
+    [BenchmarkQuote]
+      cpu_1     : 17890.0 ns/op, 55897.15 ops/sec
+      cpu_2     : 12360.0 ns/op, 80906.15 ops/sec
+      cpu_4     : 13500.0 ns/op, 74074.07 ops/sec
+      cpu_8     : 12310.0 ns/op, 81234.77 ops/sec
+      cpu_32    : 16180.0 ns/op, 61804.7 ops/sec
+    [BenchmarkQuoteRune]
+      cpu_1     : 3310.0 ns/op, 302114.8 ops/sec
+      cpu_2     : 2280.0 ns/op, 438596.49 ops/sec
+      cpu_4     : 1940.0 ns/op, 515463.92 ops/sec
+      cpu_8     : 2400.0 ns/op, 416666.67 ops/sec
+      cpu_32    : 2640.0 ns/op, 378787.88 ops/sec
+    [BenchmarkTypeFieldsCache/HitTypes1]
+      cpu_1     : 72240.0 ns/op, 13842.75 ops/sec
+      cpu_2     : 30150.0 ns/op, 33167.5 ops/sec
+      cpu_4     : 137450.0 ns/op, 7275.37 ops/sec
+      cpu_8     : 60080.0 ns/op, 16644.47 ops/sec
+      cpu_32    : 79420.0 ns/op, 12591.29 ops/sec
+    [BenchmarkTypeFieldsCache/HitTypes10]
+      cpu_1     : 78460.0 ns/op, 12745.35 ops/sec
+      cpu_2     : 47480.0 ns/op, 21061.5 ops/sec
+      cpu_4     : 55680.0 ns/op, 17959.77 ops/sec
+      cpu_8     : 78150.0 ns/op, 12795.91 ops/sec
+      cpu_32    : 112730.0 ns/op, 8870.75 ops/sec
+    [BenchmarkTypeFieldsCache/HitTypes100]
+      cpu_1     : 61490.0 ns/op, 16262.81 ops/sec
+      cpu_2     : 18000.0 ns/op, 55555.56 ops/sec
+      cpu_4     : 37470.0 ns/op, 26688.02 ops/sec
+      cpu_8     : 106350.0 ns/op, 9402.91 ops/sec
+      cpu_32    : 190520.0 ns/op, 5248.79 ops/sec
+    [BenchmarkTypeFieldsCache/HitTypes1000]
+      cpu_1     : 120360.0 ns/op, 8308.41 ops/sec
+      cpu_2     : 45580.0 ns/op, 21939.45 ops/sec
+      cpu_4     : 50130.0 ns/op, 19948.13 ops/sec
+      cpu_8     : 60200.0 ns/op, 16611.3 ops/sec
+      cpu_32    : 93840.0 ns/op, 10656.44 ops/sec
+    [BenchmarkTypeFieldsCache/HitTypes10000]
+      cpu_1     : 110450.0 ns/op, 9053.87 ops/sec
+      cpu_2     : 48190.0 ns/op, 20751.19 ops/sec
+      cpu_4     : 62030.0 ns/op, 16121.23 ops/sec
+      cpu_8     : 63670.0 ns/op, 15705.98 ops/sec
+      cpu_32    : 308320.0 ns/op, 3243.38 ops/sec
+    [BenchmarkTypeFieldsCache/HitTypes100000]
+      cpu_1     : 72060.0 ns/op, 13877.32 ops/sec
+      cpu_2     : 53020.0 ns/op, 18860.81 ops/sec
+      cpu_4     : 77610.0 ns/op, 12884.94 ops/sec
+      cpu_8     : 77960.0 ns/op, 12827.09 ops/sec
+      cpu_32    : 149130.0 ns/op, 6705.56 ops/sec
+    [BenchmarkTypeFieldsCache/HitTypes1000000]
+      cpu_1     : 124620.0 ns/op, 8024.39 ops/sec
+      cpu_2     : 72980.0 ns/op, 13702.38 ops/sec
+      cpu_4     : 55110.0 ns/op, 18145.53 ops/sec
+      cpu_8     : 47160.0 ns/op, 21204.41 ops/sec
+      cpu_32    : 99040.0 ns/op, 10096.93 ops/sec
+    [BenchmarkTypeFieldsCache/MissTypes1]
+      cpu_1     : 133960.0 ns/op, 7464.91 ops/sec
+      cpu_2     : 159400.0 ns/op, 6273.53 ops/sec
+      cpu_4     : 100360.0 ns/op, 9964.13 ops/sec
+      cpu_8     : 95750.0 ns/op, 10443.86 ops/sec
+      cpu_32    : 158080.0 ns/op, 6325.91 ops/sec
+    [BenchmarkTypeFieldsCache/MissTypes10]
+      cpu_1     : 263330.0 ns/op, 3797.52 ops/sec
+      cpu_2     : 231420.0 ns/op, 4321.15 ops/sec
+      cpu_4     : 244090.0 ns/op, 4096.85 ops/sec
+      cpu_8     : 166010.0 ns/op, 6023.73 ops/sec
+      cpu_32    : 191960.0 ns/op, 5209.42 ops/sec
+    [BenchmarkTypeFieldsCache/MissTypes100]
+      cpu_1     : 618940.0 ns/op, 1615.67 ops/sec
+      cpu_2     : 529860.0 ns/op, 1887.29 ops/sec
+      cpu_4     : 749680.0 ns/op, 1333.9 ops/sec
+      cpu_8     : 396720.0 ns/op, 2520.67 ops/sec
+      cpu_32    : 545020.0 ns/op, 1834.8 ops/sec
+    [BenchmarkTypeFieldsCache/MissTypes1000]
+      cpu_1     : 863480.0 ns/op, 1158.1 ops/sec
+      cpu_2     : 3341160.0 ns/op, 299.3 ops/sec
+      cpu_4     : 2356110.0 ns/op, 424.43 ops/sec
+      cpu_8     : 1980090.0 ns/op, 505.03 ops/sec
+      cpu_32    : 3359860.0 ns/op, 297.63 ops/sec
+    [BenchmarkTypeFieldsCache/MissTypes10000]
+      cpu_1     : 19086510.0 ns/op, 52.39 ops/sec
+      cpu_2     : 21076180.0 ns/op, 47.45 ops/sec
+      cpu_4     : 9395740.0 ns/op, 106.43 ops/sec
+      cpu_8     : 4856580.0 ns/op, 205.91 ops/sec
+      cpu_32    : 3024470.0 ns/op, 330.64 ops/sec
+    [BenchmarkTypeFieldsCache/MissTypes100000]
+      cpu_1     : 21104620.0 ns/op, 47.38 ops/sec
+      cpu_2     : 156131830.0 ns/op, 6.4 ops/sec
+      cpu_4     : 78282180.0 ns/op, 12.77 ops/sec
+      cpu_8     : 81983500.0 ns/op, 12.2 ops/sec
+      cpu_32    : 80241780.0 ns/op, 12.46 ops/sec
+    [BenchmarkTypeFieldsCache/MissTypes100000]
+      cpu_1     : 1193628300.0 ns/op, 0.84 ops/sec
+      cpu_2     : 1535276460.0 ns/op, 0.65 ops/sec
+      cpu_4     : 945553830.0 ns/op, 1.06 ops/sec
+      cpu_8     : 450625720.0 ns/op, 2.22 ops/sec
+      cpu_32    : 134074160.0 ns/op, 7.46 ops/sec
+    [BenchmarkUnicodeDecoder]
+      cpu_1     : 27160.0 ns/op, 36818.85 ops/sec
+      cpu_2     : 22300.0 ns/op, 44843.05 ops/sec
+      cpu_4     : 26510.0 ns/op, 37721.61 ops/sec
+      cpu_8     : 26790.0 ns/op, 37327.36 ops/sec
+      cpu_32    : 27690.0 ns/op, 36114.12 ops/sec
+    [BenchmarkUnmapped]
+      cpu_1     : 98240.0 ns/op, 10179.15 ops/sec
+      cpu_2     : 64230.0 ns/op, 15569.05 ops/sec
+      cpu_4     : 72240.0 ns/op, 13842.75 ops/sec
+      cpu_8     : 66350.0 ns/op, 15071.59 ops/sec
+      cpu_32    : 123320.0 ns/op, 8108.98 ops/sec
+    [BenchmarkUnmarshalFloat64]
+      cpu_1     : 89620.0 ns/op, 11158.22 ops/sec
+      cpu_2     : 59760.0 ns/op, 16733.6 ops/sec
+      cpu_4     : 63270.0 ns/op, 15805.28 ops/sec
+      cpu_8     : 56990.0 ns/op, 17546.94 ops/sec
+      cpu_32    : 106660.0 ns/op, 9375.59 ops/sec
+    [BenchmarkUnmarshalInt64]
+      cpu_1     : 67540.0 ns/op, 14806.04 ops/sec
+      cpu_2     : 68520.0 ns/op, 14594.28 ops/sec
+      cpu_4     : 52980.0 ns/op, 18875.05 ops/sec
+      cpu_8     : 50250.0 ns/op, 19900.5 ops/sec
+      cpu_32    : 120000.0 ns/op, 8333.33 ops/sec
+    [BenchmarkUnmarshalMap]
+      cpu_1     : 94820.0 ns/op, 10546.3 ops/sec
+      cpu_2     : 65860.0 ns/op, 15183.72 ops/sec
+      cpu_4     : 58970.0 ns/op, 16957.78 ops/sec
+      cpu_8     : 78720.0 ns/op, 12703.25 ops/sec
+      cpu_32    : 80440.0 ns/op, 12431.63 ops/sec
+    [BenchmarkUnmarshalNumber]
+      cpu_1     : 114050.0 ns/op, 8768.08 ops/sec
+      cpu_2     : 47820.0 ns/op, 20911.75 ops/sec
+      cpu_4     : 31710.0 ns/op, 31535.79 ops/sec
+      cpu_8     : 31020.0 ns/op, 32237.27 ops/sec
+      cpu_32    : 31700.0 ns/op, 31545.74 ops/sec
+    [BenchmarkUnmarshalString]
+      cpu_1     : 104830.0 ns/op, 9539.25 ops/sec
+      cpu_2     : 63820.0 ns/op, 15669.07 ops/sec
+      cpu_4     : 54680.0 ns/op, 18288.22 ops/sec
+      cpu_8     : 60660.0 ns/op, 16485.33 ops/sec
+      cpu_32    : 108540.0 ns/op, 9213.19 ops/sec
+    [BenchmarkUnquoteEasy]
+      cpu_1     : 1630.0 ns/op, 613496.93 ops/sec
+      cpu_2     : 950.0 ns/op, 1052631.58 ops/sec
+      cpu_4     : 1000.0 ns/op, 1000000.0 ops/sec
+      cpu_8     : 1350.0 ns/op, 740740.74 ops/sec
+      cpu_32    : 880.0 ns/op, 1136363.64 ops/sec
+    [BenchmarkUnquoteHard]
+      cpu_1     : 16170.0 ns/op, 61842.92 ops/sec
+      cpu_2     : 11170.0 ns/op, 89525.51 ops/sec
+      cpu_4     : 13370.0 ns/op, 74794.32 ops/sec
+      cpu_8     : 11220.0 ns/op, 89126.56 ops/sec
+      cpu_32    : 16580.0 ns/op, 60313.63 ops/sec
+
+  --- Overall Summary ---
+    Avg ns/op:           17071321.8
+    Min ns/op (fastest): 110.0
+    Avg ops/sec:         1006495.14
+    Max ops/sec:         9090909.09
+
+======================================================================
+  Report generated by Golang Performance Benchmark Workflow
+======================================================================

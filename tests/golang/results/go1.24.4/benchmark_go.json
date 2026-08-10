@@ -1,0 +1,5663 @@
+{
+  "benchmark": "go_stdlib",
+  "description": "Go stdlib benchmarks (go test -bench) across 6 packages on ARM64",
+  "reference": "https://github.com/golang/go",
+  "software": "golang",
+  "version": "go1.24.4",
+  "architecture": "arm64",
+  "timestamp": "2026-08-10T07:21:03Z",
+  "performance_metrics": {
+    "ns_per_op": {
+      "unit": "ns",
+      "description": "Nanoseconds per operation"
+    },
+    "ops_per_sec": {
+      "unit": "ops/sec",
+      "description": "Operations per second"
+    },
+    "mb_per_sec": {
+      "unit": "MB/s",
+      "description": "Throughput in MB/s"
+    },
+    "allocs_per_op": {
+      "unit": "allocs",
+      "description": "Allocations per operation"
+    }
+  },
+  "parameters": {
+    "packages": [
+      "encoding/json",
+      "strconv",
+      "crypto/sha256",
+      "bytes",
+      "strings",
+      "math"
+    ],
+    "iterations": 1,
+    "cpu": 1,
+    "cgo_enabled": false,
+    "benchtime": "1x"
+  },
+  "results_summary": {
+    "BenchmarkCodeEncoder": {
+      "name": "BenchmarkCodeEncoder",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 12052160.0,
+      "ops_per_sec": 82.97,
+      "mb_per_sec": 161.01,
+      "bytes_per_op": 936.0,
+      "allocs_per_op": 11.0
+    },
+    "BenchmarkCodeEncoderError": {
+      "name": "BenchmarkCodeEncoderError",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 11425340.0,
+      "ops_per_sec": 87.52,
+      "mb_per_sec": 169.84,
+      "bytes_per_op": 2512.0,
+      "allocs_per_op": 49.0
+    },
+    "BenchmarkCodeMarshal": {
+      "name": "BenchmarkCodeMarshal",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 10614200.0,
+      "ops_per_sec": 94.21,
+      "mb_per_sec": 182.82,
+      "bytes_per_op": 1941768.0,
+      "allocs_per_op": 9.0
+    },
+    "BenchmarkCodeMarshalError": {
+      "name": "BenchmarkCodeMarshalError",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 12227580.0,
+      "ops_per_sec": 81.78,
+      "mb_per_sec": 158.7,
+      "bytes_per_op": 1943808.0,
+      "allocs_per_op": 49.0
+    },
+    "BenchmarkMarshalBytes/32": {
+      "name": "BenchmarkMarshalBytes/32",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 52410.0,
+      "ops_per_sec": 19080.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 1896.0,
+      "allocs_per_op": 38.0
+    },
+    "BenchmarkMarshalBytes/256": {
+      "name": "BenchmarkMarshalBytes/256",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 17160.0,
+      "ops_per_sec": 58275.06,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 1256.0,
+      "allocs_per_op": 5.0
+    },
+    "BenchmarkMarshalBytes/4096": {
+      "name": "BenchmarkMarshalBytes/4096",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 24660.0,
+      "ops_per_sec": 40551.5,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 18568.0,
+      "allocs_per_op": 5.0
+    },
+    "BenchmarkMarshalBytesError/32": {
+      "name": "BenchmarkMarshalBytesError/32",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 1924210.0,
+      "ops_per_sec": 519.69,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 68312.0,
+      "allocs_per_op": 61.0
+    },
+    "BenchmarkMarshalBytesError/256": {
+      "name": "BenchmarkMarshalBytesError/256",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 1442650.0,
+      "ops_per_sec": 693.17,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 800.0,
+      "allocs_per_op": 9.0
+    },
+    "BenchmarkMarshalBytesError/4096": {
+      "name": "BenchmarkMarshalBytesError/4096",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 1841260.0,
+      "ops_per_sec": 543.11,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 6560.0,
+      "allocs_per_op": 9.0
+    },
+    "BenchmarkMarshalMap": {
+      "name": "BenchmarkMarshalMap",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 47550.0,
+      "ops_per_sec": 21030.49,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 1416.0,
+      "allocs_per_op": 31.0
+    },
+    "BenchmarkCodeDecoder": {
+      "name": "BenchmarkCodeDecoder",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 62313360.0,
+      "ops_per_sec": 16.05,
+      "mb_per_sec": 31.14,
+      "bytes_per_op": 8145808.0,
+      "allocs_per_op": 40019.0
+    },
+    "BenchmarkUnicodeDecoder": {
+      "name": "BenchmarkUnicodeDecoder",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 17500.0,
+      "ops_per_sec": 57142.86,
+      "mb_per_sec": 0.8,
+      "bytes_per_op": 2088.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkDecoderStream": {
+      "name": "BenchmarkDecoderStream",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 231390.0,
+      "ops_per_sec": 4321.71,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkCodeUnmarshal": {
+      "name": "BenchmarkCodeUnmarshal",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 54057720.0,
+      "ops_per_sec": 18.5,
+      "mb_per_sec": 35.9,
+      "bytes_per_op": 2010752.0,
+      "allocs_per_op": 39996.0
+    },
+    "BenchmarkCodeUnmarshalReuse": {
+      "name": "BenchmarkCodeUnmarshalReuse",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 51341360.0,
+      "ops_per_sec": 19.48,
+      "mb_per_sec": 37.8,
+      "bytes_per_op": 2010752.0,
+      "allocs_per_op": 39996.0
+    },
+    "BenchmarkUnmarshalString": {
+      "name": "BenchmarkUnmarshalString",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 27940.0,
+      "ops_per_sec": 35790.98,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 352.0,
+      "allocs_per_op": 10.0
+    },
+    "BenchmarkUnmarshalFloat64": {
+      "name": "BenchmarkUnmarshalFloat64",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 17490.0,
+      "ops_per_sec": 57175.53,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 320.0,
+      "allocs_per_op": 9.0
+    },
+    "BenchmarkUnmarshalInt64": {
+      "name": "BenchmarkUnmarshalInt64",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 15840.0,
+      "ops_per_sec": 63131.31,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 320.0,
+      "allocs_per_op": 9.0
+    },
+    "BenchmarkUnmarshalMap": {
+      "name": "BenchmarkUnmarshalMap",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 23490.0,
+      "ops_per_sec": 42571.31,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 824.0,
+      "allocs_per_op": 22.0
+    },
+    "BenchmarkIssue10335": {
+      "name": "BenchmarkIssue10335",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 35850.0,
+      "ops_per_sec": 27894.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 752.0,
+      "allocs_per_op": 16.0
+    },
+    "BenchmarkIssue34127": {
+      "name": "BenchmarkIssue34127",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 48990.0,
+      "ops_per_sec": 20412.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 2040.0,
+      "allocs_per_op": 42.0
+    },
+    "BenchmarkUnmapped": {
+      "name": "BenchmarkUnmapped",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 21080.0,
+      "ops_per_sec": 47438.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 432.0,
+      "allocs_per_op": 11.0
+    },
+    "BenchmarkTypeFieldsCache/MissTypes1": {
+      "name": "BenchmarkTypeFieldsCache/MissTypes1",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 73210.0,
+      "ops_per_sec": 13659.34,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 1720.0,
+      "allocs_per_op": 20.0
+    },
+    "BenchmarkTypeFieldsCache/MissTypes10": {
+      "name": "BenchmarkTypeFieldsCache/MissTypes10",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 71520.0,
+      "ops_per_sec": 13982.1,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 9768.0,
+      "allocs_per_op": 146.0
+    },
+    "BenchmarkTypeFieldsCache/MissTypes100": {
+      "name": "BenchmarkTypeFieldsCache/MissTypes100",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 342220.0,
+      "ops_per_sec": 2922.1,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 100008.0,
+      "allocs_per_op": 1439.0
+    },
+    "BenchmarkTypeFieldsCache/MissTypes1000": {
+      "name": "BenchmarkTypeFieldsCache/MissTypes1000",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 2738390.0,
+      "ops_per_sec": 365.18,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 1004328.0,
+      "allocs_per_op": 14381.0
+    },
+    "BenchmarkTypeFieldsCache/MissTypes10000": {
+      "name": "BenchmarkTypeFieldsCache/MissTypes10000",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 27562000.0,
+      "ops_per_sec": 36.28,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 10066408.0,
+      "allocs_per_op": 143919.0
+    },
+    "BenchmarkTypeFieldsCache/MissTypes100000": {
+      "name": "BenchmarkTypeFieldsCache/MissTypes100000",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 302501960.0,
+      "ops_per_sec": 3.31,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 100584008.0,
+      "allocs_per_op": 1438654.0
+    },
+    "BenchmarkTypeFieldsCache/MissTypes1000000": {
+      "name": "BenchmarkTypeFieldsCache/MissTypes1000000",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 6719741550.0,
+      "ops_per_sec": 0.15,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 1001677352.0,
+      "allocs_per_op": 14360489.0
+    },
+    "BenchmarkTypeFieldsCache/HitTypes1": {
+      "name": "BenchmarkTypeFieldsCache/HitTypes1",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 15980.0,
+      "ops_per_sec": 62578.22,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 144.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkTypeFieldsCache/HitTypes10": {
+      "name": "BenchmarkTypeFieldsCache/HitTypes10",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 15240.0,
+      "ops_per_sec": 65616.8,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 144.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkTypeFieldsCache/HitTypes100": {
+      "name": "BenchmarkTypeFieldsCache/HitTypes100",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 15350.0,
+      "ops_per_sec": 65146.58,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 144.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkTypeFieldsCache/HitTypes1000": {
+      "name": "BenchmarkTypeFieldsCache/HitTypes1000",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 15660.0,
+      "ops_per_sec": 63856.96,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 144.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkTypeFieldsCache/HitTypes10000": {
+      "name": "BenchmarkTypeFieldsCache/HitTypes10000",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 15600.0,
+      "ops_per_sec": 64102.56,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 144.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkTypeFieldsCache/HitTypes100000": {
+      "name": "BenchmarkTypeFieldsCache/HitTypes100000",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 26460.0,
+      "ops_per_sec": 37792.89,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 144.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkTypeFieldsCache/HitTypes1000000": {
+      "name": "BenchmarkTypeFieldsCache/HitTypes1000000",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 18750.0,
+      "ops_per_sec": 53333.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 144.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkEncodeMarshaler": {
+      "name": "BenchmarkEncodeMarshaler",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 128320.0,
+      "ops_per_sec": 7793.02,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 2568.0,
+      "allocs_per_op": 53.0
+    },
+    "BenchmarkEncoderEncode": {
+      "name": "BenchmarkEncoderEncode",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 79570.0,
+      "ops_per_sec": 12567.55,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 2016.0,
+      "allocs_per_op": 40.0
+    },
+    "BenchmarkNumberIsValid": {
+      "name": "BenchmarkNumberIsValid",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 1180.0,
+      "ops_per_sec": 847457.63,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkNumberIsValidRegexp": {
+      "name": "BenchmarkNumberIsValidRegexp",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 94880.0,
+      "ops_per_sec": 10539.63,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 9984.0,
+      "allocs_per_op": 134.0
+    },
+    "BenchmarkUnmarshalNumber": {
+      "name": "BenchmarkUnmarshalNumber",
+      "package": "encoding/json",
+      "iterations": 1,
+      "ns_per_op": 44760.0,
+      "ops_per_sec": 22341.38,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 208.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkAtof64Decimal": {
+      "name": "BenchmarkAtof64Decimal",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 6610.0,
+      "ops_per_sec": 151285.93,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof64Float": {
+      "name": "BenchmarkAtof64Float",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 6390.0,
+      "ops_per_sec": 156494.52,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof64FloatExp": {
+      "name": "BenchmarkAtof64FloatExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 6360.0,
+      "ops_per_sec": 157232.7,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof64Big": {
+      "name": "BenchmarkAtof64Big",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 6370.0,
+      "ops_per_sec": 156985.87,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof64RandomBits": {
+      "name": "BenchmarkAtof64RandomBits",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1750.0,
+      "ops_per_sec": 571428.57,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof64RandomFloats": {
+      "name": "BenchmarkAtof64RandomFloats",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 7690.0,
+      "ops_per_sec": 130039.01,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof64RandomLongFloats": {
+      "name": "BenchmarkAtof64RandomLongFloats",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 2430.0,
+      "ops_per_sec": 411522.63,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof32Decimal": {
+      "name": "BenchmarkAtof32Decimal",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8840.0,
+      "ops_per_sec": 113122.17,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof32Float": {
+      "name": "BenchmarkAtof32Float",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 5050.0,
+      "ops_per_sec": 198019.8,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof32FloatExp": {
+      "name": "BenchmarkAtof32FloatExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 5180.0,
+      "ops_per_sec": 193050.19,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof32Random": {
+      "name": "BenchmarkAtof32Random",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 880.0,
+      "ops_per_sec": 1136363.64,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtof32RandomLong": {
+      "name": "BenchmarkAtof32RandomLong",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1040.0,
+      "ops_per_sec": 961538.46,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkParseInt/Pos/7bit": {
+      "name": "BenchmarkParseInt/Pos/7bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 12350.0,
+      "ops_per_sec": 80971.66,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 360.0,
+      "allocs_per_op": 5.0
+    },
+    "BenchmarkParseInt/Pos/26bit": {
+      "name": "BenchmarkParseInt/Pos/26bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8730.0,
+      "ops_per_sec": 114547.54,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 152.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkParseInt/Pos/31bit": {
+      "name": "BenchmarkParseInt/Pos/31bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 9740.0,
+      "ops_per_sec": 102669.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 168.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkParseInt/Pos/56bit": {
+      "name": "BenchmarkParseInt/Pos/56bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 10070.0,
+      "ops_per_sec": 99304.87,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 176.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkParseInt/Pos/63bit": {
+      "name": "BenchmarkParseInt/Pos/63bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8590.0,
+      "ops_per_sec": 116414.44,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 176.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkParseInt/Neg/7bit": {
+      "name": "BenchmarkParseInt/Neg/7bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 9650.0,
+      "ops_per_sec": 103626.94,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 376.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkParseInt/Neg/26bit": {
+      "name": "BenchmarkParseInt/Neg/26bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8100.0,
+      "ops_per_sec": 123456.79,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 168.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkParseInt/Neg/31bit": {
+      "name": "BenchmarkParseInt/Neg/31bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8360.0,
+      "ops_per_sec": 119617.22,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 168.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkParseInt/Neg/56bit": {
+      "name": "BenchmarkParseInt/Neg/56bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 19940.0,
+      "ops_per_sec": 50150.45,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 176.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkParseInt/Neg/63bit": {
+      "name": "BenchmarkParseInt/Neg/63bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8200.0,
+      "ops_per_sec": 121951.22,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 176.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkAtoi/Pos/7bit": {
+      "name": "BenchmarkAtoi/Pos/7bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 10420.0,
+      "ops_per_sec": 95969.29,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 360.0,
+      "allocs_per_op": 5.0
+    },
+    "BenchmarkAtoi/Pos/26bit": {
+      "name": "BenchmarkAtoi/Pos/26bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8590.0,
+      "ops_per_sec": 116414.44,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 152.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkAtoi/Pos/31bit": {
+      "name": "BenchmarkAtoi/Pos/31bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 7860.0,
+      "ops_per_sec": 127226.46,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 168.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkAtoi/Pos/56bit": {
+      "name": "BenchmarkAtoi/Pos/56bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 9150.0,
+      "ops_per_sec": 109289.62,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 176.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkAtoi/Pos/63bit": {
+      "name": "BenchmarkAtoi/Pos/63bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8760.0,
+      "ops_per_sec": 114155.25,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 176.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkAtoi/Neg/7bit": {
+      "name": "BenchmarkAtoi/Neg/7bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8730.0,
+      "ops_per_sec": 114547.54,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 376.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkAtoi/Neg/26bit": {
+      "name": "BenchmarkAtoi/Neg/26bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 7720.0,
+      "ops_per_sec": 129533.68,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 168.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkAtoi/Neg/31bit": {
+      "name": "BenchmarkAtoi/Neg/31bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 7930.0,
+      "ops_per_sec": 126103.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 168.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkAtoi/Neg/56bit": {
+      "name": "BenchmarkAtoi/Neg/56bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8530.0,
+      "ops_per_sec": 117233.29,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 176.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkAtoi/Neg/63bit": {
+      "name": "BenchmarkAtoi/Neg/63bit",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 7990.0,
+      "ops_per_sec": 125156.45,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 176.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkFormatFloat/Decimal": {
+      "name": "BenchmarkFormatFloat/Decimal",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1890.0,
+      "ops_per_sec": 529100.53,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/Float": {
+      "name": "BenchmarkFormatFloat/Float",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1800.0,
+      "ops_per_sec": 555555.56,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/Exp": {
+      "name": "BenchmarkFormatFloat/Exp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1920.0,
+      "ops_per_sec": 520833.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/NegExp": {
+      "name": "BenchmarkFormatFloat/NegExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1460.0,
+      "ops_per_sec": 684931.51,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/LongExp": {
+      "name": "BenchmarkFormatFloat/LongExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1650.0,
+      "ops_per_sec": 606060.61,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/Big": {
+      "name": "BenchmarkFormatFloat/Big",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1640.0,
+      "ops_per_sec": 609756.1,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/BinaryExp": {
+      "name": "BenchmarkFormatFloat/BinaryExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1320.0,
+      "ops_per_sec": 757575.76,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/32Integer": {
+      "name": "BenchmarkFormatFloat/32Integer",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1240.0,
+      "ops_per_sec": 806451.61,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/32ExactFraction": {
+      "name": "BenchmarkFormatFloat/32ExactFraction",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1710.0,
+      "ops_per_sec": 584795.32,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/32Point": {
+      "name": "BenchmarkFormatFloat/32Point",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1600.0,
+      "ops_per_sec": 625000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/32Exp": {
+      "name": "BenchmarkFormatFloat/32Exp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1890.0,
+      "ops_per_sec": 529100.53,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/32NegExp": {
+      "name": "BenchmarkFormatFloat/32NegExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1770.0,
+      "ops_per_sec": 564971.75,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/32Shortest": {
+      "name": "BenchmarkFormatFloat/32Shortest",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1240.0,
+      "ops_per_sec": 806451.61,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/32Fixed8Hard": {
+      "name": "BenchmarkFormatFloat/32Fixed8Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1960.0,
+      "ops_per_sec": 510204.08,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/32Fixed9Hard": {
+      "name": "BenchmarkFormatFloat/32Fixed9Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1300.0,
+      "ops_per_sec": 769230.77,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/64Fixed1": {
+      "name": "BenchmarkFormatFloat/64Fixed1",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1580.0,
+      "ops_per_sec": 632911.39,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/64Fixed2": {
+      "name": "BenchmarkFormatFloat/64Fixed2",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1230.0,
+      "ops_per_sec": 813008.13,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/64Fixed3": {
+      "name": "BenchmarkFormatFloat/64Fixed3",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1360.0,
+      "ops_per_sec": 735294.12,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/64Fixed4": {
+      "name": "BenchmarkFormatFloat/64Fixed4",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1300.0,
+      "ops_per_sec": 769230.77,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/64Fixed12": {
+      "name": "BenchmarkFormatFloat/64Fixed12",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1210.0,
+      "ops_per_sec": 826446.28,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/64Fixed16": {
+      "name": "BenchmarkFormatFloat/64Fixed16",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1320.0,
+      "ops_per_sec": 757575.76,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/64Fixed12Hard": {
+      "name": "BenchmarkFormatFloat/64Fixed12Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1220.0,
+      "ops_per_sec": 819672.13,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/64Fixed17Hard": {
+      "name": "BenchmarkFormatFloat/64Fixed17Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1190.0,
+      "ops_per_sec": 840336.13,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/64Fixed18Hard": {
+      "name": "BenchmarkFormatFloat/64Fixed18Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 10350.0,
+      "ops_per_sec": 96618.36,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 72.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkFormatFloat/Slowpath64": {
+      "name": "BenchmarkFormatFloat/Slowpath64",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1940.0,
+      "ops_per_sec": 515463.92,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatFloat/SlowpathDenormal64": {
+      "name": "BenchmarkFormatFloat/SlowpathDenormal64",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1580.0,
+      "ops_per_sec": 632911.39,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkAppendFloat/Decimal": {
+      "name": "BenchmarkAppendFloat/Decimal",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 960.0,
+      "ops_per_sec": 1041666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/Float": {
+      "name": "BenchmarkAppendFloat/Float",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1130.0,
+      "ops_per_sec": 884955.75,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/Exp": {
+      "name": "BenchmarkAppendFloat/Exp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1290.0,
+      "ops_per_sec": 775193.8,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/NegExp": {
+      "name": "BenchmarkAppendFloat/NegExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1090.0,
+      "ops_per_sec": 917431.19,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/LongExp": {
+      "name": "BenchmarkAppendFloat/LongExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1180.0,
+      "ops_per_sec": 847457.63,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/Big": {
+      "name": "BenchmarkAppendFloat/Big",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1260.0,
+      "ops_per_sec": 793650.79,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/BinaryExp": {
+      "name": "BenchmarkAppendFloat/BinaryExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 950.0,
+      "ops_per_sec": 1052631.58,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/32Integer": {
+      "name": "BenchmarkAppendFloat/32Integer",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 870.0,
+      "ops_per_sec": 1149425.29,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/32ExactFraction": {
+      "name": "BenchmarkAppendFloat/32ExactFraction",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1260.0,
+      "ops_per_sec": 793650.79,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/32Point": {
+      "name": "BenchmarkAppendFloat/32Point",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1780.0,
+      "ops_per_sec": 561797.75,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/32Exp": {
+      "name": "BenchmarkAppendFloat/32Exp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1780.0,
+      "ops_per_sec": 561797.75,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/32NegExp": {
+      "name": "BenchmarkAppendFloat/32NegExp",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1190.0,
+      "ops_per_sec": 840336.13,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/32Shortest": {
+      "name": "BenchmarkAppendFloat/32Shortest",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1090.0,
+      "ops_per_sec": 917431.19,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/32Fixed8Hard": {
+      "name": "BenchmarkAppendFloat/32Fixed8Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1460.0,
+      "ops_per_sec": 684931.51,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/32Fixed9Hard": {
+      "name": "BenchmarkAppendFloat/32Fixed9Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1380.0,
+      "ops_per_sec": 724637.68,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/64Fixed1": {
+      "name": "BenchmarkAppendFloat/64Fixed1",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 890.0,
+      "ops_per_sec": 1123595.51,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/64Fixed2": {
+      "name": "BenchmarkAppendFloat/64Fixed2",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 790.0,
+      "ops_per_sec": 1265822.78,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/64Fixed3": {
+      "name": "BenchmarkAppendFloat/64Fixed3",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 880.0,
+      "ops_per_sec": 1136363.64,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/64Fixed4": {
+      "name": "BenchmarkAppendFloat/64Fixed4",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 770.0,
+      "ops_per_sec": 1298701.3,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/64Fixed12": {
+      "name": "BenchmarkAppendFloat/64Fixed12",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1030.0,
+      "ops_per_sec": 970873.79,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/64Fixed16": {
+      "name": "BenchmarkAppendFloat/64Fixed16",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 950.0,
+      "ops_per_sec": 1052631.58,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/64Fixed12Hard": {
+      "name": "BenchmarkAppendFloat/64Fixed12Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 960.0,
+      "ops_per_sec": 1041666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/64Fixed17Hard": {
+      "name": "BenchmarkAppendFloat/64Fixed17Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1050.0,
+      "ops_per_sec": 952380.95,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/64Fixed18Hard": {
+      "name": "BenchmarkAppendFloat/64Fixed18Hard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 9260.0,
+      "ops_per_sec": 107991.36,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/Slowpath64": {
+      "name": "BenchmarkAppendFloat/Slowpath64",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1630.0,
+      "ops_per_sec": 613496.93,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendFloat/SlowpathDenormal64": {
+      "name": "BenchmarkAppendFloat/SlowpathDenormal64",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1160.0,
+      "ops_per_sec": 862068.97,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkFormatInt": {
+      "name": "BenchmarkFormatInt",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 6640.0,
+      "ops_per_sec": 150602.41,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 552.0,
+      "allocs_per_op": 33.0
+    },
+    "BenchmarkAppendInt": {
+      "name": "BenchmarkAppendInt",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 11020.0,
+      "ops_per_sec": 90744.1,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 192.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkFormatUint": {
+      "name": "BenchmarkFormatUint",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1810.0,
+      "ops_per_sec": 552486.19,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 184.0,
+      "allocs_per_op": 6.0
+    },
+    "BenchmarkAppendUint": {
+      "name": "BenchmarkAppendUint",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 7350.0,
+      "ops_per_sec": 136054.42,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 64.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFormatIntSmall/7": {
+      "name": "BenchmarkFormatIntSmall/7",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 320.0,
+      "ops_per_sec": 3125000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkFormatIntSmall/42": {
+      "name": "BenchmarkFormatIntSmall/42",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 200.0,
+      "ops_per_sec": 5000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendIntSmall": {
+      "name": "BenchmarkAppendIntSmall",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 350.0,
+      "ops_per_sec": 2857142.86,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/1": {
+      "name": "BenchmarkAppendUintVarlen/1",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 470.0,
+      "ops_per_sec": 2127659.57,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/12": {
+      "name": "BenchmarkAppendUintVarlen/12",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 430.0,
+      "ops_per_sec": 2325581.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/123": {
+      "name": "BenchmarkAppendUintVarlen/123",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 640.0,
+      "ops_per_sec": 1562500.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/1234": {
+      "name": "BenchmarkAppendUintVarlen/1234",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 440.0,
+      "ops_per_sec": 2272727.27,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/12345": {
+      "name": "BenchmarkAppendUintVarlen/12345",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 540.0,
+      "ops_per_sec": 1851851.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/123456": {
+      "name": "BenchmarkAppendUintVarlen/123456",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 520.0,
+      "ops_per_sec": 1923076.92,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/1234567": {
+      "name": "BenchmarkAppendUintVarlen/1234567",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 430.0,
+      "ops_per_sec": 2325581.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/12345678": {
+      "name": "BenchmarkAppendUintVarlen/12345678",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 430.0,
+      "ops_per_sec": 2325581.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/123456789": {
+      "name": "BenchmarkAppendUintVarlen/123456789",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 350.0,
+      "ops_per_sec": 2857142.86,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/1234567890": {
+      "name": "BenchmarkAppendUintVarlen/1234567890",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 480.0,
+      "ops_per_sec": 2083333.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/12345678901": {
+      "name": "BenchmarkAppendUintVarlen/12345678901",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 420.0,
+      "ops_per_sec": 2380952.38,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/123456789012": {
+      "name": "BenchmarkAppendUintVarlen/123456789012",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 430.0,
+      "ops_per_sec": 2325581.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/1234567890123": {
+      "name": "BenchmarkAppendUintVarlen/1234567890123",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 490.0,
+      "ops_per_sec": 2040816.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/12345678901234": {
+      "name": "BenchmarkAppendUintVarlen/12345678901234",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 490.0,
+      "ops_per_sec": 2040816.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/123456789012345": {
+      "name": "BenchmarkAppendUintVarlen/123456789012345",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 470.0,
+      "ops_per_sec": 2127659.57,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/1234567890123456": {
+      "name": "BenchmarkAppendUintVarlen/1234567890123456",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 520.0,
+      "ops_per_sec": 1923076.92,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/12345678901234567": {
+      "name": "BenchmarkAppendUintVarlen/12345678901234567",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 390.0,
+      "ops_per_sec": 2564102.56,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/123456789012345678": {
+      "name": "BenchmarkAppendUintVarlen/123456789012345678",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 440.0,
+      "ops_per_sec": 2272727.27,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/1234567890123456789": {
+      "name": "BenchmarkAppendUintVarlen/1234567890123456789",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 440.0,
+      "ops_per_sec": 2272727.27,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAppendUintVarlen/12345678901234567890": {
+      "name": "BenchmarkAppendUintVarlen/12345678901234567890",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 430.0,
+      "ops_per_sec": 2325581.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkQuote": {
+      "name": "BenchmarkQuote",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 10390.0,
+      "ops_per_sec": 96246.39,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 144.0,
+      "allocs_per_op": 3.0
+    },
+    "BenchmarkQuoteRune": {
+      "name": "BenchmarkQuoteRune",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1060.0,
+      "ops_per_sec": 943396.23,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkAppendQuote": {
+      "name": "BenchmarkAppendQuote",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 8000.0,
+      "ops_per_sec": 125000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 72.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkAppendQuoteRune": {
+      "name": "BenchmarkAppendQuoteRune",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 870.0,
+      "ops_per_sec": 1149425.29,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkUnquoteEasy": {
+      "name": "BenchmarkUnquoteEasy",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 1210.0,
+      "ops_per_sec": 826446.28,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkUnquoteHard": {
+      "name": "BenchmarkUnquoteHard",
+      "package": "strconv",
+      "iterations": 1,
+      "ns_per_op": 2590.0,
+      "ops_per_sec": 386100.39,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 192.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkHash8Bytes/New": {
+      "name": "BenchmarkHash8Bytes/New",
+      "package": "crypto/sha256",
+      "iterations": 1,
+      "ns_per_op": 1660.0,
+      "ops_per_sec": 602409.64,
+      "mb_per_sec": 4.82,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHash8Bytes/Sum224": {
+      "name": "BenchmarkHash8Bytes/Sum224",
+      "package": "crypto/sha256",
+      "iterations": 1,
+      "ns_per_op": 1240.0,
+      "ops_per_sec": 806451.61,
+      "mb_per_sec": 6.45,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHash8Bytes/Sum256": {
+      "name": "BenchmarkHash8Bytes/Sum256",
+      "package": "crypto/sha256",
+      "iterations": 1,
+      "ns_per_op": 1110.0,
+      "ops_per_sec": 900900.9,
+      "mb_per_sec": 7.21,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHash1K/New": {
+      "name": "BenchmarkHash1K/New",
+      "package": "crypto/sha256",
+      "iterations": 1,
+      "ns_per_op": 1590.0,
+      "ops_per_sec": 628930.82,
+      "mb_per_sec": 644.03,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHash1K/Sum224": {
+      "name": "BenchmarkHash1K/Sum224",
+      "package": "crypto/sha256",
+      "iterations": 1,
+      "ns_per_op": 1660.0,
+      "ops_per_sec": 602409.64,
+      "mb_per_sec": 616.87,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHash1K/Sum256": {
+      "name": "BenchmarkHash1K/Sum256",
+      "package": "crypto/sha256",
+      "iterations": 1,
+      "ns_per_op": 1690.0,
+      "ops_per_sec": 591715.98,
+      "mb_per_sec": 605.92,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHash8K/New": {
+      "name": "BenchmarkHash8K/New",
+      "package": "crypto/sha256",
+      "iterations": 1,
+      "ns_per_op": 6030.0,
+      "ops_per_sec": 165837.48,
+      "mb_per_sec": 1358.54,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHash8K/Sum224": {
+      "name": "BenchmarkHash8K/Sum224",
+      "package": "crypto/sha256",
+      "iterations": 1,
+      "ns_per_op": 6230.0,
+      "ops_per_sec": 160513.64,
+      "mb_per_sec": 1314.93,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHash8K/Sum256": {
+      "name": "BenchmarkHash8K/Sum256",
+      "package": "crypto/sha256",
+      "iterations": 1,
+      "ns_per_op": 6120.0,
+      "ops_per_sec": 163398.69,
+      "mb_per_sec": 1338.56,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkReadString": {
+      "name": "BenchmarkReadString",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 32070.0,
+      "ops_per_sec": 31181.79,
+      "mb_per_sec": 1021.76,
+      "bytes_per_op": 32768.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkWriteByte": {
+      "name": "BenchmarkWriteByte",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 27900.0,
+      "ops_per_sec": 35842.29,
+      "mb_per_sec": 146.81,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkWriteRune": {
+      "name": "BenchmarkWriteRune",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 42490.0,
+      "ops_per_sec": 23534.95,
+      "mb_per_sec": 289.2,
+      "bytes_per_op": 16384.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkBufferNotEmptyWriteRead": {
+      "name": "BenchmarkBufferNotEmptyWriteRead",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 568940.0,
+      "ops_per_sec": 1757.65,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 3520.0,
+      "allocs_per_op": 3.0
+    },
+    "BenchmarkBufferFullSmallReads": {
+      "name": "BenchmarkBufferFullSmallReads",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 64360.0,
+      "ops_per_sec": 15537.6,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 3072.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkBufferWriteBlock/N4096": {
+      "name": "BenchmarkBufferWriteBlock/N4096",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 10380.0,
+      "ops_per_sec": 96339.11,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 7168.0,
+      "allocs_per_op": 3.0
+    },
+    "BenchmarkBufferWriteBlock/N65536": {
+      "name": "BenchmarkBufferWriteBlock/N65536",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 41160.0,
+      "ops_per_sec": 24295.43,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 130048.0,
+      "allocs_per_op": 7.0
+    },
+    "BenchmarkBufferWriteBlock/N1048576": {
+      "name": "BenchmarkBufferWriteBlock/N1048576",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 956820.0,
+      "ops_per_sec": 1045.13,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 2096128.0,
+      "allocs_per_op": 11.0
+    },
+    "BenchmarkBufferAppendNoCopy": {
+      "name": "BenchmarkBufferAppendNoCopy",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 6200930.0,
+      "ops_per_sec": 161.27,
+      "mb_per_sec": 2705.6,
+      "bytes_per_op": 16777216.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkIndexByte/10": {
+      "name": "BenchmarkIndexByte/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1050.0,
+      "ops_per_sec": 952380.95,
+      "mb_per_sec": 9.52,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkIndexByte/32": {
+      "name": "BenchmarkIndexByte/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 960.0,
+      "ops_per_sec": 1041666.67,
+      "mb_per_sec": 33.33,
+      "bytes_per_op": 32.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkIndexByte/4K": {
+      "name": "BenchmarkIndexByte/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1800.0,
+      "ops_per_sec": 555555.56,
+      "mb_per_sec": 2275.56,
+      "bytes_per_op": 4096.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkIndexByte/4M": {
+      "name": "BenchmarkIndexByte/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2042440.0,
+      "ops_per_sec": 489.61,
+      "mb_per_sec": 2053.58,
+      "bytes_per_op": 4194304.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkIndexByte/64M": {
+      "name": "BenchmarkIndexByte/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 36929930.0,
+      "ops_per_sec": 27.08,
+      "mb_per_sec": 1817.19,
+      "bytes_per_op": 67108864.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkIndexBytePortable/10": {
+      "name": "BenchmarkIndexBytePortable/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 570.0,
+      "ops_per_sec": 1754385.96,
+      "mb_per_sec": 17.54,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexBytePortable/32": {
+      "name": "BenchmarkIndexBytePortable/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 310.0,
+      "ops_per_sec": 3225806.45,
+      "mb_per_sec": 103.23,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexBytePortable/4K": {
+      "name": "BenchmarkIndexBytePortable/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4940.0,
+      "ops_per_sec": 202429.15,
+      "mb_per_sec": 829.15,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexBytePortable/4M": {
+      "name": "BenchmarkIndexBytePortable/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 3537360.0,
+      "ops_per_sec": 282.7,
+      "mb_per_sec": 1185.72,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexBytePortable/64M": {
+      "name": "BenchmarkIndexBytePortable/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 56288810.0,
+      "ops_per_sec": 17.77,
+      "mb_per_sec": 1192.22,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRune/10": {
+      "name": "BenchmarkIndexRune/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 980.0,
+      "ops_per_sec": 1020408.16,
+      "mb_per_sec": 10.2,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRune/32": {
+      "name": "BenchmarkIndexRune/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 460.0,
+      "ops_per_sec": 2173913.04,
+      "mb_per_sec": 69.57,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRune/4K": {
+      "name": "BenchmarkIndexRune/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1410.0,
+      "ops_per_sec": 709219.86,
+      "mb_per_sec": 2904.96,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRune/4M": {
+      "name": "BenchmarkIndexRune/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 599140.0,
+      "ops_per_sec": 1669.06,
+      "mb_per_sec": 7000.54,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRune/64M": {
+      "name": "BenchmarkIndexRune/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 9247320.0,
+      "ops_per_sec": 108.14,
+      "mb_per_sec": 7257.11,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneASCII/10": {
+      "name": "BenchmarkIndexRuneASCII/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 550.0,
+      "ops_per_sec": 1818181.82,
+      "mb_per_sec": 18.18,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneASCII/32": {
+      "name": "BenchmarkIndexRuneASCII/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 350.0,
+      "ops_per_sec": 2857142.86,
+      "mb_per_sec": 91.43,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneASCII/4K": {
+      "name": "BenchmarkIndexRuneASCII/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1380.0,
+      "ops_per_sec": 724637.68,
+      "mb_per_sec": 2968.12,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneASCII/4M": {
+      "name": "BenchmarkIndexRuneASCII/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 591420.0,
+      "ops_per_sec": 1690.85,
+      "mb_per_sec": 7091.92,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneASCII/64M": {
+      "name": "BenchmarkIndexRuneASCII/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 9424980.0,
+      "ops_per_sec": 106.1,
+      "mb_per_sec": 7120.32,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Latin/10": {
+      "name": "BenchmarkIndexRuneUnicode/Latin/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1700.0,
+      "ops_per_sec": 588235.29,
+      "mb_per_sec": 5.88,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Latin/32": {
+      "name": "BenchmarkIndexRuneUnicode/Latin/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 980.0,
+      "ops_per_sec": 1020408.16,
+      "mb_per_sec": 32.65,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Latin/4K": {
+      "name": "BenchmarkIndexRuneUnicode/Latin/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2940.0,
+      "ops_per_sec": 340136.05,
+      "mb_per_sec": 1393.2,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Latin/4M": {
+      "name": "BenchmarkIndexRuneUnicode/Latin/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1591580.0,
+      "ops_per_sec": 628.31,
+      "mb_per_sec": 2635.31,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Latin/64M": {
+      "name": "BenchmarkIndexRuneUnicode/Latin/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 28160520.0,
+      "ops_per_sec": 35.51,
+      "mb_per_sec": 2383.08,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Cyrillic/10": {
+      "name": "BenchmarkIndexRuneUnicode/Cyrillic/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2650.0,
+      "ops_per_sec": 377358.49,
+      "mb_per_sec": 3.77,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Cyrillic/32": {
+      "name": "BenchmarkIndexRuneUnicode/Cyrillic/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 890.0,
+      "ops_per_sec": 1123595.51,
+      "mb_per_sec": 35.96,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Cyrillic/4K": {
+      "name": "BenchmarkIndexRuneUnicode/Cyrillic/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4080.0,
+      "ops_per_sec": 245098.04,
+      "mb_per_sec": 1003.92,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Cyrillic/4M": {
+      "name": "BenchmarkIndexRuneUnicode/Cyrillic/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2729950.0,
+      "ops_per_sec": 366.31,
+      "mb_per_sec": 1536.4,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Cyrillic/64M": {
+      "name": "BenchmarkIndexRuneUnicode/Cyrillic/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 48844530.0,
+      "ops_per_sec": 20.47,
+      "mb_per_sec": 1373.93,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Han/10": {
+      "name": "BenchmarkIndexRuneUnicode/Han/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2120.0,
+      "ops_per_sec": 471698.11,
+      "mb_per_sec": 4.72,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Han/32": {
+      "name": "BenchmarkIndexRuneUnicode/Han/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1020.0,
+      "ops_per_sec": 980392.16,
+      "mb_per_sec": 31.37,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Han/4K": {
+      "name": "BenchmarkIndexRuneUnicode/Han/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2980.0,
+      "ops_per_sec": 335570.47,
+      "mb_per_sec": 1374.5,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Han/4M": {
+      "name": "BenchmarkIndexRuneUnicode/Han/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2114000.0,
+      "ops_per_sec": 473.04,
+      "mb_per_sec": 1984.06,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneUnicode/Han/64M": {
+      "name": "BenchmarkIndexRuneUnicode/Han/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 32955570.0,
+      "ops_per_sec": 30.34,
+      "mb_per_sec": 2036.34,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/0": {
+      "name": "BenchmarkEqual/0",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 310.0,
+      "ops_per_sec": 3225806.45,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/1": {
+      "name": "BenchmarkEqual/same/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 520.0,
+      "ops_per_sec": 1923076.92,
+      "mb_per_sec": 1.92,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/6": {
+      "name": "BenchmarkEqual/same/6",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 280.0,
+      "ops_per_sec": 3571428.57,
+      "mb_per_sec": 21.43,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/9": {
+      "name": "BenchmarkEqual/same/9",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 34.62,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/15": {
+      "name": "BenchmarkEqual/same/15",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 57.69,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/16": {
+      "name": "BenchmarkEqual/same/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 200.0,
+      "ops_per_sec": 5000000.0,
+      "mb_per_sec": 80.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/20": {
+      "name": "BenchmarkEqual/same/20",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 76.92,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/32": {
+      "name": "BenchmarkEqual/same/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 250.0,
+      "ops_per_sec": 4000000.0,
+      "mb_per_sec": 128.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/4K": {
+      "name": "BenchmarkEqual/same/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 270.0,
+      "ops_per_sec": 3703703.7,
+      "mb_per_sec": 15170.37,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/4M": {
+      "name": "BenchmarkEqual/same/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 400.0,
+      "ops_per_sec": 2500000.0,
+      "mb_per_sec": 10485760.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/same/64M": {
+      "name": "BenchmarkEqual/same/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 190310.0,
+      "ops_per_sec": 5254.58,
+      "mb_per_sec": 352629.2,
+      "bytes_per_op": 134217728.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkEqual/1": {
+      "name": "BenchmarkEqual/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 6210.0,
+      "ops_per_sec": 161030.6,
+      "mb_per_sec": 0.16,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/6": {
+      "name": "BenchmarkEqual/6",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 630.0,
+      "ops_per_sec": 1587301.59,
+      "mb_per_sec": 9.52,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/9": {
+      "name": "BenchmarkEqual/9",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 520.0,
+      "ops_per_sec": 1923076.92,
+      "mb_per_sec": 17.31,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/15": {
+      "name": "BenchmarkEqual/15",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 510.0,
+      "ops_per_sec": 1960784.31,
+      "mb_per_sec": 29.41,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/16": {
+      "name": "BenchmarkEqual/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 520.0,
+      "ops_per_sec": 1923076.92,
+      "mb_per_sec": 30.77,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/20": {
+      "name": "BenchmarkEqual/20",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 530.0,
+      "ops_per_sec": 1886792.45,
+      "mb_per_sec": 37.74,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/32": {
+      "name": "BenchmarkEqual/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 420.0,
+      "ops_per_sec": 2380952.38,
+      "mb_per_sec": 76.19,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/4K": {
+      "name": "BenchmarkEqual/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 8050.0,
+      "ops_per_sec": 124223.6,
+      "mb_per_sec": 508.82,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/4M": {
+      "name": "BenchmarkEqual/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1611150.0,
+      "ops_per_sec": 620.67,
+      "mb_per_sec": 2603.3,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqual/64M": {
+      "name": "BenchmarkEqual/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 24171080.0,
+      "ops_per_sec": 41.37,
+      "mb_per_sec": 2776.41,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/64_0": {
+      "name": "BenchmarkEqualBothUnaligned/64_0",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 390.0,
+      "ops_per_sec": 2564102.56,
+      "mb_per_sec": 164.1,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/64_1": {
+      "name": "BenchmarkEqualBothUnaligned/64_1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 510.0,
+      "ops_per_sec": 1960784.31,
+      "mb_per_sec": 125.49,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/64_4": {
+      "name": "BenchmarkEqualBothUnaligned/64_4",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 400.0,
+      "ops_per_sec": 2500000.0,
+      "mb_per_sec": 160.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/64_7": {
+      "name": "BenchmarkEqualBothUnaligned/64_7",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 246.15,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/4096_0": {
+      "name": "BenchmarkEqualBothUnaligned/4096_0",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1040.0,
+      "ops_per_sec": 961538.46,
+      "mb_per_sec": 3938.46,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/4096_1": {
+      "name": "BenchmarkEqualBothUnaligned/4096_1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1140.0,
+      "ops_per_sec": 877192.98,
+      "mb_per_sec": 3592.98,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/4096_4": {
+      "name": "BenchmarkEqualBothUnaligned/4096_4",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 960.0,
+      "ops_per_sec": 1041666.67,
+      "mb_per_sec": 4266.67,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/4096_7": {
+      "name": "BenchmarkEqualBothUnaligned/4096_7",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1000.0,
+      "ops_per_sec": 1000000.0,
+      "mb_per_sec": 4096.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/4194304_0": {
+      "name": "BenchmarkEqualBothUnaligned/4194304_0",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1435650.0,
+      "ops_per_sec": 696.55,
+      "mb_per_sec": 2921.54,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/4194304_1": {
+      "name": "BenchmarkEqualBothUnaligned/4194304_1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 523800.0,
+      "ops_per_sec": 1909.13,
+      "mb_per_sec": 8007.45,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/4194304_4": {
+      "name": "BenchmarkEqualBothUnaligned/4194304_4",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 511410.0,
+      "ops_per_sec": 1955.38,
+      "mb_per_sec": 8201.45,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/4194304_7": {
+      "name": "BenchmarkEqualBothUnaligned/4194304_7",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 500810.0,
+      "ops_per_sec": 1996.77,
+      "mb_per_sec": 8375.04,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/67108864_0": {
+      "name": "BenchmarkEqualBothUnaligned/67108864_0",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 22060050.0,
+      "ops_per_sec": 45.33,
+      "mb_per_sec": 3042.1,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/67108864_1": {
+      "name": "BenchmarkEqualBothUnaligned/67108864_1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 8033230.0,
+      "ops_per_sec": 124.48,
+      "mb_per_sec": 8353.91,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/67108864_4": {
+      "name": "BenchmarkEqualBothUnaligned/67108864_4",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 8013770.0,
+      "ops_per_sec": 124.79,
+      "mb_per_sec": 8374.19,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualBothUnaligned/67108864_7": {
+      "name": "BenchmarkEqualBothUnaligned/67108864_7",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 7998190.0,
+      "ops_per_sec": 125.03,
+      "mb_per_sec": 8390.51,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndex/10": {
+      "name": "BenchmarkIndex/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 940.0,
+      "ops_per_sec": 1063829.79,
+      "mb_per_sec": 10.64,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndex/32": {
+      "name": "BenchmarkIndex/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 790.0,
+      "ops_per_sec": 1265822.78,
+      "mb_per_sec": 40.51,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndex/4K": {
+      "name": "BenchmarkIndex/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4930.0,
+      "ops_per_sec": 202839.76,
+      "mb_per_sec": 830.83,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndex/4M": {
+      "name": "BenchmarkIndex/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4412160.0,
+      "ops_per_sec": 226.65,
+      "mb_per_sec": 950.62,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndex/64M": {
+      "name": "BenchmarkIndex/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 70971990.0,
+      "ops_per_sec": 14.09,
+      "mb_per_sec": 945.57,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexEasy/10": {
+      "name": "BenchmarkIndexEasy/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 890.0,
+      "ops_per_sec": 1123595.51,
+      "mb_per_sec": 11.24,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexEasy/32": {
+      "name": "BenchmarkIndexEasy/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 530.0,
+      "ops_per_sec": 1886792.45,
+      "mb_per_sec": 60.38,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexEasy/4K": {
+      "name": "BenchmarkIndexEasy/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1660.0,
+      "ops_per_sec": 602409.64,
+      "mb_per_sec": 2467.47,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexEasy/4M": {
+      "name": "BenchmarkIndexEasy/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 387720.0,
+      "ops_per_sec": 2579.18,
+      "mb_per_sec": 10817.87,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexEasy/64M": {
+      "name": "BenchmarkIndexEasy/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 6190280.0,
+      "ops_per_sec": 161.54,
+      "mb_per_sec": 10841.01,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCount/10": {
+      "name": "BenchmarkCount/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 700.0,
+      "ops_per_sec": 1428571.43,
+      "mb_per_sec": 14.29,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCount/32": {
+      "name": "BenchmarkCount/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 630.0,
+      "ops_per_sec": 1587301.59,
+      "mb_per_sec": 50.79,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCount/4K": {
+      "name": "BenchmarkCount/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4640.0,
+      "ops_per_sec": 215517.24,
+      "mb_per_sec": 882.76,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCount/4M": {
+      "name": "BenchmarkCount/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4399830.0,
+      "ops_per_sec": 227.28,
+      "mb_per_sec": 953.29,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCount/64M": {
+      "name": "BenchmarkCount/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 71190810.0,
+      "ops_per_sec": 14.05,
+      "mb_per_sec": 942.66,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountEasy/10": {
+      "name": "BenchmarkCountEasy/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1290.0,
+      "ops_per_sec": 775193.8,
+      "mb_per_sec": 7.75,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountEasy/32": {
+      "name": "BenchmarkCountEasy/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 970.0,
+      "ops_per_sec": 1030927.84,
+      "mb_per_sec": 32.99,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountEasy/4K": {
+      "name": "BenchmarkCountEasy/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1490.0,
+      "ops_per_sec": 671140.94,
+      "mb_per_sec": 2748.99,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountEasy/4M": {
+      "name": "BenchmarkCountEasy/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 378190.0,
+      "ops_per_sec": 2644.17,
+      "mb_per_sec": 11090.47,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountEasy/64M": {
+      "name": "BenchmarkCountEasy/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 6107340.0,
+      "ops_per_sec": 163.74,
+      "mb_per_sec": 10988.23,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountSingle/10": {
+      "name": "BenchmarkCountSingle/10",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 540.0,
+      "ops_per_sec": 1851851.85,
+      "mb_per_sec": 18.52,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountSingle/32": {
+      "name": "BenchmarkCountSingle/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 440.0,
+      "ops_per_sec": 2272727.27,
+      "mb_per_sec": 72.73,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountSingle/4K": {
+      "name": "BenchmarkCountSingle/4K",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4790.0,
+      "ops_per_sec": 208768.27,
+      "mb_per_sec": 855.11,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountSingle/4M": {
+      "name": "BenchmarkCountSingle/4M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 8652350.0,
+      "ops_per_sec": 115.58,
+      "mb_per_sec": 484.76,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountSingle/64M": {
+      "name": "BenchmarkCountSingle/64M",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 164771690.0,
+      "ops_per_sec": 6.07,
+      "mb_per_sec": 407.28,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkToUpper/ONLYUPPER": {
+      "name": "BenchmarkToUpper/ONLYUPPER",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 565.0,
+      "ops_per_sec": 2069597.07,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToUpper/abc": {
+      "name": "BenchmarkToUpper/abc",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 5150.0,
+      "ops_per_sec": 590996.21,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToUpper/AbC123": {
+      "name": "BenchmarkToUpper/AbC123",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4280.0,
+      "ops_per_sec": 697261.46,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToUpper/azAZ09_": {
+      "name": "BenchmarkToUpper/azAZ09_",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4125.0,
+      "ops_per_sec": 780510.88,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToUpper/longStrinGwitHmixofsmaLLandcAps": {
+      "name": "BenchmarkToUpper/longStrinGwitHmixofsmaLLandcAps",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4235.0,
+      "ops_per_sec": 598315.96,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 32.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToUpper/long\u0250string\u0250with\u0250nonascii\u2c6fchars": {
+      "name": "BenchmarkToUpper/long\u0250string\u0250with\u0250nonascii\u2c6fchars",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 10035.0,
+      "ops_per_sec": 100505.18,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 128.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkToUpper/\u0250\u0250\u0250\u0250\u0250": {
+      "name": "BenchmarkToUpper/\u0250\u0250\u0250\u0250\u0250",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 7220.0,
+      "ops_per_sec": 138657.37,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 40.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkToLower/abc": {
+      "name": "BenchmarkToLower/abc",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 555.0,
+      "ops_per_sec": 2027027.03,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToLower/AbC123": {
+      "name": "BenchmarkToLower/AbC123",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4620.0,
+      "ops_per_sec": 592155.86,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToLower/azAZ09_": {
+      "name": "BenchmarkToLower/azAZ09_",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4205.0,
+      "ops_per_sec": 810868.14,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToLower/longStrinGwitHmixofsmaLLandcAps": {
+      "name": "BenchmarkToLower/longStrinGwitHmixofsmaLLandcAps",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4270.0,
+      "ops_per_sec": 674522.94,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 32.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToLower/LONG\u2c6fSTRING\u2c6fWITH\u2c6fNONASCII\u2c6fCHARS": {
+      "name": "BenchmarkToLower/LONG\u2c6fSTRING\u2c6fWITH\u2c6fNONASCII\u2c6fCHARS",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 7650.0,
+      "ops_per_sec": 131349.42,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 48.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToLower/\u2c6d\u2c6d\u2c6d\u2c6d\u2c6d": {
+      "name": "BenchmarkToLower/\u2c6d\u2c6d\u2c6d\u2c6d\u2c6d",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 7150.0,
+      "ops_per_sec": 142214.69,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFields/ASCII/16": {
+      "name": "BenchmarkFields/ASCII/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1285.0,
+      "ops_per_sec": 784493.28,
+      "mb_per_sec": 13.68,
+      "bytes_per_op": 48.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFields/ASCII/256": {
+      "name": "BenchmarkFields/ASCII/256",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 7070.0,
+      "ops_per_sec": 172502.56,
+      "mb_per_sec": 25.42,
+      "bytes_per_op": 384.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFields/ASCII/4096": {
+      "name": "BenchmarkFields/ASCII/4096",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 25320.0,
+      "ops_per_sec": 39646.9,
+      "mb_per_sec": 172.46,
+      "bytes_per_op": 9472.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFields/ASCII/65536": {
+      "name": "BenchmarkFields/ASCII/65536",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 309030.0,
+      "ops_per_sec": 3238.34,
+      "mb_per_sec": 206.45,
+      "bytes_per_op": 147456.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFields/ASCII/1048576": {
+      "name": "BenchmarkFields/ASCII/1048576",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4775695.0,
+      "ops_per_sec": 209.71,
+      "mb_per_sec": 211.4,
+      "bytes_per_op": 2269184.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFields/Mixed/16": {
+      "name": "BenchmarkFields/Mixed/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 3950.0,
+      "ops_per_sec": 505218.46,
+      "mb_per_sec": 2.37,
+      "bytes_per_op": 80.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFields/Mixed/256": {
+      "name": "BenchmarkFields/Mixed/256",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 13170.0,
+      "ops_per_sec": 77010.65,
+      "mb_per_sec": 17.38,
+      "bytes_per_op": 576.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFields/Mixed/4096": {
+      "name": "BenchmarkFields/Mixed/4096",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 62320.0,
+      "ops_per_sec": 16200.41,
+      "mb_per_sec": 72.83,
+      "bytes_per_op": 24832.0,
+      "allocs_per_op": 5.0
+    },
+    "BenchmarkFields/Mixed/65536": {
+      "name": "BenchmarkFields/Mixed/65536",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 843810.0,
+      "ops_per_sec": 1185.1,
+      "mb_per_sec": 77.61,
+      "bytes_per_op": 512256.0,
+      "allocs_per_op": 12.0
+    },
+    "BenchmarkFields/Mixed/1048576": {
+      "name": "BenchmarkFields/Mixed/1048576",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 15646295.0,
+      "ops_per_sec": 64.14,
+      "mb_per_sec": 71.22,
+      "bytes_per_op": 11211008.0,
+      "allocs_per_op": 24.0
+    },
+    "BenchmarkFieldsFunc/ASCII/16": {
+      "name": "BenchmarkFieldsFunc/ASCII/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 6180.0,
+      "ops_per_sec": 162753.65,
+      "mb_per_sec": 2.8,
+      "bytes_per_op": 48.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFieldsFunc/ASCII/256": {
+      "name": "BenchmarkFieldsFunc/ASCII/256",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 7715.0,
+      "ops_per_sec": 129637.29,
+      "mb_per_sec": 33.6,
+      "bytes_per_op": 384.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFieldsFunc/ASCII/4096": {
+      "name": "BenchmarkFieldsFunc/ASCII/4096",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 46550.0,
+      "ops_per_sec": 21540.01,
+      "mb_per_sec": 92.8,
+      "bytes_per_op": 24832.0,
+      "allocs_per_op": 5.0
+    },
+    "BenchmarkFieldsFunc/ASCII/65536": {
+      "name": "BenchmarkFieldsFunc/ASCII/65536",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 632185.0,
+      "ops_per_sec": 1584.78,
+      "mb_per_sec": 108.35,
+      "bytes_per_op": 512256.0,
+      "allocs_per_op": 12.0
+    },
+    "BenchmarkFieldsFunc/ASCII/1048576": {
+      "name": "BenchmarkFieldsFunc/ASCII/1048576",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 11783080.0,
+      "ops_per_sec": 88.68,
+      "mb_per_sec": 112.27,
+      "bytes_per_op": 11211008.0,
+      "allocs_per_op": 24.0
+    },
+    "BenchmarkFieldsFunc/Mixed/16": {
+      "name": "BenchmarkFieldsFunc/Mixed/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 6405.0,
+      "ops_per_sec": 156506.57,
+      "mb_per_sec": 2.63,
+      "bytes_per_op": 80.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFieldsFunc/Mixed/256": {
+      "name": "BenchmarkFieldsFunc/Mixed/256",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 8720.0,
+      "ops_per_sec": 114833.54,
+      "mb_per_sec": 30.48,
+      "bytes_per_op": 576.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkFieldsFunc/Mixed/4096": {
+      "name": "BenchmarkFieldsFunc/Mixed/4096",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 47620.0,
+      "ops_per_sec": 21001.14,
+      "mb_per_sec": 86.76,
+      "bytes_per_op": 24832.0,
+      "allocs_per_op": 5.0
+    },
+    "BenchmarkFieldsFunc/Mixed/65536": {
+      "name": "BenchmarkFieldsFunc/Mixed/65536",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 715625.0,
+      "ops_per_sec": 1398.0,
+      "mb_per_sec": 93.55,
+      "bytes_per_op": 512256.0,
+      "allocs_per_op": 12.0
+    },
+    "BenchmarkFieldsFunc/Mixed/1048576": {
+      "name": "BenchmarkFieldsFunc/Mixed/1048576",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 13248655.0,
+      "ops_per_sec": 78.62,
+      "mb_per_sec": 98.95,
+      "bytes_per_op": 11211008.0,
+      "allocs_per_op": 24.0
+    },
+    "BenchmarkTrimSpace/NoTrim": {
+      "name": "BenchmarkTrimSpace/NoTrim",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 495.0,
+      "ops_per_sec": 2045454.54,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkTrimSpace/ASCII": {
+      "name": "BenchmarkTrimSpace/ASCII",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 350.0,
+      "ops_per_sec": 2976190.47,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkTrimSpace/SomeNonASCII": {
+      "name": "BenchmarkTrimSpace/SomeNonASCII",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2030.0,
+      "ops_per_sec": 494965.01,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkTrimSpace/JustNonASCII": {
+      "name": "BenchmarkTrimSpace/JustNonASCII",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1145.0,
+      "ops_per_sec": 880769.23,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkToValidUTF8/Valid": {
+      "name": "BenchmarkToValidUTF8/Valid",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 765.0,
+      "ops_per_sec": 1308587.06,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToValidUTF8/InvalidASCII": {
+      "name": "BenchmarkToValidUTF8/InvalidASCII",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 5075.0,
+      "ops_per_sec": 777491.81,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToValidUTF8/InvalidNonASCII": {
+      "name": "BenchmarkToValidUTF8/InvalidNonASCII",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4280.0,
+      "ops_per_sec": 730687.15,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkIndexHard1": {
+      "name": "BenchmarkIndexHard1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1260445.0,
+      "ops_per_sec": 813.54,
+      "mb_per_sec": 718.74,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexHard2": {
+      "name": "BenchmarkIndexHard2",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1128795.0,
+      "ops_per_sec": 954.08,
+      "mb_per_sec": 732.99,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexHard3": {
+      "name": "BenchmarkIndexHard3",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1324935.0,
+      "ops_per_sec": 809.55,
+      "mb_per_sec": 628.02,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexHard4": {
+      "name": "BenchmarkIndexHard4",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2432560.0,
+      "ops_per_sec": 462.8,
+      "mb_per_sec": 323.07,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLastIndexHard1": {
+      "name": "BenchmarkLastIndexHard1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1643885.0,
+      "ops_per_sec": 608.44,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLastIndexHard2": {
+      "name": "BenchmarkLastIndexHard2",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1629215.0,
+      "ops_per_sec": 613.82,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLastIndexHard3": {
+      "name": "BenchmarkLastIndexHard3",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1634480.0,
+      "ops_per_sec": 611.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountHard1": {
+      "name": "BenchmarkCountHard1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 755370.0,
+      "ops_per_sec": 1332.76,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountHard2": {
+      "name": "BenchmarkCountHard2",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 771065.0,
+      "ops_per_sec": 1302.93,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountHard3": {
+      "name": "BenchmarkCountHard3",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 904075.0,
+      "ops_per_sec": 1115.2,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSplitEmptySeparator": {
+      "name": "BenchmarkSplitEmptySeparator",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 24193930.0,
+      "ops_per_sec": 48.28,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 25165824.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkSplitSingleByteSeparator": {
+      "name": "BenchmarkSplitSingleByteSeparator",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2368755.0,
+      "ops_per_sec": 422.69,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 2097152.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkSplitMultiByteSeparator": {
+      "name": "BenchmarkSplitMultiByteSeparator",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1793525.0,
+      "ops_per_sec": 557.59,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 524288.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkSplitNSingleByteSeparator": {
+      "name": "BenchmarkSplitNSingleByteSeparator",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1790.0,
+      "ops_per_sec": 603913.63,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 240.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkSplitNMultiByteSeparator": {
+      "name": "BenchmarkSplitNMultiByteSeparator",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1790.0,
+      "ops_per_sec": 621700.47,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 240.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeat": {
+      "name": "BenchmarkRepeat",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1740.0,
+      "ops_per_sec": 574712.64,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 80.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/256/1": {
+      "name": "BenchmarkRepeatLarge/256/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1310.0,
+      "ops_per_sec": 773500.24,
+      "mb_per_sec": 175.34,
+      "bytes_per_op": 256.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/256/16": {
+      "name": "BenchmarkRepeatLarge/256/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1010.0,
+      "ops_per_sec": 1034836.06,
+      "mb_per_sec": 209.84,
+      "bytes_per_op": 256.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/512/1": {
+      "name": "BenchmarkRepeatLarge/512/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 5365.0,
+      "ops_per_sec": 452742.61,
+      "mb_per_sec": 409.6,
+      "bytes_per_op": 512.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/512/16": {
+      "name": "BenchmarkRepeatLarge/512/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4505.0,
+      "ops_per_sec": 487585.78,
+      "mb_per_sec": 433.9,
+      "bytes_per_op": 512.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/1024/1": {
+      "name": "BenchmarkRepeatLarge/1024/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1390.0,
+      "ops_per_sec": 722453.23,
+      "mb_per_sec": 691.89,
+      "bytes_per_op": 1024.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/1024/16": {
+      "name": "BenchmarkRepeatLarge/1024/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 865.0,
+      "ops_per_sec": 1180726.18,
+      "mb_per_sec": 1383.78,
+      "bytes_per_op": 1024.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/2048/1": {
+      "name": "BenchmarkRepeatLarge/2048/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1315.0,
+      "ops_per_sec": 795234.64,
+      "mb_per_sec": 1969.23,
+      "bytes_per_op": 2048.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/2048/16": {
+      "name": "BenchmarkRepeatLarge/2048/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 935.0,
+      "ops_per_sec": 1088982.06,
+      "mb_per_sec": 2528.4,
+      "bytes_per_op": 2048.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/4096/1": {
+      "name": "BenchmarkRepeatLarge/4096/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1575.0,
+      "ops_per_sec": 636775.29,
+      "mb_per_sec": 2748.99,
+      "bytes_per_op": 4096.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/4096/16": {
+      "name": "BenchmarkRepeatLarge/4096/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1110.0,
+      "ops_per_sec": 920016.57,
+      "mb_per_sec": 4311.58,
+      "bytes_per_op": 4096.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/8192/1": {
+      "name": "BenchmarkRepeatLarge/8192/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 8375.0,
+      "ops_per_sec": 232790.2,
+      "mb_per_sec": 3237.94,
+      "bytes_per_op": 8192.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/8192/16": {
+      "name": "BenchmarkRepeatLarge/8192/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 7200.0,
+      "ops_per_sec": 263374.48,
+      "mb_per_sec": 3640.89,
+      "bytes_per_op": 8192.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/8192/4097": {
+      "name": "BenchmarkRepeatLarge/8192/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1120.0,
+      "ops_per_sec": 2520252.02,
+      "mb_per_sec": 2028.22,
+      "bytes_per_op": 4864.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/16384/1": {
+      "name": "BenchmarkRepeatLarge/16384/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 9655.0,
+      "ops_per_sec": 152138.29,
+      "mb_per_sec": 3900.95,
+      "bytes_per_op": 16384.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/16384/16": {
+      "name": "BenchmarkRepeatLarge/16384/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 9165.0,
+      "ops_per_sec": 170346.19,
+      "mb_per_sec": 4464.31,
+      "bytes_per_op": 16384.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/16384/4097": {
+      "name": "BenchmarkRepeatLarge/16384/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 6180.0,
+      "ops_per_sec": 222110.41,
+      "mb_per_sec": 4152.36,
+      "bytes_per_op": 13568.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/32768/1": {
+      "name": "BenchmarkRepeatLarge/32768/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4150.0,
+      "ops_per_sec": 240969.45,
+      "mb_per_sec": 7934.14,
+      "bytes_per_op": 32768.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/32768/16": {
+      "name": "BenchmarkRepeatLarge/32768/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4860.0,
+      "ops_per_sec": 210644.94,
+      "mb_per_sec": 5851.43,
+      "bytes_per_op": 32768.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/32768/4097": {
+      "name": "BenchmarkRepeatLarge/32768/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 11855.0,
+      "ops_per_sec": 148308.38,
+      "mb_per_sec": 1460.23,
+      "bytes_per_op": 32768.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/65536/1": {
+      "name": "BenchmarkRepeatLarge/65536/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 6015.0,
+      "ops_per_sec": 167085.19,
+      "mb_per_sec": 11723.79,
+      "bytes_per_op": 65536.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/65536/16": {
+      "name": "BenchmarkRepeatLarge/65536/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 5770.0,
+      "ops_per_sec": 173662.84,
+      "mb_per_sec": 11894.01,
+      "bytes_per_op": 65536.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/65536/4097": {
+      "name": "BenchmarkRepeatLarge/65536/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 21590.0,
+      "ops_per_sec": 46786.03,
+      "mb_per_sec": 3162.89,
+      "bytes_per_op": 65536.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/131072/1": {
+      "name": "BenchmarkRepeatLarge/131072/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 30585.0,
+      "ops_per_sec": 73713.36,
+      "mb_per_sec": 16868.98,
+      "bytes_per_op": 131072.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/131072/16": {
+      "name": "BenchmarkRepeatLarge/131072/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 8165.0,
+      "ops_per_sec": 122907.64,
+      "mb_per_sec": 17066.67,
+      "bytes_per_op": 131072.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/131072/4097": {
+      "name": "BenchmarkRepeatLarge/131072/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 12410.0,
+      "ops_per_sec": 80612.89,
+      "mb_per_sec": 10032.15,
+      "bytes_per_op": 131072.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/262144/1": {
+      "name": "BenchmarkRepeatLarge/262144/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 47865.0,
+      "ops_per_sec": 22005.15,
+      "mb_per_sec": 7065.88,
+      "bytes_per_op": 262144.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/262144/16": {
+      "name": "BenchmarkRepeatLarge/262144/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 27210.0,
+      "ops_per_sec": 36795.11,
+      "mb_per_sec": 9978.84,
+      "bytes_per_op": 262144.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/262144/4097": {
+      "name": "BenchmarkRepeatLarge/262144/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 27775.0,
+      "ops_per_sec": 36004.58,
+      "mb_per_sec": 9244.66,
+      "bytes_per_op": 262144.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/524288/1": {
+      "name": "BenchmarkRepeatLarge/524288/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 93675.0,
+      "ops_per_sec": 14239.18,
+      "mb_per_sec": 11200.34,
+      "bytes_per_op": 524288.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/524288/16": {
+      "name": "BenchmarkRepeatLarge/524288/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 33710.0,
+      "ops_per_sec": 29764.39,
+      "mb_per_sec": 16507.81,
+      "bytes_per_op": 524288.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/524288/4097": {
+      "name": "BenchmarkRepeatLarge/524288/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 44045.0,
+      "ops_per_sec": 22710.72,
+      "mb_per_sec": 12019.38,
+      "bytes_per_op": 524288.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/1048576/1": {
+      "name": "BenchmarkRepeatLarge/1048576/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 166660.0,
+      "ops_per_sec": 7013.62,
+      "mb_per_sec": 10149.8,
+      "bytes_per_op": 1048576.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/1048576/16": {
+      "name": "BenchmarkRepeatLarge/1048576/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 59495.0,
+      "ops_per_sec": 16839.68,
+      "mb_per_sec": 18421.93,
+      "bytes_per_op": 1048576.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/1048576/4097": {
+      "name": "BenchmarkRepeatLarge/1048576/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 87170.0,
+      "ops_per_sec": 11475.51,
+      "mb_per_sec": 12203.42,
+      "bytes_per_op": 1048576.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/2097152/1": {
+      "name": "BenchmarkRepeatLarge/2097152/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 463345.0,
+      "ops_per_sec": 4306.47,
+      "mb_per_sec": 15410.04,
+      "bytes_per_op": 2097152.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/2097152/16": {
+      "name": "BenchmarkRepeatLarge/2097152/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 129935.0,
+      "ops_per_sec": 7743.64,
+      "mb_per_sec": 17511.29,
+      "bytes_per_op": 2097152.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/2097152/4097": {
+      "name": "BenchmarkRepeatLarge/2097152/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 163210.0,
+      "ops_per_sec": 6144.45,
+      "mb_per_sec": 13547.96,
+      "bytes_per_op": 2097152.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/4194304/1": {
+      "name": "BenchmarkRepeatLarge/4194304/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 568600.0,
+      "ops_per_sec": 2637.97,
+      "mb_per_sec": 17452.27,
+      "bytes_per_op": 4194304.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/4194304/16": {
+      "name": "BenchmarkRepeatLarge/4194304/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 267055.0,
+      "ops_per_sec": 3812.04,
+      "mb_per_sec": 18116.38,
+      "bytes_per_op": 4194304.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/4194304/4097": {
+      "name": "BenchmarkRepeatLarge/4194304/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 375830.0,
+      "ops_per_sec": 2684.14,
+      "mb_per_sec": 12299.3,
+      "bytes_per_op": 4194304.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/8388608/1": {
+      "name": "BenchmarkRepeatLarge/8388608/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1166800.0,
+      "ops_per_sec": 1318.72,
+      "mb_per_sec": 17607.59,
+      "bytes_per_op": 8388608.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/8388608/16": {
+      "name": "BenchmarkRepeatLarge/8388608/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 573630.0,
+      "ops_per_sec": 1836.74,
+      "mb_per_sec": 18883.05,
+      "bytes_per_op": 8388608.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/8388608/4097": {
+      "name": "BenchmarkRepeatLarge/8388608/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 853985.0,
+      "ops_per_sec": 1188.86,
+      "mb_per_sec": 11193.12,
+      "bytes_per_op": 8388608.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/16777216/1": {
+      "name": "BenchmarkRepeatLarge/16777216/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 3044765.0,
+      "ops_per_sec": 354.85,
+      "mb_per_sec": 7577.68,
+      "bytes_per_op": 16777216.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/16777216/16": {
+      "name": "BenchmarkRepeatLarge/16777216/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1267290.0,
+      "ops_per_sec": 813.49,
+      "mb_per_sec": 16011.85,
+      "bytes_per_op": 16777216.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/16777216/4097": {
+      "name": "BenchmarkRepeatLarge/16777216/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 1872390.0,
+      "ops_per_sec": 534.92,
+      "mb_per_sec": 9330.52,
+      "bytes_per_op": 16777216.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/33554432/1": {
+      "name": "BenchmarkRepeatLarge/33554432/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 7641605.0,
+      "ops_per_sec": 130.9,
+      "mb_per_sec": 4462.57,
+      "bytes_per_op": 33554432.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/33554432/16": {
+      "name": "BenchmarkRepeatLarge/33554432/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 2780780.0,
+      "ops_per_sec": 364.54,
+      "mb_per_sec": 13655.0,
+      "bytes_per_op": 33554432.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/33554432/4097": {
+      "name": "BenchmarkRepeatLarge/33554432/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 4120095.0,
+      "ops_per_sec": 243.08,
+      "mb_per_sec": 8473.96,
+      "bytes_per_op": 33554432.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/67108864/1": {
+      "name": "BenchmarkRepeatLarge/67108864/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 15246955.0,
+      "ops_per_sec": 65.81,
+      "mb_per_sec": 4669.88,
+      "bytes_per_op": 67108864.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/67108864/16": {
+      "name": "BenchmarkRepeatLarge/67108864/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 5376585.0,
+      "ops_per_sec": 195.96,
+      "mb_per_sec": 16117.06,
+      "bytes_per_op": 67108864.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/67108864/4097": {
+      "name": "BenchmarkRepeatLarge/67108864/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 8231115.0,
+      "ops_per_sec": 121.72,
+      "mb_per_sec": 8520.8,
+      "bytes_per_op": 67108864.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/134217728/1": {
+      "name": "BenchmarkRepeatLarge/134217728/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 29980650.0,
+      "ops_per_sec": 33.42,
+      "mb_per_sec": 4680.94,
+      "bytes_per_op": 134217728.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/134217728/16": {
+      "name": "BenchmarkRepeatLarge/134217728/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 8572645.0,
+      "ops_per_sec": 119.54,
+      "mb_per_sec": 18540.77,
+      "bytes_per_op": 134217728.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/134217728/4097": {
+      "name": "BenchmarkRepeatLarge/134217728/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 16046105.0,
+      "ops_per_sec": 62.36,
+      "mb_per_sec": 8590.02,
+      "bytes_per_op": 134217728.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/268435456/1": {
+      "name": "BenchmarkRepeatLarge/268435456/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 83104270.0,
+      "ops_per_sec": 13.19,
+      "mb_per_sec": 2491.51,
+      "bytes_per_op": 268435456.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/268435456/16": {
+      "name": "BenchmarkRepeatLarge/268435456/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 18200415.0,
+      "ops_per_sec": 55.44,
+      "mb_per_sec": 13471.34,
+      "bytes_per_op": 268435456.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/268435456/4097": {
+      "name": "BenchmarkRepeatLarge/268435456/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 32360060.0,
+      "ops_per_sec": 30.95,
+      "mb_per_sec": 7989.97,
+      "bytes_per_op": 268435456.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/536870912/1": {
+      "name": "BenchmarkRepeatLarge/536870912/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 113783975.0,
+      "ops_per_sec": 8.79,
+      "mb_per_sec": 4629.6,
+      "bytes_per_op": 536870912.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/536870912/16": {
+      "name": "BenchmarkRepeatLarge/536870912/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 28958715.0,
+      "ops_per_sec": 34.72,
+      "mb_per_sec": 17260.11,
+      "bytes_per_op": 536870912.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/536870912/4097": {
+      "name": "BenchmarkRepeatLarge/536870912/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 61888115.0,
+      "ops_per_sec": 16.16,
+      "mb_per_sec": 8495.74,
+      "bytes_per_op": 536870912.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/1073741824/1": {
+      "name": "BenchmarkRepeatLarge/1073741824/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 230275785.0,
+      "ops_per_sec": 4.36,
+      "mb_per_sec": 4462.76,
+      "bytes_per_op": 1073741824.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/1073741824/16": {
+      "name": "BenchmarkRepeatLarge/1073741824/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 49415465.0,
+      "ops_per_sec": 20.27,
+      "mb_per_sec": 20969.32,
+      "bytes_per_op": 1073741824.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatLarge/1073741824/4097": {
+      "name": "BenchmarkRepeatLarge/1073741824/4097",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 125883665.0,
+      "ops_per_sec": 7.94,
+      "mb_per_sec": 8594.81,
+      "bytes_per_op": 1073741824.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkBytesCompare/1": {
+      "name": "BenchmarkBytesCompare/1",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 340.0,
+      "ops_per_sec": 2941176.47,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/2": {
+      "name": "BenchmarkBytesCompare/2",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 250.0,
+      "ops_per_sec": 4000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/4": {
+      "name": "BenchmarkBytesCompare/4",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 220.0,
+      "ops_per_sec": 4545454.55,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/8": {
+      "name": "BenchmarkBytesCompare/8",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 250.0,
+      "ops_per_sec": 4000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/16": {
+      "name": "BenchmarkBytesCompare/16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 210.0,
+      "ops_per_sec": 4761904.76,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/32": {
+      "name": "BenchmarkBytesCompare/32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 240.0,
+      "ops_per_sec": 4166666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/64": {
+      "name": "BenchmarkBytesCompare/64",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 250.0,
+      "ops_per_sec": 4000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/128": {
+      "name": "BenchmarkBytesCompare/128",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/256": {
+      "name": "BenchmarkBytesCompare/256",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 280.0,
+      "ops_per_sec": 3571428.57,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/512": {
+      "name": "BenchmarkBytesCompare/512",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 250.0,
+      "ops_per_sec": 4000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/1024": {
+      "name": "BenchmarkBytesCompare/1024",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 310.0,
+      "ops_per_sec": 3225806.45,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBytesCompare/2048": {
+      "name": "BenchmarkBytesCompare/2048",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 440.0,
+      "ops_per_sec": 2272727.27,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkTrimByte": {
+      "name": "BenchmarkTrimByte",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 415.0,
+      "ops_per_sec": 2409988.38,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexPeriodic/IndexPeriodic2": {
+      "name": "BenchmarkIndexPeriodic/IndexPeriodic2",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 79860.0,
+      "ops_per_sec": 13492.6,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexPeriodic/IndexPeriodic4": {
+      "name": "BenchmarkIndexPeriodic/IndexPeriodic4",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 60980.0,
+      "ops_per_sec": 16419.61,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexPeriodic/IndexPeriodic8": {
+      "name": "BenchmarkIndexPeriodic/IndexPeriodic8",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 56425.0,
+      "ops_per_sec": 17728.38,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexPeriodic/IndexPeriodic16": {
+      "name": "BenchmarkIndexPeriodic/IndexPeriodic16",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 88795.0,
+      "ops_per_sec": 11281.75,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexPeriodic/IndexPeriodic32": {
+      "name": "BenchmarkIndexPeriodic/IndexPeriodic32",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 48970.0,
+      "ops_per_sec": 20451.78,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexPeriodic/IndexPeriodic64": {
+      "name": "BenchmarkIndexPeriodic/IndexPeriodic64",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 39700.0,
+      "ops_per_sec": 26363.57,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCompareBytesEqual": {
+      "name": "BenchmarkCompareBytesEqual",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 660.0,
+      "ops_per_sec": 1515151.52,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCompareBytesToNil": {
+      "name": "BenchmarkCompareBytesToNil",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCompareBytesEmpty": {
+      "name": "BenchmarkCompareBytesEmpty",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCompareBytesIdentical": {
+      "name": "BenchmarkCompareBytesIdentical",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 270.0,
+      "ops_per_sec": 3703703.7,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCompareBytesSameLength": {
+      "name": "BenchmarkCompareBytesSameLength",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 320.0,
+      "ops_per_sec": 3125000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCompareBytesDifferentLength": {
+      "name": "BenchmarkCompareBytesDifferentLength",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 300.0,
+      "ops_per_sec": 3333333.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCompareBytesBig": {
+      "name": "BenchmarkCompareBytesBig",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 164320.0,
+      "ops_per_sec": 6085.69,
+      "mb_per_sec": 6381.37,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCompareBytesBigIdentical": {
+      "name": "BenchmarkCompareBytesBigIdentical",
+      "package": "bytes",
+      "iterations": 1,
+      "ns_per_op": 410.0,
+      "ops_per_sec": 2439024.39,
+      "mb_per_sec": 2557526.83,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkBuildString_Builder/1Write_NoGrow": {
+      "name": "BenchmarkBuildString_Builder/1Write_NoGrow",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1980.0,
+      "ops_per_sec": 505050.51,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 48.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkBuildString_Builder/3Write_NoGrow": {
+      "name": "BenchmarkBuildString_Builder/3Write_NoGrow",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 7520.0,
+      "ops_per_sec": 132978.72,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 336.0,
+      "allocs_per_op": 3.0
+    },
+    "BenchmarkBuildString_Builder/3Write_Grow": {
+      "name": "BenchmarkBuildString_Builder/3Write_Grow",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1170.0,
+      "ops_per_sec": 854700.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 112.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkBuildString_WriteString/1Write_NoGrow": {
+      "name": "BenchmarkBuildString_WriteString/1Write_NoGrow",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1000.0,
+      "ops_per_sec": 1000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 48.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkBuildString_WriteString/3Write_NoGrow": {
+      "name": "BenchmarkBuildString_WriteString/3Write_NoGrow",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 11440.0,
+      "ops_per_sec": 87412.59,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 336.0,
+      "allocs_per_op": 3.0
+    },
+    "BenchmarkBuildString_WriteString/3Write_Grow": {
+      "name": "BenchmarkBuildString_WriteString/3Write_Grow",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1020.0,
+      "ops_per_sec": 980392.16,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 112.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkBuildString_ByteBuffer/1Write_NoGrow": {
+      "name": "BenchmarkBuildString_ByteBuffer/1Write_NoGrow",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1710.0,
+      "ops_per_sec": 584795.32,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 112.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkBuildString_ByteBuffer/3Write_NoGrow": {
+      "name": "BenchmarkBuildString_ByteBuffer/3Write_NoGrow",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 12290.0,
+      "ops_per_sec": 81366.97,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 304.0,
+      "allocs_per_op": 3.0
+    },
+    "BenchmarkBuildString_ByteBuffer/3Write_Grow": {
+      "name": "BenchmarkBuildString_ByteBuffer/3Write_Grow",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 9480.0,
+      "ops_per_sec": 105485.23,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 224.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkClone": {
+      "name": "BenchmarkClone",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1720.0,
+      "ops_per_sec": 581395.35,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 96.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkGenericNoMatch": {
+      "name": "BenchmarkGenericNoMatch",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 64810.0,
+      "ops_per_sec": 15429.72,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 1736.0,
+      "allocs_per_op": 14.0
+    },
+    "BenchmarkGenericMatch1": {
+      "name": "BenchmarkGenericMatch1",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 27390.0,
+      "ops_per_sec": 36509.68,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 1736.0,
+      "allocs_per_op": 14.0
+    },
+    "BenchmarkGenericMatch2": {
+      "name": "BenchmarkGenericMatch2",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 54270.0,
+      "ops_per_sec": 18426.39,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 10328.0,
+      "allocs_per_op": 20.0
+    },
+    "BenchmarkSingleMaxSkipping": {
+      "name": "BenchmarkSingleMaxSkipping",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 6640.0,
+      "ops_per_sec": 150602.41,
+      "mb_per_sec": 1506.02,
+      "bytes_per_op": 2536.0,
+      "allocs_per_op": 3.0
+    },
+    "BenchmarkSingleLongSuffixFail": {
+      "name": "BenchmarkSingleLongSuffixFail",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 232420.0,
+      "ops_per_sec": 4302.56,
+      "mb_per_sec": 4.31,
+      "bytes_per_op": 6424.0,
+      "allocs_per_op": 3.0
+    },
+    "BenchmarkSingleMatch": {
+      "name": "BenchmarkSingleMatch",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 51800.0,
+      "ops_per_sec": 19305.02,
+      "mb_per_sec": 289.58,
+      "bytes_per_op": 42872.0,
+      "allocs_per_op": 13.0
+    },
+    "BenchmarkByteByteNoMatch": {
+      "name": "BenchmarkByteByteNoMatch",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 12610.0,
+      "ops_per_sec": 79302.14,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 688.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkByteByteMatch": {
+      "name": "BenchmarkByteByteMatch",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 2480.0,
+      "ops_per_sec": 403225.81,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 848.0,
+      "allocs_per_op": 5.0
+    },
+    "BenchmarkByteStringMatch": {
+      "name": "BenchmarkByteStringMatch",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 21720.0,
+      "ops_per_sec": 46040.52,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 7504.0,
+      "allocs_per_op": 12.0
+    },
+    "BenchmarkHTMLEscapeNew": {
+      "name": "BenchmarkHTMLEscapeNew",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1920.0,
+      "ops_per_sec": 520833.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 96.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkHTMLEscapeOld": {
+      "name": "BenchmarkHTMLEscapeOld",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 11150.0,
+      "ops_per_sec": 89686.1,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 96.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkByteStringReplacerWriteString": {
+      "name": "BenchmarkByteStringReplacerWriteString",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 39260.0,
+      "ops_per_sec": 25471.22,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 20464.0,
+      "allocs_per_op": 10.0
+    },
+    "BenchmarkByteReplacerWriteString": {
+      "name": "BenchmarkByteReplacerWriteString",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 23100.0,
+      "ops_per_sec": 43290.04,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 10864.0,
+      "allocs_per_op": 9.0
+    },
+    "BenchmarkByteByteReplaces": {
+      "name": "BenchmarkByteByteReplaces",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 15080.0,
+      "ops_per_sec": 66313.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 848.0,
+      "allocs_per_op": 5.0
+    },
+    "BenchmarkByteByteMap": {
+      "name": "BenchmarkByteByteMap",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 3800.0,
+      "ops_per_sec": 263157.89,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 640.0,
+      "allocs_per_op": 4.0
+    },
+    "BenchmarkMap/identity/ASCII": {
+      "name": "BenchmarkMap/identity/ASCII",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 810.0,
+      "ops_per_sec": 1234567.9,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkMap/identity/Greek": {
+      "name": "BenchmarkMap/identity/Greek",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 980.0,
+      "ops_per_sec": 1020408.16,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkMap/change/ASCII": {
+      "name": "BenchmarkMap/change/ASCII",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1710.0,
+      "ops_per_sec": 584795.32,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 64.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkMap/change/Greek": {
+      "name": "BenchmarkMap/change/Greek",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 18300.0,
+      "ops_per_sec": 54644.81,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 80.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkIndexRune": {
+      "name": "BenchmarkIndexRune",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1060.0,
+      "ops_per_sec": 943396.23,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneLongString": {
+      "name": "BenchmarkIndexRuneLongString",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 620.0,
+      "ops_per_sec": 1612903.23,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexRuneFastPath": {
+      "name": "BenchmarkIndexRuneFastPath",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 310.0,
+      "ops_per_sec": 3225806.45,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndex": {
+      "name": "BenchmarkIndex",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 310.0,
+      "ops_per_sec": 3225806.45,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLastIndex": {
+      "name": "BenchmarkLastIndex",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 390.0,
+      "ops_per_sec": 2564102.56,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexByte": {
+      "name": "BenchmarkIndexByte",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 270.0,
+      "ops_per_sec": 3703703.7,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkToUpper/RENAN_BASTOS_93_AOSDAJDJAIDJAIDAJIaidsjjaidijadsjiadjiOOKKO": {
+      "name": "BenchmarkToUpper/RENAN_BASTOS_93_AOSDAJDJAIDJAIDAJIaidsjjaidijadsjiadjiOOKKO",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 7550.0,
+      "ops_per_sec": 132450.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 64.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkToLower/renan_bastos_93_AOSDAJDJAIDJAIDAJIaidsjjaidijadsjiadjiOOKKO": {
+      "name": "BenchmarkToLower/renan_bastos_93_AOSDAJDJAIDJAIDAJIaidsjjaidijadsjiadjiOOKKO",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 7560.0,
+      "ops_per_sec": 132275.13,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 64.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkMapNoChanges": {
+      "name": "BenchmarkMapNoChanges",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 800.0,
+      "ops_per_sec": 1250000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkTrim": {
+      "name": "BenchmarkTrim",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 5410.0,
+      "ops_per_sec": 184842.88,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualFold/Tests": {
+      "name": "BenchmarkEqualFold/Tests",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 3140.0,
+      "ops_per_sec": 318471.34,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualFold/ASCII": {
+      "name": "BenchmarkEqualFold/ASCII",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 330.0,
+      "ops_per_sec": 3030303.03,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualFold/UnicodePrefix": {
+      "name": "BenchmarkEqualFold/UnicodePrefix",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1100.0,
+      "ops_per_sec": 909090.91,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkEqualFold/UnicodeSuffix": {
+      "name": "BenchmarkEqualFold/UnicodeSuffix",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1050.0,
+      "ops_per_sec": 952380.95,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIndexTorture": {
+      "name": "BenchmarkIndexTorture",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 17250.0,
+      "ops_per_sec": 57971.01,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountTorture": {
+      "name": "BenchmarkCountTorture",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 13490.0,
+      "ops_per_sec": 74128.98,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountTortureOverlapping": {
+      "name": "BenchmarkCountTortureOverlapping",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1658220.0,
+      "ops_per_sec": 603.06,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 3148800.0,
+      "allocs_per_op": 2.0
+    },
+    "BenchmarkCountByte/10": {
+      "name": "BenchmarkCountByte/10",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 720.0,
+      "ops_per_sec": 1388888.89,
+      "mb_per_sec": 13.89,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountByte/32": {
+      "name": "BenchmarkCountByte/32",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 230.0,
+      "ops_per_sec": 4347826.09,
+      "mb_per_sec": 139.13,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountByte/4096": {
+      "name": "BenchmarkCountByte/4096",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 840.0,
+      "ops_per_sec": 1190476.19,
+      "mb_per_sec": 4876.19,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountByte/4194304": {
+      "name": "BenchmarkCountByte/4194304",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 728130.0,
+      "ops_per_sec": 1373.38,
+      "mb_per_sec": 5760.38,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCountByte/67108864": {
+      "name": "BenchmarkCountByte/67108864",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 11405250.0,
+      "ops_per_sec": 87.68,
+      "mb_per_sec": 5884.03,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkRepeat/5x0": {
+      "name": "BenchmarkRepeat/5x0",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 650.0,
+      "ops_per_sec": 1538461.54,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkRepeat/5x1": {
+      "name": "BenchmarkRepeat/5x1",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 230.0,
+      "ops_per_sec": 4347826.09,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkRepeat/5x2": {
+      "name": "BenchmarkRepeat/5x2",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 2080.0,
+      "ops_per_sec": 480769.23,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeat/5x6": {
+      "name": "BenchmarkRepeat/5x6",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1010.0,
+      "ops_per_sec": 990099.01,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 32.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeat/10x0": {
+      "name": "BenchmarkRepeat/10x0",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkRepeat/10x1": {
+      "name": "BenchmarkRepeat/10x1",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 270.0,
+      "ops_per_sec": 3703703.7,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkRepeat/10x2": {
+      "name": "BenchmarkRepeat/10x2",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1070.0,
+      "ops_per_sec": 934579.44,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeat/10x6": {
+      "name": "BenchmarkRepeat/10x6",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1050.0,
+      "ops_per_sec": 952380.95,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 64.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkRepeatSpaces": {
+      "name": "BenchmarkRepeatSpaces",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 690.0,
+      "ops_per_sec": 1449275.36,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkJoin/0": {
+      "name": "BenchmarkJoin/0",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 560.0,
+      "ops_per_sec": 1785714.29,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkJoin/1": {
+      "name": "BenchmarkJoin/1",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 300.0,
+      "ops_per_sec": 3333333.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkJoin/2": {
+      "name": "BenchmarkJoin/2",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1300.0,
+      "ops_per_sec": 769230.77,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkJoin/3": {
+      "name": "BenchmarkJoin/3",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 930.0,
+      "ops_per_sec": 1075268.82,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 24.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkJoin/4": {
+      "name": "BenchmarkJoin/4",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 940.0,
+      "ops_per_sec": 1063829.79,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 48.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkJoin/5": {
+      "name": "BenchmarkJoin/5",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 920.0,
+      "ops_per_sec": 1086956.52,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 48.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkJoin/6": {
+      "name": "BenchmarkJoin/6",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 920.0,
+      "ops_per_sec": 1086956.52,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 64.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkJoin/7": {
+      "name": "BenchmarkJoin/7",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1010.0,
+      "ops_per_sec": 990099.01,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 64.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkReplaceAll": {
+      "name": "BenchmarkReplaceAll",
+      "package": "strings",
+      "iterations": 1,
+      "ns_per_op": 1500.0,
+      "ops_per_sec": 666666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 16.0,
+      "allocs_per_op": 1.0
+    },
+    "BenchmarkAcos": {
+      "name": "BenchmarkAcos",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 790.0,
+      "ops_per_sec": 1265822.78,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAcosh": {
+      "name": "BenchmarkAcosh",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 1200.0,
+      "ops_per_sec": 833333.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAsin": {
+      "name": "BenchmarkAsin",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 670.0,
+      "ops_per_sec": 1492537.31,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAsinh": {
+      "name": "BenchmarkAsinh",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 740.0,
+      "ops_per_sec": 1351351.35,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtan": {
+      "name": "BenchmarkAtan",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 430.0,
+      "ops_per_sec": 2325581.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtanh": {
+      "name": "BenchmarkAtanh",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 680.0,
+      "ops_per_sec": 1470588.24,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAtan2": {
+      "name": "BenchmarkAtan2",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 600.0,
+      "ops_per_sec": 1666666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCbrt": {
+      "name": "BenchmarkCbrt",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 460.0,
+      "ops_per_sec": 2173913.04,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCeil": {
+      "name": "BenchmarkCeil",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 220.0,
+      "ops_per_sec": 4545454.55,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCopysign": {
+      "name": "BenchmarkCopysign",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 240.0,
+      "ops_per_sec": 4166666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCos": {
+      "name": "BenchmarkCos",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 500.0,
+      "ops_per_sec": 2000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkCosh": {
+      "name": "BenchmarkCosh",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 510.0,
+      "ops_per_sec": 1960784.31,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkErf": {
+      "name": "BenchmarkErf",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 480.0,
+      "ops_per_sec": 2083333.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkErfc": {
+      "name": "BenchmarkErfc",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 430.0,
+      "ops_per_sec": 2325581.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkErfinv": {
+      "name": "BenchmarkErfinv",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 610.0,
+      "ops_per_sec": 1639344.26,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkErfcinv": {
+      "name": "BenchmarkErfcinv",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 430.0,
+      "ops_per_sec": 2325581.4,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkExp": {
+      "name": "BenchmarkExp",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkExpGo": {
+      "name": "BenchmarkExpGo",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 690.0,
+      "ops_per_sec": 1449275.36,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkExpm1": {
+      "name": "BenchmarkExpm1",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 510.0,
+      "ops_per_sec": 1960784.31,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkExp2": {
+      "name": "BenchmarkExp2",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 370.0,
+      "ops_per_sec": 2702702.7,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkExp2Go": {
+      "name": "BenchmarkExp2Go",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 560.0,
+      "ops_per_sec": 1785714.29,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkAbs": {
+      "name": "BenchmarkAbs",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 150.0,
+      "ops_per_sec": 6666666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkDim": {
+      "name": "BenchmarkDim",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 170.0,
+      "ops_per_sec": 5882352.94,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkFloor": {
+      "name": "BenchmarkFloor",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 170.0,
+      "ops_per_sec": 5882352.94,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkMax": {
+      "name": "BenchmarkMax",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 310.0,
+      "ops_per_sec": 3225806.45,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkMin": {
+      "name": "BenchmarkMin",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 230.0,
+      "ops_per_sec": 4347826.09,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkMod": {
+      "name": "BenchmarkMod",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 680.0,
+      "ops_per_sec": 1470588.24,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkFrexp": {
+      "name": "BenchmarkFrexp",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 360.0,
+      "ops_per_sec": 2777777.78,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkGamma": {
+      "name": "BenchmarkGamma",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 780.0,
+      "ops_per_sec": 1282051.28,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHypot": {
+      "name": "BenchmarkHypot",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 250.0,
+      "ops_per_sec": 4000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkHypotGo": {
+      "name": "BenchmarkHypotGo",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 370.0,
+      "ops_per_sec": 2702702.7,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkIlogb": {
+      "name": "BenchmarkIlogb",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 420.0,
+      "ops_per_sec": 2380952.38,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkJ0": {
+      "name": "BenchmarkJ0",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 1420.0,
+      "ops_per_sec": 704225.35,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkJ1": {
+      "name": "BenchmarkJ1",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 870.0,
+      "ops_per_sec": 1149425.29,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkJn": {
+      "name": "BenchmarkJn",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 1360.0,
+      "ops_per_sec": 735294.12,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLdexp": {
+      "name": "BenchmarkLdexp",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 340.0,
+      "ops_per_sec": 2941176.47,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLgamma": {
+      "name": "BenchmarkLgamma",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 820.0,
+      "ops_per_sec": 1219512.2,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLog": {
+      "name": "BenchmarkLog",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 470.0,
+      "ops_per_sec": 2127659.57,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLogb": {
+      "name": "BenchmarkLogb",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLog1p": {
+      "name": "BenchmarkLog1p",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 390.0,
+      "ops_per_sec": 2564102.56,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLog10": {
+      "name": "BenchmarkLog10",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 370.0,
+      "ops_per_sec": 2702702.7,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkLog2": {
+      "name": "BenchmarkLog2",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 310.0,
+      "ops_per_sec": 3225806.45,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkModf": {
+      "name": "BenchmarkModf",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 240.0,
+      "ops_per_sec": 4166666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkNextafter32": {
+      "name": "BenchmarkNextafter32",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 250.0,
+      "ops_per_sec": 4000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkNextafter64": {
+      "name": "BenchmarkNextafter64",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 180.0,
+      "ops_per_sec": 5555555.56,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkPowInt": {
+      "name": "BenchmarkPowInt",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 760.0,
+      "ops_per_sec": 1315789.47,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkPowFrac": {
+      "name": "BenchmarkPowFrac",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 790.0,
+      "ops_per_sec": 1265822.78,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkPow10Pos": {
+      "name": "BenchmarkPow10Pos",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 280.0,
+      "ops_per_sec": 3571428.57,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkPow10Neg": {
+      "name": "BenchmarkPow10Neg",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 260.0,
+      "ops_per_sec": 3846153.85,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkRound": {
+      "name": "BenchmarkRound",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 210.0,
+      "ops_per_sec": 4761904.76,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkRoundToEven": {
+      "name": "BenchmarkRoundToEven",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 230.0,
+      "ops_per_sec": 4347826.09,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkRemainder": {
+      "name": "BenchmarkRemainder",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 690.0,
+      "ops_per_sec": 1449275.36,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSignbit": {
+      "name": "BenchmarkSignbit",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 150.0,
+      "ops_per_sec": 6666666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSin": {
+      "name": "BenchmarkSin",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 480.0,
+      "ops_per_sec": 2083333.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSincos": {
+      "name": "BenchmarkSincos",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 340.0,
+      "ops_per_sec": 2941176.47,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSinh": {
+      "name": "BenchmarkSinh",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 410.0,
+      "ops_per_sec": 2439024.39,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSqrtIndirect": {
+      "name": "BenchmarkSqrtIndirect",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 180.0,
+      "ops_per_sec": 5555555.56,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSqrtLatency": {
+      "name": "BenchmarkSqrtLatency",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 200.0,
+      "ops_per_sec": 5000000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSqrtIndirectLatency": {
+      "name": "BenchmarkSqrtIndirectLatency",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 220.0,
+      "ops_per_sec": 4545454.55,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSqrtGoLatency": {
+      "name": "BenchmarkSqrtGoLatency",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 580.0,
+      "ops_per_sec": 1724137.93,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkSqrtPrime": {
+      "name": "BenchmarkSqrtPrime",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 920.0,
+      "ops_per_sec": 1086956.52,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkTan": {
+      "name": "BenchmarkTan",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 520.0,
+      "ops_per_sec": 1923076.92,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkTanh": {
+      "name": "BenchmarkTanh",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 390.0,
+      "ops_per_sec": 2564102.56,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkTrunc": {
+      "name": "BenchmarkTrunc",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 160.0,
+      "ops_per_sec": 6250000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkY0": {
+      "name": "BenchmarkY0",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 1050.0,
+      "ops_per_sec": 952380.95,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkY1": {
+      "name": "BenchmarkY1",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 750.0,
+      "ops_per_sec": 1333333.33,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkYn": {
+      "name": "BenchmarkYn",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 1150.0,
+      "ops_per_sec": 869565.22,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkFloat64bits": {
+      "name": "BenchmarkFloat64bits",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 220.0,
+      "ops_per_sec": 4545454.55,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkFloat64frombits": {
+      "name": "BenchmarkFloat64frombits",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 140.0,
+      "ops_per_sec": 7142857.14,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkFloat32bits": {
+      "name": "BenchmarkFloat32bits",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 240.0,
+      "ops_per_sec": 4166666.67,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkFloat32frombits": {
+      "name": "BenchmarkFloat32frombits",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 210.0,
+      "ops_per_sec": 4761904.76,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    },
+    "BenchmarkFMA": {
+      "name": "BenchmarkFMA",
+      "package": "math",
+      "iterations": 1,
+      "ns_per_op": 160.0,
+      "ops_per_sec": 6250000.0,
+      "mb_per_sec": 0.0,
+      "bytes_per_op": 0.0,
+      "allocs_per_op": 0.0
+    }
+  }
+}
