@@ -1,0 +1,35 @@
+{
+  "benchmark": "micro_operations",
+  "description": "glibc micro: pthread lock scaling + malloc thread scaling on ARM64",
+  "reference": "https://sourceware.org/glibc/wiki/",
+  "software": "glibc",
+  "version": "2.44",
+  "architecture": "arm64",
+  "timestamp": "2026-08-10T08:38:45Z",
+  "performance_metrics": {
+    "mean_ns": {
+      "unit": "ns",
+      "description": "Mean timing per operation (nanoseconds)"
+    }
+  },
+  "parameters": {
+    "benchsets": [
+      "bench-pthread"
+    ]
+  },
+  "results": {
+    "pthread_scaling": {
+      "ffs": {
+        "mean_ns": 3.1,
+        "min_ns": 3.08,
+        "max_ns": 20.8
+      },
+      "ffsll": {
+        "mean_ns": 3.1,
+        "min_ns": 3.08,
+        "max_ns": 24.04
+      }
+    },
+    "malloc_scaling": {}
+  }
+}

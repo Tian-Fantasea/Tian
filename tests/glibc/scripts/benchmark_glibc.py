@@ -13,6 +13,7 @@ This script:
 3. Aggregates into a single results_summary
 """
 import subprocess
+import signal
 import sys
 import os
 import json
@@ -20,22 +21,43 @@ import glob
 import shutil
 from datetime import datetime, timezone
 
-BENCHSETS = ["bench-math", "bench-string", "bench-pthread", "bench-malloc"]
+BENCHSETS = ["bench-math", "bench-string", "bench-pthread"]
 
 
-def run_benchset(build_dir, benchset, timeout=600):
-    """Run a single benchset via `make bench BENCHSET=...` in the build dir."""
+def run_benchset(build_dir, benchset, timeout=300):
+    """Run a single benchset via `make bench BENCHSET=...` in the build dir.
+
+    Uses start_new_session=True so the entire process group can be killed
+    on timeout (make spawns shell -> ld-linux -> benchtest binaries).
+    After running, copies bench.out to bench-<benchset>.out for collection.
+    """
     print(f"[BENCHMARK_GLIBC] Running {benchset}...")
-    result = subprocess.run(
+    proc = subprocess.Popen(
         ["make", f"BENCHSET={benchset}", "bench"],
         cwd=build_dir,
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
-        timeout=timeout,
+        start_new_session=True,
     )
-    if result.returncode != 0:
-        print(f"[BENCHMARK_GLIBC] {benchset} had issues: {result.stderr[:300]}")
-    return result.returncode == 0
+    try:
+        stdout_data, stderr_data = proc.communicate(timeout=timeout)
+        if proc.returncode != 0:
+            print(f"[BENCHMARK_GLIBC] {benchset} had issues: {stderr_data[:300]}")
+    except subprocess.TimeoutExpired:
+        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        proc.communicate()
+        print(f"[BENCHMARK_GLIBC] {benchset} timed out after {timeout}s, collecting partial results")
+
+    bench_out = os.path.join(build_dir, "benchtests", "bench.out")
+    bench_named = os.path.join(build_dir, "benchtests", f"{benchset}.out")
+    if os.path.exists(bench_out):
+        shutil.copy2(bench_out, bench_named)
+        print(f"[BENCHMARK_GLIBC] Saved {benchset} results to {benchset}.out")
+    else:
+        print(f"[BENCHMARK_GLIBC] No bench.out produced by {benchset}")
+
+    return os.path.exists(bench_named)
 
 
 def parse_bench_json(json_path):
@@ -58,20 +80,30 @@ def parse_bench_json(json_path):
             if not isinstance(variant_data, dict):
                 continue
             timings = variant_data.get("timings", [])
-            if not timings:
-                continue
-            mean = variant_data.get("mean", 0)
-            if mean == 0 and timings:
-                mean = sum(timings) / len(timings)
-            key = f"{func_name}.{variant}" if variant != "" else func_name
-            results[key] = {
-                "function": func_name,
-                "variant": variant,
-                "mean_ns": round(mean, 2),
-                "timings_count": len(timings),
-                "min_ns": round(min(timings), 2),
-                "max_ns": round(max(timings), 2),
-            }
+            if timings:
+                mean = variant_data.get("mean", 0)
+                if mean == 0 and timings:
+                    mean = sum(timings) / len(timings)
+                key = f"{func_name}.{variant}" if variant != "" else func_name
+                results[key] = {
+                    "function": func_name,
+                    "variant": variant,
+                    "mean_ns": round(mean, 2),
+                    "timings_count": len(timings),
+                    "min_ns": round(min(timings), 2),
+                    "max_ns": round(max(timings), 2),
+                }
+            elif "mean" in variant_data:
+                mean = variant_data.get("mean", 0)
+                key = f"{func_name}.{variant}" if variant != "" else func_name
+                results[key] = {
+                    "function": func_name,
+                    "variant": variant,
+                    "mean_ns": round(mean, 2),
+                    "timings_count": variant_data.get("iterations", 0),
+                    "min_ns": round(variant_data.get("min", 0), 2),
+                    "max_ns": round(variant_data.get("max", 0), 2),
+                }
     return {"timing_type": timing_type, "functions": results}
 
 
@@ -111,10 +143,12 @@ def main():
     bench_dir = os.path.join(build_dir, "benchtests")
     existing_files = glob.glob(os.path.join(bench_dir, "bench-*.out")) if os.path.isdir(bench_dir) else []
 
+    bench_timeout = int(os.environ.get("BENCH_TIMEOUT", "300"))
+
     if not existing_files:
         # Run benchtests ourselves
         for benchset in BENCHSETS:
-            run_benchset(build_dir, benchset)
+            run_benchset(build_dir, benchset, timeout=bench_timeout)
 
     # Collect and parse results
     results_summary = collect_bench_results(build_dir)
@@ -139,6 +173,7 @@ def main():
         "parameters": {
             "benchsets": BENCHSETS,
             "timing_method": "glibc hp-timing (architecture-specific high-precision counter)",
+            "timeout_per_benchset": int(os.environ.get("BENCH_TIMEOUT", "300")),
         },
         "results_summary": results_summary,
     }

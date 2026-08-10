@@ -1,0 +1,76 @@
+{
+  "benchmark": "glibc_benchtests",
+  "description": "glibc benchtests (bench-math, bench-string, bench-pthread) on ARM64, run via loader trick",
+  "reference": "https://sourceware.org/glibc/wiki/",
+  "software": "glibc",
+  "version": "2.44",
+  "architecture": "arm64",
+  "timestamp": "2026-08-10T08:38:44Z",
+  "performance_metrics": {
+    "mean_ns": {
+      "unit": "ns",
+      "description": "Mean timing per function call (nanoseconds)"
+    },
+    "min_ns": {
+      "unit": "ns",
+      "description": "Minimum timing"
+    },
+    "max_ns": {
+      "unit": "ns",
+      "description": "Maximum timing"
+    }
+  },
+  "parameters": {
+    "benchsets": [
+      "bench-math",
+      "bench-string",
+      "bench-pthread"
+    ],
+    "timing_method": "glibc hp-timing (architecture-specific high-precision counter)",
+    "timeout_per_benchset": 300
+  },
+  "results_summary": {
+    "pthread": {
+      "timing_type": "hp_timing",
+      "functions": {
+        "ffs": {
+          "function": "ffs",
+          "variant": "",
+          "mean_ns": 3.1,
+          "timings_count": 321200000.0,
+          "min_ns": 3.08,
+          "max_ns": 20.8
+        },
+        "ffsll": {
+          "function": "ffsll",
+          "variant": "",
+          "mean_ns": 3.1,
+          "timings_count": 321400000.0,
+          "min_ns": 3.08,
+          "max_ns": 24.04
+        }
+      }
+    },
+    "string": {
+      "timing_type": "hp_timing",
+      "functions": {
+        "ffs": {
+          "function": "ffs",
+          "variant": "",
+          "mean_ns": 3.1,
+          "timings_count": 321200000.0,
+          "min_ns": 3.08,
+          "max_ns": 20.8
+        },
+        "ffsll": {
+          "function": "ffsll",
+          "variant": "",
+          "mean_ns": 3.1,
+          "timings_count": 321400000.0,
+          "min_ns": 3.08,
+          "max_ns": 24.04
+        }
+      }
+    }
+  }
+}

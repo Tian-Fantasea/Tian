@@ -18,6 +18,7 @@ GLIBC_BUILD_DIR=""
 
 ITERATIONS="${ITERATIONS:-1}"
 MINIMUM_MEAN_NS="${MINIMUM_MEAN_NS:-0.1}"
+export BENCH_TIMEOUT="${BENCH_TIMEOUT:-300}"
 
 log() { local tag="$1"; shift; printf '[%s] %s\n' "$tag" "$*" | tee -a "${LOG_FILE}"; }
 
@@ -72,6 +73,11 @@ check_prerequisites() {
 
 phase1_build() {
     log "PHASE1" "=== Phase 1: Source Build glibc ${SOFTWARE_VERSION} (out-of-tree, NOT touching system) ==="
+    if [ -n "${GLIBC_BUILD_DIR}" ] && [ -d "${GLIBC_BUILD_DIR}" ]; then
+        log "PHASE1" "Reusing existing glibc build at ${GLIBC_BUILD_DIR}"
+        log "PHASE1" "Build phase complete (reused, system glibc untouched)"
+        return 0
+    fi
     create_build_tmpdir
     local SRC="${BUILD_TMPDIR}/glibc_src"
     local BUILD="${BUILD_TMPDIR}/build"
@@ -194,6 +200,8 @@ usage() {
     echo "Options: --check (prerequisites), -h|--help"
     echo "Env: SOFTWARE_VERSION (default: 2.44, tag glibc-2.44), ITERATIONS (default: 1)"
     echo "      MINIMUM_MEAN_NS (default: 0.1)"
+    echo "      BENCH_TIMEOUT (default: 300s per benchset)"
+    echo "      GLIBC_BUILD_DIR (set to reuse an existing build dir, skip compile)"
     echo "Note: Builds glibc to /tmp, system glibc NOT touched"
     echo "      make bench runs via loader trick (ld-linux --library-path)"
 }

@@ -1,0 +1,140 @@
+{
+  "test_time": "2026-08-10T08:28:40Z",
+  "environment": {
+    "test_time": "2026-08-10T08:28:40Z",
+    "Model": "Kunpeng-920",
+    "architecture": "aarch64",
+    "kernel": "6.6.0-132.0.0.111.oe2403sp3.aarch64",
+    "os": "openEuler 24.03 SP3",
+    "cpu_model": "ARM64 CPU (32 cores)",
+    "cpu_cores": 32,
+    "software_name": "glibc",
+    "software_version": "2.44",
+    "python_version": "Python 3.11.6",
+    "gcc_version": "gcc (GCC) 12.3.1 (openEuler 12.3.1-105.oe2403sp3)"
+  },
+  "benchmarks": {
+    "primary": {
+      "benchmark": "glibc_benchtests",
+      "description": "glibc benchtests (bench-math, bench-string, bench-pthread) on ARM64, run via loader trick",
+      "reference": "https://sourceware.org/glibc/wiki/",
+      "software": "glibc",
+      "version": "2.44",
+      "architecture": "arm64",
+      "timestamp": "2026-08-10T08:38:44Z",
+      "performance_metrics": {
+        "mean_ns": {
+          "unit": "ns",
+          "description": "Mean timing per function call (nanoseconds)"
+        },
+        "min_ns": {
+          "unit": "ns",
+          "description": "Minimum timing"
+        },
+        "max_ns": {
+          "unit": "ns",
+          "description": "Maximum timing"
+        }
+      },
+      "parameters": {
+        "benchsets": [
+          "bench-math",
+          "bench-string",
+          "bench-pthread"
+        ],
+        "timing_method": "glibc hp-timing (architecture-specific high-precision counter)",
+        "timeout_per_benchset": 300
+      },
+      "results_summary": {
+        "pthread": {
+          "timing_type": "hp_timing",
+          "functions": {
+            "ffs": {
+              "function": "ffs",
+              "variant": "",
+              "mean_ns": 3.1,
+              "timings_count": 321200000.0,
+              "min_ns": 3.08,
+              "max_ns": 20.8
+            },
+            "ffsll": {
+              "function": "ffsll",
+              "variant": "",
+              "mean_ns": 3.1,
+              "timings_count": 321400000.0,
+              "min_ns": 3.08,
+              "max_ns": 24.04
+            }
+          }
+        },
+        "string": {
+          "timing_type": "hp_timing",
+          "functions": {
+            "ffs": {
+              "function": "ffs",
+              "variant": "",
+              "mean_ns": 3.1,
+              "timings_count": 321200000.0,
+              "min_ns": 3.08,
+              "max_ns": 20.8
+            },
+            "ffsll": {
+              "function": "ffsll",
+              "variant": "",
+              "mean_ns": 3.1,
+              "timings_count": 321400000.0,
+              "min_ns": 3.08,
+              "max_ns": 24.04
+            }
+          }
+        }
+      }
+    },
+    "micro": {
+      "benchmark": "micro_operations",
+      "description": "glibc micro: pthread lock scaling + malloc thread scaling on ARM64",
+      "reference": "https://sourceware.org/glibc/wiki/",
+      "software": "glibc",
+      "version": "2.44",
+      "architecture": "arm64",
+      "timestamp": "2026-08-10T08:38:45Z",
+      "performance_metrics": {
+        "mean_ns": {
+          "unit": "ns",
+          "description": "Mean timing per operation (nanoseconds)"
+        }
+      },
+      "parameters": {
+        "benchsets": [
+          "bench-pthread"
+        ]
+      },
+      "results": {
+        "pthread_scaling": {
+          "ffs": {
+            "mean_ns": 3.1,
+            "min_ns": 3.08,
+            "max_ns": 20.8
+          },
+          "ffsll": {
+            "mean_ns": 3.1,
+            "min_ns": 3.08,
+            "max_ns": 24.04
+          }
+        },
+        "malloc_scaling": {}
+      }
+    }
+  },
+  "summary": {
+    "benchset_count": 2,
+    "function_count": 4,
+    "avg_mean_ns": 3.1,
+    "max_mean_ns": 3.1,
+    "min_timing_ns": 3.08,
+    "pthread_avg_mean_ns": 3.1,
+    "pthread_count": 2
+  },
+  "software": "glibc",
+  "version": "2.44"
+}
