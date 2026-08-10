@@ -65,29 +65,61 @@ phase1_build() {
     BOLT_SRC_DIR="${BUILD_TMPDIR}/bolt_src"
     BOLT_BUILD_DIR="${BUILD_TMPDIR}/build"
     log "PHASE1" "Cloning Bolt (main branch)..."
-    git clone --depth 1 https://github.com/bytedance/bolt.git "${BOLT_SRC_DIR}" 2>&1 | tee -a "${LOG_FILE}" || { log "ERROR" "Failed to clone Bolt"; return 1; }
+    if ! git clone --depth 1 https://github.com/bytedance/bolt.git "${BOLT_SRC_DIR}" >> "${LOG_FILE}" 2>&1; then
+        log "ERROR" "Failed to clone Bolt"
+        return 1
+    fi
     log "PHASE1" "Installing Conan (dependency manager)..."
-    pip3 install --break-system-packages conan 2>&1 | tee -a "${LOG_FILE}" || log "WARN" "conan install failed, trying without..."
+    pip3 install --break-system-packages conan >> "${LOG_FILE}" 2>&1 || log "WARN" "conan install failed, trying without..."
     log "PHASE1" "Running setup-dev-env.sh..."
     if [ -f "${BOLT_SRC_DIR}/scripts/setup-dev-env.sh" ]; then
-        (cd "${BOLT_SRC_DIR}" && bash scripts/setup-dev-env.sh 2>&1 | tee -a "${LOG_FILE}") || log "WARN" "setup-dev-env had issues, continuing..."
+        (cd "${BOLT_SRC_DIR}" && bash scripts/setup-dev-env.sh >> "${LOG_FILE}" 2>&1) || log "WARN" "setup-dev-env had issues, continuing..."
     fi
     log "PHASE1" "Building Bolt (make release, may take 10-30+ minutes)..."
-    (cd "${BOLT_SRC_DIR}" && make release BUILD_VERSION="${SOFTWARE_VERSION}" 2>&1 | tee -a "${LOG_FILE}") || {
+    local build_ok=0
+    if (cd "${BOLT_SRC_DIR}" && make release BUILD_VERSION="${SOFTWARE_VERSION}" >> "${LOG_FILE}" 2>&1); then
+        log "PHASE1" "make release succeeded"
+        build_ok=1
+    else
         log "WARN" "make release failed, trying cmake directly..."
         mkdir -p "${BOLT_BUILD_DIR}"
-        (cd "${BOLT_BUILD_DIR}" && cmake -DCMAKE_BUILD_TYPE=Release "${BOLT_SRC_DIR}" 2>&1 | tee -a "${LOG_FILE}") && \
-        (cd "${BOLT_BUILD_DIR}" && make -j$(nproc) 2>&1 | tee -a "${LOG_FILE}") || { log "ERROR" "Build failed"; return 1; }
-    }
-    # Find the build output directory
-    for dir in "${BOLT_SRC_DIR}/build" "${BOLT_SRC_DIR}/_build" "${BOLT_BUILD_DIR}" "${BOLT_SRC_DIR}/cmake-build-release"; do
-        if [ -d "${dir}" ] && find "${dir}" -name "*.a" -o -name "*.so" 2>/dev/null | head -1 | grep -q .; then
-            BOLT_BUILD_DIR="${dir}"
-            break
+        if (cd "${BOLT_BUILD_DIR}" && cmake -DCMAKE_BUILD_TYPE=Release "${BOLT_SRC_DIR}" >> "${LOG_FILE}" 2>&1) && \
+           (cd "${BOLT_BUILD_DIR}" && make -j$(nproc) >> "${LOG_FILE}" 2>&1); then
+            log "PHASE1" "cmake build succeeded"
+            build_ok=1
+        else
+            log "ERROR" "Both make release and cmake build failed"
+            return 1
+        fi
+    fi
+    # Search for build output directory with actual artifacts
+    BOLT_BUILD_DIR=""
+    for dir in "${BOLT_SRC_DIR}/build" "${BOLT_SRC_DIR}/_build" "${BUILD_TMPDIR}/build" "${BOLT_SRC_DIR}/cmake-build-release" "${BOLT_SRC_DIR}"; do
+        if [ -d "${dir}" ]; then
+            local found_libs
+            found_libs="$(find "${dir}" \( -name "*.a" -o -name "*.so" \) 2>/dev/null | head -1)"
+            if [ -n "${found_libs}" ]; then
+                BOLT_BUILD_DIR="${dir}"
+                log "PHASE1" "Build dir found: ${BOLT_BUILD_DIR} (has: $(basename "${found_libs}"))"
+                break
+            fi
         fi
     done
-    log "PHASE1" "Build dir: ${BOLT_BUILD_DIR}"
-    log "PHASE1" "Build phase complete"
+    if [ -z "${BOLT_BUILD_DIR}" ]; then
+        log "WARN" "No .a/.so files found in any build dir. Searching for any build output..."
+        for dir in "${BOLT_SRC_DIR}/build" "${BOLT_SRC_DIR}/_build" "${BUILD_TMPDIR}/build" "${BOLT_SRC_DIR}/cmake-build-release"; do
+            if [ -d "${dir}" ]; then
+                BOLT_BUILD_DIR="${dir}"
+                log "PHASE1" "Using build dir (no libs yet): ${BOLT_BUILD_DIR}"
+                break
+            fi
+        done
+    fi
+    if [ -z "${BOLT_BUILD_DIR}" ]; then
+        BOLT_BUILD_DIR="${BOLT_SRC_DIR}"
+        log "WARN" "No dedicated build dir found, using source dir as fallback: ${BOLT_BUILD_DIR}"
+    fi
+    log "PHASE1" "Build phase complete (build_ok=${build_ok}, build_dir=${BOLT_BUILD_DIR})"
 }
 phase2_verify() {
     log "PHASE2" "=== Phase 2: Collect Version Info ==="
