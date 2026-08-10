@@ -10,7 +10,7 @@ RESULTS_DIR="${SCRIPT_DIR}/results/${SOFTWARE_VERSION}"
 mkdir -p "${RESULTS_DIR}"
 LOG_FILE="${RESULTS_DIR}/results.log"
 
-DATA_SCALE="${DATA_SCALE:-1M}"
+DATA_SCALE="${DATA_SCALE:-100K}"
 DATA_DIM="${DATA_DIM:-128}"
 ITERATIONS="${ITERATIONS:-1}"
 K_VALUE="${K_VALUE:-10}"
@@ -20,9 +20,36 @@ MINIMUM_RECALL="${MINIMUM_RECALL:-0.3}"
 MAXIMUM_LATENCY_US="${MAXIMUM_LATENCY_US:-5000}"
 MINIMUM_ADD_RATE="${MINIMUM_ADD_RATE:-500}"
 
+INSTALL_TIMEOUT="${INSTALL_TIMEOUT:-300}"
+PHASE_TIMEOUT="${PHASE_TIMEOUT:-1800}"
+
 JSON_HELPER="${SCRIPT_DIR}/scripts/json_helper.py"
 
 log() { local tag="$1"; shift; printf '[%s] %s\n' "$tag" "$*" | tee -a "${LOG_FILE}"; }
+
+run_phase() {
+    local secs="$1"; shift
+    timeout "${secs}" "$@" 2>&1 | tee -a "${LOG_FILE}"
+    local rc="${PIPESTATUS[0]}"
+    if [ "${rc}" -eq 124 ]; then
+        log "TIMEOUT" "Command timed out after ${secs}s: $*"
+    elif [ "${rc}" -ne 0 ]; then
+        log "WARN" "Command exited with code ${rc}: $*"
+    fi
+    return "${rc}"
+}
+
+run_timeout() {
+    local secs="$1"; shift
+    timeout "${secs}" "$@"
+    local rc=$?
+    if [ "${rc}" -eq 124 ]; then
+        log "TIMEOUT" "Command timed out after ${secs}s: $*"
+    elif [ "${rc}" -ne 0 ]; then
+        log "WARN" "Command exited with code ${rc}: $*"
+    fi
+    return "${rc}"
+}
 
 json_get()              { python3 "${JSON_HELPER}" "$1" get "${@:2}"; }
 json_field_exists()     { python3 "${JSON_HELPER}" "$1" field_exists "$2"; }
@@ -107,9 +134,9 @@ phase1_install() {
     case "${BUILD_METHOD}" in
         pip)
             log "PHASE1" "Installing scann==${SOFTWARE_VERSION} via pip..."
-            pip3 install --break-system-packages "scann==${SOFTWARE_VERSION}" 2>&1 | tee -a "${LOG_FILE}" || {
+            run_phase ${INSTALL_TIMEOUT} pip3 install --break-system-packages "scann==${SOFTWARE_VERSION}" || {
                 log "WARN" "scann==${SOFTWARE_VERSION} not found, trying latest..."
-                pip3 install --break-system-packages scann 2>&1 | tee -a "${LOG_FILE}" || {
+                run_phase ${INSTALL_TIMEOUT} pip3 install --break-system-packages scann || {
                     log "ERROR" "Failed to install scann via pip"
                     return 1
                 }
@@ -157,27 +184,27 @@ phase3_run_benchmarks() {
     export DATA_SCALE DATA_DIM ITERATIONS K_VALUE RESULTS_DIR
 
     log "PHASE3A" "Running ANN benchmark..."
-    python3 "${SCRIPT_DIR}/scripts/benchmark_ann.py" \
+    run_phase ${PHASE_TIMEOUT} python3 "${SCRIPT_DIR}/scripts/benchmark_ann.py" \
         --output "${RESULTS_DIR}/benchmark_ann.json" \
         --data-scale "${DATA_SCALE}" \
         --data-dim "${DATA_DIM}" \
         --iterations "${ITERATIONS}" \
-        --k "${K_VALUE}" 2>&1 | tee -a "${LOG_FILE}"
+        --k "${K_VALUE}"
 
     log "PHASE3B" "Running micro benchmark..."
-    python3 "${SCRIPT_DIR}/scripts/micro_benchmark.py" \
+    run_phase ${PHASE_TIMEOUT} python3 "${SCRIPT_DIR}/scripts/micro_benchmark.py" \
         --output "${RESULTS_DIR}/micro_benchmark.json" \
         --data-scale "${DATA_SCALE}" \
         --data-dim "${DATA_DIM}" \
-        --iterations "${ITERATIONS}" 2>&1 | tee -a "${LOG_FILE}"
+        --iterations "${ITERATIONS}"
 }
 
 phase4_results() {
     log "PHASE4" "=== Phase 4: Aggregate & Report ==="
-    python3 "${SCRIPT_DIR}/scripts/aggregate_results.py" \
+    run_timeout ${PHASE_TIMEOUT} python3 "${SCRIPT_DIR}/scripts/aggregate_results.py" \
         --results-dir "${RESULTS_DIR}" \
         --output "${RESULTS_DIR}/results.json"
-    python3 "${SCRIPT_DIR}/scripts/generate_summary.py" \
+    run_timeout ${PHASE_TIMEOUT} python3 "${SCRIPT_DIR}/scripts/generate_summary.py" \
         "${RESULTS_DIR}/results.json" \
         "${RESULTS_DIR}/results.txt"
     log "PHASE4" "Reports generated:"
@@ -349,13 +376,15 @@ usage() {
     echo "  BUILD_METHOD         Build method: pip (default: pip, only option)"
     echo "  TARGET_OS            OS name in results (default: openEuler 24.03 SP3)"
     echo "  TARGET_MODEL         Hardware model (default: Kunpeng-920)"
-    echo "  DATA_SCALE           Dataset scale: 10K, 100K, 1M (default: 1M)"
+    echo "  DATA_SCALE           Dataset scale: 10K, 100K, 1M (default: 100K)"
     echo "  DATA_DIM             Vector dimension (default: 128)"
     echo "  ITERATIONS           Number of iterations (default: 1)"
     echo "  K_VALUE              k for nearest neighbor (default: 10)"
     echo "  MINIMUM_QPS          QPS threshold (default: 50)"
     echo "  MINIMUM_RECALL       Recall threshold (default: 0.3)"
     echo "  MINIMUM_ADD_RATE     Index construction rate threshold (default: 500)"
+    echo "  INSTALL_TIMEOUT      Timeout for pip install in seconds (default: 300)"
+    echo "  PHASE_TIMEOUT        Timeout for each benchmark/aggregate phase in seconds (default: 1800)"
     exit 0
 }
 

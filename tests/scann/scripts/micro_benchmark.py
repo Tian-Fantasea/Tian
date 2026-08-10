@@ -38,11 +38,11 @@ OPS = {
 def build_searcher(xb, d, n, k=10):
     num_leaves = max(100, n // 100)
     searcher = (
-        scann.scann_ops_pybind.builder(xb, num_neighbors=k, distance_type="squared_l2")
-        .tree(num_leaves=num_leaves)
+        scann.scann_ops_pybind.builder(xb, num_neighbors=k, distance_measure="squared_l2")
+        .tree(num_leaves=num_leaves, num_leaves_to_search=num_leaves)
         .score_ah(2, anisotropic_quantization_threshold=0.2)
         .reorder(max(k, 100))
-        .create_py_searcher()
+        .build()
     )
     return searcher, num_leaves
 
@@ -72,7 +72,7 @@ def bench_batch_search_multithread(searcher, xq, k, nq, iterations=3):
         thread_results = []
         for i in range(iterations):
             start = time.time()
-            searcher.search_batch(xq, final_num_neighbors=k, leaves_to_search=100)
+            searcher.search_batched(xq, final_num_neighbors=k, leaves_to_search=100)
             elapsed = time.time() - start
             qps = nq / elapsed if elapsed > 0 else 0
             thread_results.append({"time_s": elapsed, "qps": round(qps, 2)})
@@ -87,12 +87,16 @@ def bench_leaves_parameter_sweep(searcher, xb, d, n, k=10, iterations=3):
     np.random.seed(123)
     xq = np.float32(np.random.random((nq, d)))
 
+    xb_sq = np.einsum('ij,ij->i', xb, xb)
     gt_I = np.zeros((nq, k), dtype=np.int64)
     chunk = 1000
     for i in range(0, nq, chunk):
         end = min(i + chunk, nq)
-        dists = np.sum((xq[i:end].reshape(end - i, 1, -1) - xb.reshape(1, n, -1)) ** 2, axis=2)
-        gt_I[i:end] = np.argsort(dists, axis=1)[:, :k]
+        xq_chunk = xq[i:end]
+        dots = np.dot(xq_chunk, xb.T)
+        dists = xb_sq[None, :] + np.einsum('ij,ij->i', xq_chunk, xq_chunk)[:, None] - 2.0 * dots
+        np.maximum(dists, 0, out=dists)
+        gt_I[i:end] = np.argpartition(dists, k, axis=1)[:, :k]
 
     leaves_values = [10, 20, 50, 100, 200, 500, 1000]
     sweep_results = {}
@@ -100,7 +104,7 @@ def bench_leaves_parameter_sweep(searcher, xb, d, n, k=10, iterations=3):
         runs = []
         for i in range(iterations):
             start = time.time()
-            neighbors, dists = searcher.search_batch(
+            neighbors, dists = searcher.search_batched(
                 xq, final_num_neighbors=k, leaves_to_search=leaves
             )
             elapsed = time.time() - start
@@ -117,17 +121,21 @@ def bench_leaves_parameter_sweep(searcher, xb, d, n, k=10, iterations=3):
 
 
 def bench_serialization(searcher, iterations=3):
+    import tempfile
+    import shutil
     results = []
     try:
         for i in range(iterations):
+            tmpdir = tempfile.mkdtemp(prefix="scann_ser_")
             ser_start = time.time()
-            serialized = searcher.serialize()
+            searcher.serialize(tmpdir)
             ser_time = time.time() - ser_start
-            ser_size = len(serialized)
+            ser_size = sum(os.path.getsize(os.path.join(tmpdir, f)) for f in os.listdir(tmpdir))
 
             deser_start = time.time()
-            scann.scann_ops_pybind.searcher(serialized)
+            scann.scann_ops_pybind.load_searcher(tmpdir)
             deser_time = time.time() - deser_start
+            shutil.rmtree(tmpdir, ignore_errors=True)
 
             results.append({
                 "save_time_s": round(ser_time, 4),

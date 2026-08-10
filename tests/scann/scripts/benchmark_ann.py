@@ -40,13 +40,16 @@ def generate_data(n, d, distance, seed=42):
 
 def compute_ground_truth_l2(xb, xq, k):
     nq = xq.shape[0]
-    nb = xb.shape[0]
     gt_I = np.zeros((nq, k), dtype=np.int64)
-    chunk = min(100, nq)
+    xb_sq = np.einsum('ij,ij->i', xb, xb)
+    chunk = min(1000, nq)
     for i in range(0, nq, chunk):
         end = min(i + chunk, nq)
-        dists = np.sum((xq[i:end].reshape(end - i, 1, -1) - xb.reshape(1, nb, -1)) ** 2, axis=2)
-        gt_I[i:end] = np.argsort(dists, axis=1)[:, :k]
+        dots = np.dot(xq[i:end], xb.T)
+        dists = xb_sq[None, :] + np.einsum('ij,ij->i', xq[i:end], xq[i:end])[:, None] - 2.0 * dots
+        np.maximum(dists, 0, out=dists)
+        part = np.argpartition(dists, k, axis=1)[:, :k]
+        gt_I[i:end] = part
     return gt_I
 
 
@@ -57,7 +60,8 @@ def compute_ground_truth_ip(xb, xq, k):
     for i in range(0, nq, chunk):
         end = min(i + chunk, nq)
         sims = np.dot(xq[i:end], xb.T)
-        gt_I[i:end] = np.argsort(-sims, axis=1)[:, :k]
+        part = np.argpartition(-sims, k, axis=1)[:, :k]
+        gt_I[i:end] = part
     return gt_I
 
 
@@ -79,14 +83,14 @@ def benchmark_index(config_name, config, xb, xq, d, k, iterations, gt_I):
     for iteration in range(iterations):
         print(f'[ANN] {config_name} iteration {iteration+1}/{iterations}')
 
-        builder = scann.scann_ops_pybind.builder(xb, num_neighbors=k, distance_type=distance)
+        builder = scann.scann_ops_pybind.builder(xb, num_neighbors=k, distance_measure=distance)
         build_start = time.time()
         searcher = (
             builder
-            .tree(num_leaves=num_leaves)
+            .tree(num_leaves=num_leaves, num_leaves_to_search=num_leaves)
             .score_ah(2, anisotropic_quantization_threshold=0.2)
             .reorder(max(k, 100))
-            .create_py_searcher()
+            .build()
         )
         build_time = time.time() - build_start
 
@@ -94,7 +98,7 @@ def benchmark_index(config_name, config, xb, xq, d, k, iterations, gt_I):
         for leaves in LEAVES_TO_SEARCH_VALUES:
             actual_leaves = min(leaves, num_leaves)
             search_start = time.time()
-            neighbors, distances = searcher.search_batch(
+            neighbors, distances = searcher.search_batched(
                 xq, final_num_neighbors=k, leaves_to_search=actual_leaves
             )
             search_time = time.time() - search_start
