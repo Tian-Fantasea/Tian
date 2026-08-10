@@ -9,11 +9,13 @@ import time
 import signal
 from datetime import datetime, timezone
 
+REDIS_CLI = os.environ.get("REDIS_CLI_BIN", "redis-cli")
+
 COMMANDS = ["SET", "GET", "INCR", "LPUSH", "LRANGE_100", "SADD", "HSET", "ZADD"]
 CONCURRENCY_LEVELS = [1, 10, 50, 100, 200]
 
 STATS_RE = re.compile(
-    r'"([A-Z_0-9]+)","\[.*?\]",\s*([\d.]+),\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)'
+    r'"([A-Z_0-9]+)[^"]*","([\d.]+)","([\d.]+)","[\d.]+","[\d.]+","[\d.]+","([\d.]+)","[\d.]+"'
 )
 SIMPLE_RE = re.compile(
     r'([A-Z_0-9]+):\s*([\d.]+)\s+requests per second'
@@ -40,7 +42,7 @@ def start_redis_server(redis_server_bin, port, db_path, extra_args=None):
         print(f"[BENCHMARK_REDIS] Failed to start redis-server: {result.stderr}")
         return False
     for _ in range(20):
-        r = subprocess.run(["redis-cli", "-p", str(port), "PING"],
+        r = subprocess.run([REDIS_CLI, "-p", str(port), "PING"],
                            capture_output=True, text=True, timeout=2)
         if r.returncode == 0 and "PONG" in r.stdout:
             return True
@@ -50,7 +52,7 @@ def start_redis_server(redis_server_bin, port, db_path, extra_args=None):
 
 
 def stop_redis_server(port):
-    subprocess.run(["redis-cli", "-p", str(port), "SHUTDOWN", "NOSAVE"],
+    subprocess.run([REDIS_CLI, "-p", str(port), "SHUTDOWN", "NOSAVE"],
                    capture_output=True, text=True, timeout=5)
     time.sleep(1)
 
@@ -83,13 +85,13 @@ def run_redis_benchmark(redis_bench_bin, port, command, concurrency, data_size=N
 
 
 def parse_bench_output(text, command):
-    m = STATS_RE.search(text)
-    if m:
-        return {
-            "qps": float(m.group(2)),
-            "avg_latency_ms": float(m.group(3)),
-            "p99_latency_ms": float(m.group(5)),
-        }
+    for m in STATS_RE.finditer(text):
+        if m.group(1) == command:
+            return {
+                "qps": float(m.group(2)),
+                "avg_latency_ms": float(m.group(3)),
+                "p99_latency_ms": float(m.group(4)),
+            }
     m2 = SIMPLE_RE.search(text)
     if m2:
         return {"qps": float(m2.group(2)), "avg_latency_ms": 0, "p99_latency_ms": 0}

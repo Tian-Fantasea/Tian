@@ -16,6 +16,8 @@ BUILD_TMPDIR=""
 SHUNIT2_PATH=""
 REDIS_SERVER_BIN=""
 REDIS_BENCH_BIN=""
+REDIS_CLI_BIN=""
+export REDIS_CLI_BIN
 
 ITERATIONS="${ITERATIONS:-1}"
 
@@ -90,16 +92,21 @@ phase1_build() {
 
     REDIS_SERVER_BIN="${SRC}/src/redis-server"
     REDIS_BENCH_BIN="${SRC}/src/redis-benchmark"
+    REDIS_CLI_BIN="${SRC}/src/redis-cli"
     if [ ! -x "${REDIS_SERVER_BIN}" ]; then
         REDIS_SERVER_BIN="$(find "${SRC}" -name redis-server -type f -executable 2>/dev/null | head -1)"
     fi
     if [ ! -x "${REDIS_BENCH_BIN}" ]; then
         REDIS_BENCH_BIN="$(find "${SRC}" -name redis-benchmark -type f -executable 2>/dev/null | head -1)"
     fi
-    if [ ! -x "${REDIS_SERVER_BIN}" ] || [ ! -x "${REDIS_BENCH_BIN}" ]; then
-        log "ERROR" "redis-server or redis-benchmark not found after build"
+    if [ ! -x "${REDIS_CLI_BIN}" ]; then
+        REDIS_CLI_BIN="$(find "${SRC}" -name redis-cli -type f -executable 2>/dev/null | head -1)"
+    fi
+    if [ ! -x "${REDIS_SERVER_BIN}" ] || [ ! -x "${REDIS_BENCH_BIN}" ] || [ ! -x "${REDIS_CLI_BIN}" ]; then
+        log "ERROR" "redis-server, redis-benchmark or redis-cli not found after build"
         return 1
     fi
+    log "PHASE1" "redis-cli found at ${REDIS_CLI_BIN}"
 
     log "PHASE1" "Verifying redis-server..."
     "${REDIS_SERVER_BIN}" --version 2>&1 | tee -a "${LOG_FILE}" | head -1 || log "WARN" "version check failed"
