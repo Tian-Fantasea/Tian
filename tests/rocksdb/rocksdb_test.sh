@@ -75,9 +75,9 @@ phase1_build() {
     local os_id_lower; os_id_lower="$(echo "${os_id}" | tr '[:upper:]' '[:lower:]')"
     log "PHASE1" "Preparing env on ${os_id}..."
     case "${os_id_lower}" in
-        ubuntu|debian) sudo apt-get update -qq 2>&1 | tee -a "${LOG_FILE}" >/dev/null; sudo apt-get install -y -qq build-essential g++ cmake make git 2>&1 | tee -a "${LOG_FILE}" >/dev/null ;;
-        openeuler) sudo dnf install -y gcc gcc-c++ cmake make git 2>&1 | tee -a "${LOG_FILE}" >/dev/null ;;
-        centos|rhel|fedora) sudo dnf install -y gcc gcc-c++ cmake make git 2>&1 | tee -a "${LOG_FILE}" >/dev/null ;;
+        ubuntu|debian) sudo apt-get update -qq 2>&1 | tee -a "${LOG_FILE}" >/dev/null; sudo apt-get install -y -qq build-essential g++ cmake make git libgflags-dev libsnappy-dev libzstd-dev zlib1g-dev libatomic1 2>&1 | tee -a "${LOG_FILE}" >/dev/null ;;
+        openeuler) sudo dnf install -y gcc gcc-c++ cmake make git gflags gflags-devel snappy snappy-devel zstd-devel zlib-devel libatomic 2>&1 | tee -a "${LOG_FILE}" >/dev/null ;;
+        centos|rhel|fedora) sudo dnf install -y gcc gcc-c++ cmake make git gflags gflags-devel snappy snappy-devel zstd-devel zlib-devel libatomic 2>&1 | tee -a "${LOG_FILE}" >/dev/null ;;
         *) log "WARN" "Unknown OS: ${os_id}, generic build..." ;;
     esac
 
@@ -88,10 +88,10 @@ phase1_build() {
 
     log "PHASE1" "Configuring CMake..."
     mkdir -p "${BUILD}"
-    (cd "${BUILD}" && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${BUILD_TMPDIR}/install" "${SRC}" 2>&1 | tee -a "${LOG_FILE}") || { log "ERROR" "cmake failed"; return 1; }
+    (cd "${BUILD}" && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${BUILD_TMPDIR}/install" -DFAIL_ON_WARNINGS=OFF -DWITH_SNAPPY=ON -DWITH_ZSTD=ON -DWITH_ZLIB=ON "${SRC}" 2>&1 | tee -a "${LOG_FILE}") || { log "ERROR" "cmake failed"; return 1; }
 
-    log "PHASE1" "Compiling RocksDB..."
-    (cd "${BUILD}" && make -j$(nproc) 2>&1 | tee -a "${LOG_FILE}") || { log "ERROR" "make failed"; return 1; }
+    log "PHASE1" "Compiling RocksDB (db_bench target)..."
+    (cd "${BUILD}" && make -j$(nproc) db_bench 2>&1 | tee -a "${LOG_FILE}") || { log "ERROR" "make failed"; return 1; }
 
     log "PHASE1" "Finding db_bench binary..."
     BENCHMARK_BIN="${BUILD}/tools/db_bench"

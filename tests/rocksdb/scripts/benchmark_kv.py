@@ -12,7 +12,7 @@ WORKLOADS = ["fillseq", "readrandom", "overwrite", "readwhilewriting"]
 
 BENCH_RE = re.compile(
     r"(\w+)\s*:\s*([\d.]+)\s*micros/op\s+([\d.]+)\s+ops/sec"
-    r"(?:;[\s]*([\d.]+)\s*MB/s)?"
+    r"(?:.*?([\d.]+)\s*MB/s)?"
 )
 
 
