@@ -80,11 +80,21 @@ phase1_build() {
     local os_id_lower; os_id_lower="$(echo "${os_id}" | tr '[:upper:]' '[:lower:]')"
     local ver_tag="glibc-${SOFTWARE_VERSION}"
     [ "${SOFTWARE_VERSION:0:6}" = "glibc-" ] && ver_tag="${SOFTWARE_VERSION}"
-    log "PHASE1" "Cloning glibc tag ${ver_tag}..."
-    git clone --branch "${ver_tag}" --depth 1 https://sourceware.org/git/glibc.git "${SRC}" 2>&1 | tee -a "${LOG_FILE}" || {
-        log "WARN" "sourceware clone failed, trying GitHub mirror..."
-        git clone --branch "${ver_tag}" --depth 1 https://github.com/bminor/glibc.git "${SRC}" 2>&1 | tee -a "${LOG_FILE}" || { log "ERROR" "Failed to clone glibc"; return 1; }
-    }
+    local tarball="glibc-${SOFTWARE_VERSION}.tar.xz"
+    log "PHASE1" "Downloading glibc ${SOFTWARE_VERSION} tarball from GNU FTP..."
+    (cd "${BUILD_TMPDIR}" && curl -sL -o "${tarball}" "https://ftp.gnu.org/gnu/glibc/${tarball}" 2>&1 | tee -a "${LOG_FILE}") || \
+        wget -q -O "${BUILD_TMPDIR}/${tarball}" "https://ftp.gnu.org/gnu/glibc/${tarball}" 2>&1 | tee -a "${LOG_FILE}"
+    if [ -f "${BUILD_TMPDIR}/${tarball}" ]; then
+        log "PHASE1" "Extracting tarball..."
+        (cd "${BUILD_TMPDIR}" && tar xJf "${tarball}" 2>&1 | tee -a "${LOG_FILE}") && SRC="${BUILD_TMPDIR}/glibc-${SOFTWARE_VERSION}"
+    fi
+    if [ ! -d "${SRC}" ]; then
+        log "WARN" "tarball download failed, trying git clone from GitHub mirror..."
+        git clone --branch "${ver_tag}" --depth 1 https://github.com/bminor/glibc.git "${SRC}" >> "${LOG_FILE}" 2>&1 || {
+            log "WARN" "GitHub mirror failed, trying sourceware.org..."
+            git clone --branch "${ver_tag}" --depth 1 https://sourceware.org/git/glibc.git "${SRC}" >> "${LOG_FILE}" 2>&1 || { log "ERROR" "Failed to download glibc"; return 1; }
+        }
+    fi
     log "PHASE1" "Configuring (out-of-tree build)..."
     mkdir -p "${BUILD}"
     (cd "${BUILD}" && "${SRC}/configure" --prefix="${INSTALL}" --disable-werror --enable-kernel=6.6 2>&1 | tee -a "${LOG_FILE}") || { log "ERROR" "configure failed"; return 1; }
