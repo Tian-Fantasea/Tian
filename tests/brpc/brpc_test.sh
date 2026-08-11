@@ -74,7 +74,7 @@ phase1_build() {
     fi
     log "PHASE1" "Configuring CMake..."
     mkdir -p "${BUILD}"
-    if ! (cd "${BUILD}" && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_BRPC_TOOLS=ON -DBUILD_BRPC_EXAMPLES=ON "${SRC}" >> "${LOG_FILE}" 2>&1); then
+    if ! (cd "${BUILD}" && cmake -DCMAKE_BUILD_TYPE=Release "${SRC}" >> "${LOG_FILE}" 2>&1); then
         log "ERROR" "cmake failed (check protobuf version compatibility)"
         return 1
     fi
@@ -83,21 +83,62 @@ phase1_build() {
         log "ERROR" "make failed"
         return 1
     fi
-    log "PHASE1" "Finding echo_s++ and echo_c++ binaries..."
-    ECHO_SERVER_BIN="$(find "${BUILD}" -name "echo_s++" -o -name "echo_server" 2>/dev/null | head -1)"
-    ECHO_CLIENT_BIN="$(find "${BUILD}" -name "echo_c++" -o -name "echo_client" 2>/dev/null | head -1)"
-    if [ -z "${ECHO_SERVER_BIN}" ]; then
-        log "WARN" "echo_s++ not found in build, trying to build example..."
-        (cd "${BUILD}" && make echo_s++ echo_c++ >> "${LOG_FILE}" 2>&1) || true
-        ECHO_SERVER_BIN="$(find "${BUILD}" -name "echo_s++" -o -name "echo_server" 2>/dev/null | head -1)"
-        ECHO_CLIENT_BIN="$(find "${BUILD}" -name "echo_c++" -o -name "echo_client" 2>/dev/null | head -1)"
-    fi
-    if [ -z "${ECHO_SERVER_BIN}" ] || [ -z "${ECHO_CLIENT_BIN}" ]; then
-        log "ERROR" "echo_s++ or echo_c++ not found after build"
+    # Find libbrpc
+    local LIBBRPC=""
+    LIBBRPC="$(find "${BUILD}" -name "libbrpc.a" -o -name "libbrpc.so" 2>/dev/null | head -1)"
+    if [ -z "${LIBBRPC}" ]; then
+        log "ERROR" "libbrpc not found after build"
         return 1
     fi
-    log "PHASE1" "echo_s++: ${ECHO_SERVER_BIN}"
-    log "PHASE1" "echo_c++: ${ECHO_CLIENT_BIN}"
+    log "PHASE1" "libbrpc found: ${LIBBRPC}"
+    local LIB_DIR; LIB_DIR="$(dirname "${LIBBRPC}")"
+    # Find echo example source files
+    local ECHO_SERVER_SRC="${SRC}/example/echo_c++/server.cpp"
+    local ECHO_CLIENT_SRC="${SRC}/example/echo_c++/client.cpp"
+    # Try alternate paths
+    [ ! -f "${ECHO_SERVER_SRC}" ] && ECHO_SERVER_SRC="$(find "${SRC}/example" -name "server.cpp" -o -name "echo_server.cpp" 2>/dev/null | head -1)"
+    [ ! -f "${ECHO_CLIENT_SRC}" ] && ECHO_CLIENT_SRC="$(find "${SRC}/example" -name "client.cpp" -o -name "echo_client.cpp" 2>/dev/null | head -1)"
+    # Build echo binaries
+    ECHO_SERVER_BIN="${BUILD}/echo_server"
+    ECHO_CLIENT_BIN="${BUILD}/echo_client"
+    local INC_FLAGS="-I${SRC}/src -I${BUILD} -I${SRC}/test"
+    # Add protobuf include paths
+    for inc in $(pkg-config --cflags protobuf 2>/dev/null); do INC_FLAGS="${INC_FLAGS} ${inc}"; done
+    for inc in $(pkg-config --cflags gflags 2>/dev/null); do INC_FLAGS="${INC_FLAGS} ${inc}"; done
+    local LIB_FLAGS="-L${LIB_DIR} -lbrpc"
+    for lib in $(pkg-config --libs protobuf gflags leveldb openssl 2>/dev/null); do LIB_FLAGS="${LIB_FLAGS} ${lib}"; done
+    LIB_FLAGS="${LIB_FLAGS} -lssl -lcrypto -lz -lpthread"
+    log "PHASE1] Building echo_server from ${ECHO_SERVER_SRC}..."
+    if g++ -O2 -std=c++11 ${INC_FLAGS} "${ECHO_SERVER_SRC}" ${LIB_FLAGS} -o "${ECHO_SERVER_BIN}" >> "${LOG_FILE}" 2>&1; then
+        log "PHASE1" "echo_server built: ${ECHO_SERVER_BIN}"
+    else
+        log "WARN" "echo_server build failed, trying cmake target..."
+        (cd "${BUILD}" && cmake --build . --target echo_server 2>/dev/null || cmake --build . --target echo_s++ 2>/dev/null) >> "${LOG_FILE}" 2>&1 || true
+        ECHO_SERVER_BIN="$(find "${BUILD}" -name "echo_s++" -o -name "echo_server" -type f -executable 2>/dev/null | head -1)"
+    fi
+    log "PHASE1] Building echo_client from ${ECHO_CLIENT_SRC}..."
+    if g++ -O2 -std=c++11 ${INC_FLAGS} "${ECHO_CLIENT_SRC}" ${LIB_FLAGS} -o "${ECHO_CLIENT_BIN}" >> "${LOG_FILE}" 2>&1; then
+        log "PHASE1" "echo_client built: ${ECHO_CLIENT_BIN}"
+    else
+        log "WARN" "echo_client build failed, trying cmake target..."
+        (cd "${BUILD}" && cmake --build . --target echo_client 2>/dev/null || cmake --build . --target echo_c++ 2>/dev/null) >> "${LOG_FILE}" 2>&1 || true
+        ECHO_CLIENT_BIN="$(find "${BUILD}" -name "echo_c++" -o -name "echo_client" -type f -executable 2>/dev/null | head -1)"
+    fi
+    log "PHASE1] Compiling brpc (may take a few minutes)..."
+    if ! (cd "${BUILD}" && make -j$(nproc) >> "${LOG_FILE}" 2>&1); then
+        log "ERROR" "make failed"
+        return 1
+    fi
+    if [ -z "${ECHO_SERVER_BIN}" ] || [ ! -x "${ECHO_SERVER_BIN}" ]; then
+        log "ERROR" "echo_server not built"
+        return 1
+    fi
+    if [ -z "${ECHO_CLIENT_BIN}" ] || [ ! -x "${ECHO_CLIENT_BIN}" ]; then
+        log "ERROR" "echo_client not built"
+        return 1
+    fi
+    log "PHASE1" "echo_server: ${ECHO_SERVER_BIN}"
+    log "PHASE1" "echo_client: ${ECHO_CLIENT_BIN}"
     log "PHASE1" "Build phase complete"
 }
 phase2_verify() {
