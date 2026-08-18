@@ -143,18 +143,18 @@ def main():
     spreadsheet_id = os.environ.get("SPREADSHEET_ID", DEFAULT_SPREADSHEET_ID)
     sheet_gid = int(os.environ.get("SHEET_GID", str(DEFAULT_SHEET_GID)))
 
-    # --- Step 1: Cleanup duplicates ---
-    print("Step 1: Cleaning up duplicate rows...")
-    cleanup_payload = {
-        "mode": "cleanup",
+    # --- Step 1: Delete auto-added rows (keep original data only) ---
+    print("Step 1: Deleting auto-added rows...")
+    delete_payload = {
+        "mode": "delete_auto",
         "spreadsheet_id": spreadsheet_id,
         "sheet_gid": sheet_gid,
     }
     try:
-        cleanup_result = send_to_apps_script(apps_script_url, cleanup_payload)
-        print(f"  Deleted: {cleanup_result.get('deleted', '?')} duplicates, remaining: {cleanup_result.get('remaining', '?')}")
+        delete_result = send_to_apps_script(apps_script_url, delete_payload)
+        print(f"  Deleted: {delete_result.get('deleted', '?')} auto rows, remaining: {delete_result.get('remaining', '?')}")
     except Exception as e:
-        print(f"  Cleanup warning: {e}")
+        print(f"  Delete warning: {e}")
 
     # --- Step 2: Fetch OPEN issues from GitHub ---
     print("\nStep 2: Fetching open issues from GitHub...")
