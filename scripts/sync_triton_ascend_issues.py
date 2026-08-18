@@ -78,8 +78,8 @@ def _gh_request(url: str, headers: dict, params: dict | None = None) -> requests
     return resp
 
 
-def fetch_all_issues(token: str = "") -> list[dict]:
-    """Fetch all issues (open + closed, excluding PRs) from triton-ascend."""
+def fetch_open_issues(token: str = "") -> list[dict]:
+    """Fetch all OPEN issues (excluding PRs) from triton-ascend."""
     headers = {"Accept": "application/vnd.github+json"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -89,7 +89,7 @@ def fetch_all_issues(token: str = "") -> list[dict]:
     while True:
         url = f"{GITHUB_API_BASE}/repos/{GITHUB_REPO}/issues"
         params = {
-            "state": "all",
+            "state": "open",
             "per_page": 100,
             "page": page,
             "sort": "created",
@@ -106,6 +106,20 @@ def fetch_all_issues(token: str = "") -> list[dict]:
         page += 1
 
     return issues
+
+
+def fetch_issue(number: int, token: str = "") -> dict | None:
+    """Fetch a single issue by number."""
+    headers = {"Accept": "application/vnd.github+json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    url = f"{GITHUB_API_BASE}/repos/{GITHUB_REPO}/issues/{number}"
+    resp = _gh_request(url, headers)
+    if resp.status_code == 404:
+        return None
+    resp.raise_for_status()
+    return resp.json()
 
 
 # ==================== Apps Script Web App ====================
@@ -142,20 +156,18 @@ def main():
     except Exception as e:
         print(f"  Cleanup warning: {e}")
 
-    # --- Step 2: Fetch all issues from GitHub ---
-    print("\nStep 2: Fetching all issues from GitHub...")
-    all_issues = fetch_all_issues(github_token)
-    print(f"Found {len(all_issues)} issues (excluding PRs)")
+    # --- Step 2: Fetch OPEN issues from GitHub ---
+    print("\nStep 2: Fetching open issues from GitHub...")
+    open_issues = fetch_open_issues(github_token)
+    print(f"Found {len(open_issues)} open issues (excluding PRs)")
 
-    # --- Build payload for Apps Script ---
-    formatted = []
-    for issue in all_issues:
+    # --- Build payload ---
+    def format_issue(issue):
         labels = [l["name"] for l in issue["labels"]]
         status_label, type_label = categorize_labels(labels)
         state = issue["state"]
         closed_at = issue.get("closed_at")
-
-        formatted.append({
+        return {
             "number": issue["number"],
             "title": issue["title"],
             "url": issue["html_url"],
@@ -167,7 +179,9 @@ def main():
             "comments": issue["comments"],
             "updated_at": issue["updated_at"],
             "created_at": issue.get("created_at", ""),
-        })
+        }
+
+    formatted = [format_issue(i) for i in open_issues]
 
     payload = {
         "mode": "sync",
@@ -176,19 +190,47 @@ def main():
         "issues": formatted,
     }
 
-    # --- Step 3: Send to Apps Script for sync ---
-    print(f"\nStep 3: Sending {len(formatted)} issues to Apps Script...")
+    # --- Step 3: Send open issues to Apps Script ---
+    print(f"\nStep 3: Sending {len(formatted)} open issues to Apps Script...")
     result = send_to_apps_script(apps_script_url, payload)
+
+    # --- Step 4: Check tracked issues that might be closed ---
+    possibly_closed = result.get("possibly_closed", [])
+    if possibly_closed:
+        print(f"\nStep 4: Checking {len(possibly_closed)} tracked issues that may be closed...")
+        closed_formatted = []
+        for num in possibly_closed:
+            issue = fetch_issue(num, github_token)
+            if issue and issue["state"] == "closed":
+                closed_formatted.append(format_issue(issue))
+            elif issue:
+                # Still open but wasn't in the open list (edge case)
+                closed_formatted.append(format_issue(issue))
+
+        if closed_formatted:
+            closed_payload = {
+                "mode": "sync",
+                "spreadsheet_id": spreadsheet_id,
+                "sheet_gid": sheet_gid,
+                "issues": closed_formatted,
+            }
+            closed_result = send_to_apps_script(apps_script_url, closed_payload)
+            print(f"  Closed issues updated: {closed_result.get('updates', 0)}")
+            result["updates"] = result.get("updates", 0) + closed_result.get("updates", 0)
+            result["inserts"] = result.get("inserts", 0) + closed_result.get("inserts", 0)
+    else:
+        print("\nStep 4: No tracked issues missing from open list.")
 
     # --- Print summary ---
     print(f"\n{'=' * 50}")
     print(f"Sync Summary ({datetime.date.today()})")
     print(f"{'=' * 50}")
-    print(f"  Issues fetched:  {len(formatted)}")
-    print(f"  Updated:         {result.get('updates', '?')}")
-    print(f"  Inserted:        {result.get('inserts', '?')}")
-    print(f"  Unchanged:       {result.get('unchanged', '?')}")
-    print(f"  Total in sheet:  {result.get('total_in_sheet', '?')}")
+    print(f"  Open issues fetched: {len(formatted)}")
+    print(f"  Possibly closed:     {len(possibly_closed)}")
+    print(f"  Updated:            {result.get('updates', '?')}")
+    print(f"  Inserted:            {result.get('inserts', '?')}")
+    print(f"  Unchanged:          {result.get('unchanged', '?')}")
+    print(f"  Total in sheet:     {result.get('total_in_sheet', '?')}")
     print(f"{'=' * 50}")
 
 
