@@ -129,8 +129,21 @@ def main():
     spreadsheet_id = os.environ.get("SPREADSHEET_ID", DEFAULT_SPREADSHEET_ID)
     sheet_gid = int(os.environ.get("SHEET_GID", str(DEFAULT_SHEET_GID)))
 
-    # --- Fetch all issues from GitHub ---
-    print("Fetching all issues from GitHub...")
+    # --- Step 1: Cleanup duplicates ---
+    print("Step 1: Cleaning up duplicate rows...")
+    cleanup_payload = {
+        "mode": "cleanup",
+        "spreadsheet_id": spreadsheet_id,
+        "sheet_gid": sheet_gid,
+    }
+    try:
+        cleanup_result = send_to_apps_script(apps_script_url, cleanup_payload)
+        print(f"  Deleted: {cleanup_result.get('deleted', '?')} duplicates, remaining: {cleanup_result.get('remaining', '?')}")
+    except Exception as e:
+        print(f"  Cleanup warning: {e}")
+
+    # --- Step 2: Fetch all issues from GitHub ---
+    print("\nStep 2: Fetching all issues from GitHub...")
     all_issues = fetch_all_issues(github_token)
     print(f"Found {len(all_issues)} issues (excluding PRs)")
 
@@ -163,8 +176,8 @@ def main():
         "issues": formatted,
     }
 
-    # --- Send to Apps Script ---
-    print(f"Sending {len(formatted)} issues to Apps Script...")
+    # --- Step 3: Send to Apps Script for sync ---
+    print(f"\nStep 3: Sending {len(formatted)} issues to Apps Script...")
     result = send_to_apps_script(apps_script_url, payload)
 
     # --- Print summary ---
