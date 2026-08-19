@@ -1,14 +1,16 @@
 #
 # Sync triton-ascend issues to Google Sheets via Apps Script Web App.
 #
-# Runs daily at 10:00 AM Beijing time (02:00 UTC) and can be triggered manually.
+# Runs 3 times daily: 10:00, 15:00, 20:00 Beijing time (UTC+8).
 #
 
 name: "Sync triton-ascend Issues to Google Sheets"
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # 10:00 AM Beijing time (UTC+8)
+    - cron: '0 2 * * *'   # 10:00 AM Beijing
+    - cron: '0 7 * * *'   # 15:00 Beijing
+    - cron: '0 12 * * *'  # 20:00 Beijing
   workflow_dispatch:
 
 permissions:
