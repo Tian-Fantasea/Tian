@@ -193,11 +193,13 @@ def main():
     # --- Step 3: Send open issues to Apps Script ---
     print(f"\nStep 3: Sending {len(formatted)} open issues to Apps Script...")
     result = send_to_apps_script(apps_script_url, payload)
+    print(f"  Step3 response: {json.dumps(result, ensure_ascii=False)}")
 
     # --- Step 4: Check tracked issues that might be closed ---
     possibly_closed = result.get("possibly_closed", [])
     if possibly_closed:
         print(f"\nStep 4: Checking {len(possibly_closed)} tracked issues that may be closed...")
+        print(f"  Possibly closed numbers: {possibly_closed[:20]}{'...' if len(possibly_closed)>20 else ''}")
         closed_formatted = []
         for num in possibly_closed:
             issue = fetch_issue(num, github_token)
@@ -208,6 +210,21 @@ def main():
                 closed_formatted.append(format_issue(issue))
 
         if closed_formatted:
+            # Debug: read one closed issue's row data BEFORE update
+            if closed_formatted:
+                debug_payload = {
+                    "mode": "read_row",
+                    "spreadsheet_id": spreadsheet_id,
+                    "sheet_gid": sheet_gid,
+                    "issue_number": closed_formatted[0]["number"],
+                }
+                try:
+                    debug_result = send_to_apps_script(apps_script_url, debug_payload)
+                    print(f"  [DEBUG] Issue #{closed_formatted[0]['number']} BEFORE update:")
+                    print(f"    {json.dumps(debug_result, ensure_ascii=False)[:500]}")
+                except Exception as e:
+                    print(f"  [DEBUG] read_row error: {e}")
+
             closed_payload = {
                 "mode": "sync",
                 "spreadsheet_id": spreadsheet_id,
@@ -215,9 +232,17 @@ def main():
                 "issues": closed_formatted,
             }
             closed_result = send_to_apps_script(apps_script_url, closed_payload)
-            print(f"  Closed issues updated: {closed_result.get('updates', 0)}")
+            print(f"  Step4 response: {json.dumps(closed_result, ensure_ascii=False)}")
             result["updates"] = result.get("updates", 0) + closed_result.get("updates", 0)
             result["inserts"] = result.get("inserts", 0) + closed_result.get("inserts", 0)
+
+            # Debug: read same issue's row data AFTER update
+            try:
+                debug_result2 = send_to_apps_script(apps_script_url, debug_payload)
+                print(f"  [DEBUG] Issue #{closed_formatted[0]['number']} AFTER update:")
+                print(f"    {json.dumps(debug_result2, ensure_ascii=False)[:500]}")
+            except Exception as e:
+                print(f"  [DEBUG] read_row error: {e}")
     else:
         print("\nStep 4: No tracked issues missing from open list.")
 
