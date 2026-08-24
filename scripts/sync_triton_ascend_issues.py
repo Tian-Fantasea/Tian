@@ -123,7 +123,7 @@ def fetch_issue(number: int, token: str = "") -> dict | None:
 
 
 def fetch_latest_reply(number: int, token: str = "") -> str:
-    """Fetch the latest comment time for an issue. Returns formatted datetime or empty."""
+    """Fetch the latest comment content for an issue. Returns comment body or empty."""
     headers = {"Accept": "application/vnd.github+json"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -136,7 +136,10 @@ def fetch_latest_reply(number: int, token: str = "") -> str:
     resp.raise_for_status()
     data = resp.json()
     if data:
-        return format_datetime(data[0].get("created_at", ""))
+        body = data[0].get("body", "")
+        if len(body) > 500:
+            body = body[:500] + "..."
+        return body
     return ""
 
 
@@ -293,4 +296,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
