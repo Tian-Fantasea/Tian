@@ -146,6 +146,36 @@ def fetch_latest_reply(number: int, token: str = "") -> str:
     return ""
 
 
+# ==================== Format issue data ====================
+
+def format_issue(issue, latest_reply=""):
+    """Format GitHub issue data for Apps Script."""
+    labels = [l["name"] for l in issue["labels"]]
+    status_label, type_label = categorize_labels(labels)
+    state = issue["state"]
+    closed_at = issue.get("closed_at")
+    creator = ""
+    if issue.get("user"):
+        creator = issue["user"].get("login", "")
+    return {
+        "number": issue["number"],
+        "title": issue["title"],
+        "url": issue["html_url"],
+        "state": state,
+        "is_closed": "是" if state == "closed" else "否",
+        "close_time": format_datetime(closed_at) if closed_at else "",
+        "created_time": format_datetime(issue.get("created_at", "")),
+        "status_label": status_label,
+        "type_label": type_label,
+        "comments": issue["comments"],
+        "updated_at": issue["updated_at"],
+        "created_at": issue.get("created_at", ""),
+        "creator": creator,
+        "latest_reply": latest_reply,
+        "last_updated": format_datetime(issue.get("updated_at", "")),
+    }
+
+
 # ==================== Apps Script Web App ====================
 
 def send_to_apps_script(url: str, payload: dict) -> dict:
@@ -236,32 +266,6 @@ def main():
     print(f"Found {len(open_issues)} open issues (excluding PRs)")
 
     # --- Build formatted issue data (once for all sheets) ---
-    def format_issue(issue, latest_reply=""):
-        labels = [l["name"] for l in issue["labels"]]
-        status_label, type_label = categorize_labels(labels)
-        state = issue["state"]
-        closed_at = issue.get("closed_at")
-        creator = ""
-        if issue.get("user"):
-            creator = issue["user"].get("login", "")
-        return {
-            "number": issue["number"],
-            "title": issue["title"],
-            "url": issue["html_url"],
-            "state": state,
-            "is_closed": "是" if state == "closed" else "否",
-            "close_time": format_datetime(closed_at) if closed_at else "",
-            "created_time": format_datetime(issue.get("created_at", "")),
-            "status_label": status_label,
-            "type_label": type_label,
-            "comments": issue["comments"],
-            "updated_at": issue["updated_at"],
-            "created_at": issue.get("created_at", ""),
-            "creator": creator,
-            "latest_reply": latest_reply,
-            "last_updated": format_datetime(issue.get("updated_at", "")),
-        }
-
     print("Fetching latest replies...")
     formatted = []
     for issue in open_issues:
