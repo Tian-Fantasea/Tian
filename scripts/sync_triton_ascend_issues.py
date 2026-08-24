@@ -173,7 +173,7 @@ def main():
             "url": issue["html_url"],
             "state": state,
             "is_closed": "是" if state == "closed" else "否",
-            "close_time": format_datetime(closed_at) if closed_at else "",
+            "close_time": format_datetime(closed_at) if closed_at else format_datetime(issue.get("created_at", "")),
             "status_label": status_label,
             "type_label": type_label,
             "comments": issue["comments"],
@@ -261,3 +261,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
