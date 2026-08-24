@@ -217,6 +217,9 @@ def main():
         if issue.get("comments", 0) > 0:
             reply = fetch_latest_reply(issue["number"], github_token)
         formatted.append(format_issue(issue, reply))
+    # Debug: print sample latest_reply values
+    for f in formatted[:5]:
+        print(f"  #{f['number']}: latest_reply='{f['latest_reply'][:60]}'")
 
     payload = {
         "mode": "sync",
