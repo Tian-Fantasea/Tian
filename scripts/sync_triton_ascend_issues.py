@@ -122,6 +122,24 @@ def fetch_issue(number: int, token: str = "") -> dict | None:
     return resp.json()
 
 
+def fetch_latest_reply(number: int, token: str = "") -> str:
+    """Fetch the latest comment time for an issue. Returns formatted datetime or empty."""
+    headers = {"Accept": "application/vnd.github+json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    url = f"{GITHUB_API_BASE}/repos/{GITHUB_REPO}/issues/{number}/comments"
+    params = {"per_page": 1, "sort": "created", "direction": "desc"}
+    resp = _gh_request(url, headers, params)
+    if resp.status_code == 404:
+        return ""
+    resp.raise_for_status()
+    data = resp.json()
+    if data:
+        return format_datetime(data[0].get("created_at", ""))
+    return ""
+
+
 # ==================== Apps Script Web App ====================
 
 def send_to_apps_script(url: str, payload: dict) -> dict:
@@ -162,11 +180,14 @@ def main():
     print(f"Found {len(open_issues)} open issues (excluding PRs)")
 
     # --- Build payload ---
-    def format_issue(issue):
+    def format_issue(issue, latest_reply=""):
         labels = [l["name"] for l in issue["labels"]]
         status_label, type_label = categorize_labels(labels)
         state = issue["state"]
         closed_at = issue.get("closed_at")
+        creator = ""
+        if issue.get("user"):
+            creator = issue["user"].get("login", "")
         return {
             "number": issue["number"],
             "title": issue["title"],
@@ -179,9 +200,19 @@ def main():
             "comments": issue["comments"],
             "updated_at": issue["updated_at"],
             "created_at": issue.get("created_at", ""),
+            "creator": creator,
+            "latest_reply": latest_reply,
+            "last_updated": format_datetime(issue.get("updated_at", "")),
         }
 
-    formatted = [format_issue(i) for i in open_issues]
+    # Fetch latest reply for issues with comments > 0
+    print("Fetching latest replies...")
+    formatted = []
+    for issue in open_issues:
+        reply = ""
+        if issue.get("comments", 0) > 0:
+            reply = fetch_latest_reply(issue["number"], github_token)
+        formatted.append(format_issue(issue, reply))
 
     payload = {
         "mode": "sync",
@@ -203,11 +234,11 @@ def main():
         closed_formatted = []
         for num in possibly_closed:
             issue = fetch_issue(num, github_token)
-            if issue and issue["state"] == "closed":
-                closed_formatted.append(format_issue(issue))
-            elif issue:
-                # Still open but wasn't in the open list (edge case)
-                closed_formatted.append(format_issue(issue))
+            if issue:
+                reply = ""
+                if issue.get("comments", 0) > 0:
+                    reply = fetch_latest_reply(issue["number"], github_token)
+                closed_formatted.append(format_issue(issue, reply))
 
         if closed_formatted:
             # Debug: read one closed issue's row data BEFORE update
