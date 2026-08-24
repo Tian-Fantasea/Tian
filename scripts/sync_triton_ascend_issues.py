@@ -225,9 +225,11 @@ def main():
     try:
         debug_row = send_to_apps_script(apps_script_url, {
             "mode": "read_row", "spreadsheet_id": spreadsheet_id,
-            "sheet_gid": sheet_gid, "issue_number": formatted[0]["number"] if formatted else 1
+            "sheet_gid": sheet_gid, "issue_number": 1676
         })
         print(f"  [DEBUG] colMap: {debug_row.get('_colMap', 'N/A')}")
+        print(f"  [DEBUG] #1676 col_7 (G): {debug_row.get('col_7', 'N/A')}")
+        print(f"  [DEBUG] #1676 col_5 (F): {debug_row.get('col_5', 'N/A')}")
     except Exception as e:
         print(f"  [DEBUG] read_row error: {e}")
 
