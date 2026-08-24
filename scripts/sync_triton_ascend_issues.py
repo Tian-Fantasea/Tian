@@ -221,6 +221,16 @@ def main():
     for f in formatted[:5]:
         print(f"  #{f['number']}: latest_reply='{f['latest_reply'][:60]}'")
 
+    # Debug: read colMap from Apps Script
+    try:
+        debug_row = send_to_apps_script(apps_script_url, {
+            "mode": "read_row", "spreadsheet_id": spreadsheet_id,
+            "sheet_gid": sheet_gid, "issue_number": formatted[0]["number"] if formatted else 1
+        })
+        print(f"  [DEBUG] colMap: {debug_row.get('_colMap', 'N/A')}")
+    except Exception as e:
+        print(f"  [DEBUG] read_row error: {e}")
+
     payload = {
         "mode": "sync",
         "spreadsheet_id": spreadsheet_id,
