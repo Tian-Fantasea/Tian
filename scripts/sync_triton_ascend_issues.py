@@ -28,6 +28,9 @@ import requests
 
 DEFAULT_SPREADSHEET_ID = "1i_Wlw1-XNeMdE-ELv9s_hgWjWztYUy6hYgckIh4Ov4k"
 DEFAULT_SHEET_GID = 144346032
+# 第二个表格
+SPREADSHEET_ID_2 = "1qYcIQI9L-HuhogMTZ9GKMeJh_9lpZl72OVs3PK-0VQo"
+SHEET_GID_2 = 1474875087
 GITHUB_REPO = "triton-lang/triton-ascend"
 GITHUB_API_BASE = "https://api.github.com"
 
@@ -152,6 +155,65 @@ def send_to_apps_script(url: str, payload: dict) -> dict:
     return resp.json()
 
 
+# ==================== Sync one sheet ====================
+
+def sync_sheet(apps_script_url, spreadsheet_id, sheet_gid, formatted, github_token, sheet_label=""):
+    """Sync issues to one Google Sheet (delete_auto + sync + possibly_closed)."""
+    prefix = f"[{sheet_label}] " if sheet_label else ""
+
+    # Step 1: Delete auto-added rows
+    print(f"\n{prefix}Step 1: Deleting auto-added rows...")
+    try:
+        delete_result = send_to_apps_script(apps_script_url, {
+            "mode": "delete_auto",
+            "spreadsheet_id": spreadsheet_id,
+            "sheet_gid": sheet_gid,
+        })
+        print(f"  {prefix}Deleted: {delete_result.get('deleted', '?')} rows, remaining: {delete_result.get('remaining', '?')}")
+    except Exception as e:
+        print(f"  {prefix}Delete warning: {e}")
+
+    # Step 2: Sync open issues
+    print(f"{prefix}Step 2: Sending {len(formatted)} open issues...")
+    result = send_to_apps_script(apps_script_url, {
+        "mode": "sync",
+        "spreadsheet_id": spreadsheet_id,
+        "sheet_gid": sheet_gid,
+        "issues": formatted,
+    })
+    print(f"  {prefix}Sync: updates={result.get('updates', 0)}, inserts={result.get('inserts', 0)}, unchanged={result.get('unchanged', 0)}")
+
+    # Step 3: Check possibly closed issues
+    possibly_closed = result.get("possibly_closed", [])
+    if possibly_closed:
+        print(f"{prefix}Step 3: Checking {len(possibly_closed)} possibly closed issues...")
+        closed_formatted = []
+        for num in possibly_closed:
+            issue = fetch_issue(num, github_token)
+            if issue:
+                reply = ""
+                if issue.get("comments", 0) > 0:
+                    reply = fetch_latest_reply(issue["number"], github_token)
+                closed_formatted.append(format_issue(issue, reply))
+
+        if closed_formatted:
+            closed_result = send_to_apps_script(apps_script_url, {
+                "mode": "sync",
+                "spreadsheet_id": spreadsheet_id,
+                "sheet_gid": sheet_gid,
+                "issues": closed_formatted,
+            })
+            print(f"  {prefix}Closed: updates={closed_result.get('updates', 0)}, unchanged={closed_result.get('unchanged', 0)}")
+            result["updates"] = result.get("updates", 0) + closed_result.get("updates", 0)
+            result["inserts"] = result.get("inserts", 0) + closed_result.get("inserts", 0)
+    else:
+        print(f"{prefix}Step 3: No possibly closed issues.")
+
+    # Summary
+    print(f"\n{prefix}Summary: updated={result.get('updates', 0)}, inserted={result.get('inserts', 0)}, unchanged={result.get('unchanged', 0)}, total_in_sheet={result.get('total_in_sheet', '?')}")
+    return result
+
+
 # ==================== Main ====================
 
 def main():
@@ -161,28 +223,19 @@ def main():
         sys.exit(1)
 
     github_token = os.environ.get("GITHUB_TOKEN", "")
-    spreadsheet_id = os.environ.get("SPREADSHEET_ID", DEFAULT_SPREADSHEET_ID)
-    sheet_gid = int(os.environ.get("SHEET_GID", str(DEFAULT_SHEET_GID)))
 
-    # --- Step 1: Delete auto-added rows (keep original data only) ---
-    print("Step 1: Deleting auto-added rows...")
-    delete_payload = {
-        "mode": "delete_auto",
-        "spreadsheet_id": spreadsheet_id,
-        "sheet_gid": sheet_gid,
-    }
-    try:
-        delete_result = send_to_apps_script(apps_script_url, delete_payload)
-        print(f"  Deleted: {delete_result.get('deleted', '?')} auto rows, remaining: {delete_result.get('remaining', '?')}")
-    except Exception as e:
-        print(f"  Delete warning: {e}")
+    # Sheet configs
+    sheets = [
+        ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),
+        ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),
+    ]
 
-    # --- Step 2: Fetch OPEN issues from GitHub ---
-    print("\nStep 2: Fetching open issues from GitHub...")
+    # --- Fetch OPEN issues from GitHub (once for all sheets) ---
+    print("Fetching open issues from GitHub...")
     open_issues = fetch_open_issues(github_token)
     print(f"Found {len(open_issues)} open issues (excluding PRs)")
 
-    # --- Build payload ---
+    # --- Build formatted issue data (once for all sheets) ---
     def format_issue(issue, latest_reply=""):
         labels = [l["name"] for l in issue["labels"]]
         status_label, type_label = categorize_labels(labels)
@@ -209,7 +262,6 @@ def main():
             "last_updated": format_datetime(issue.get("updated_at", "")),
         }
 
-    # Fetch latest reply for issues with comments > 0
     print("Fetching latest replies...")
     formatted = []
     for issue in open_issues:
@@ -217,95 +269,16 @@ def main():
         if issue.get("comments", 0) > 0:
             reply = fetch_latest_reply(issue["number"], github_token)
         formatted.append(format_issue(issue, reply))
-    # Debug: print sample latest_reply values
-    for f in formatted[:5]:
-        print(f"  #{f['number']}: latest_reply='{f['latest_reply'][:60]}'")
 
-    # Debug: read colMap from Apps Script
-    try:
-        debug_row = send_to_apps_script(apps_script_url, {
-            "mode": "read_row", "spreadsheet_id": spreadsheet_id,
-            "sheet_gid": sheet_gid, "issue_number": 1676
-        })
-        print(f"  [DEBUG] colMap: {debug_row.get('_colMap', 'N/A')}")
-        print(f"  [DEBUG] #1676 col_7 (G): {debug_row.get('col_7', 'N/A')}")
-        print(f"  [DEBUG] #1676 col_5 (F): {debug_row.get('col_5', 'N/A')}")
-    except Exception as e:
-        print(f"  [DEBUG] read_row error: {e}")
+    # --- Sync each sheet ---
+    for label, sid, gid in sheets:
+        print(f"\n{'=' * 50}")
+        print(f"Syncing {label}")
+        print(f"{'=' * 50}")
+        sync_sheet(apps_script_url, sid, gid, formatted, github_token, label)
 
-    payload = {
-        "mode": "sync",
-        "spreadsheet_id": spreadsheet_id,
-        "sheet_gid": sheet_gid,
-        "issues": formatted,
-    }
-
-    # --- Step 3: Send open issues to Apps Script ---
-    print(f"\nStep 3: Sending {len(formatted)} open issues to Apps Script...")
-    result = send_to_apps_script(apps_script_url, payload)
-    print(f"  Step3 response: {json.dumps(result, ensure_ascii=False)}")
-
-    # --- Step 4: Check tracked issues that might be closed ---
-    possibly_closed = result.get("possibly_closed", [])
-    if possibly_closed:
-        print(f"\nStep 4: Checking {len(possibly_closed)} tracked issues that may be closed...")
-        print(f"  Possibly closed numbers: {possibly_closed[:20]}{'...' if len(possibly_closed)>20 else ''}")
-        closed_formatted = []
-        for num in possibly_closed:
-            issue = fetch_issue(num, github_token)
-            if issue:
-                reply = ""
-                if issue.get("comments", 0) > 0:
-                    reply = fetch_latest_reply(issue["number"], github_token)
-                closed_formatted.append(format_issue(issue, reply))
-
-        if closed_formatted:
-            # Debug: read one closed issue's row data BEFORE update
-            if closed_formatted:
-                debug_payload = {
-                    "mode": "read_row",
-                    "spreadsheet_id": spreadsheet_id,
-                    "sheet_gid": sheet_gid,
-                    "issue_number": closed_formatted[0]["number"],
-                }
-                try:
-                    debug_result = send_to_apps_script(apps_script_url, debug_payload)
-                    print(f"  [DEBUG] Issue #{closed_formatted[0]['number']} BEFORE update:")
-                    print(f"    {json.dumps(debug_result, ensure_ascii=False)[:500]}")
-                except Exception as e:
-                    print(f"  [DEBUG] read_row error: {e}")
-
-            closed_payload = {
-                "mode": "sync",
-                "spreadsheet_id": spreadsheet_id,
-                "sheet_gid": sheet_gid,
-                "issues": closed_formatted,
-            }
-            closed_result = send_to_apps_script(apps_script_url, closed_payload)
-            print(f"  Step4 response: {json.dumps(closed_result, ensure_ascii=False)}")
-            result["updates"] = result.get("updates", 0) + closed_result.get("updates", 0)
-            result["inserts"] = result.get("inserts", 0) + closed_result.get("inserts", 0)
-
-            # Debug: read same issue's row data AFTER update
-            try:
-                debug_result2 = send_to_apps_script(apps_script_url, debug_payload)
-                print(f"  [DEBUG] Issue #{closed_formatted[0]['number']} AFTER update:")
-                print(f"    {json.dumps(debug_result2, ensure_ascii=False)[:500]}")
-            except Exception as e:
-                print(f"  [DEBUG] read_row error: {e}")
-    else:
-        print("\nStep 4: No tracked issues missing from open list.")
-
-    # --- Print summary ---
     print(f"\n{'=' * 50}")
-    print(f"Sync Summary ({datetime.date.today()})")
-    print(f"{'=' * 50}")
-    print(f"  Open issues fetched: {len(formatted)}")
-    print(f"  Possibly closed:     {len(possibly_closed)}")
-    print(f"  Updated:            {result.get('updates', '?')}")
-    print(f"  Inserted:            {result.get('inserts', '?')}")
-    print(f"  Unchanged:          {result.get('unchanged', '?')}")
-    print(f"  Total in sheet:     {result.get('total_in_sheet', '?')}")
+    print(f"All sheets synced. ({datetime.date.today()})")
     print(f"{'=' * 50}")
 
 
