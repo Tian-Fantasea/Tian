@@ -298,10 +298,10 @@ def main():
 
     github_token = os.environ.get("GITHUB_TOKEN", "")
 
-    # Sheet configs (调试期间只同步 Sheet1)
+    # Sheet configs
     sheets = [
         ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),
-        # ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),  # 调试完成后再放开
+        ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),
     ]
 
     # --- Fetch OPEN issues from GitHub (once for all sheets) ---
