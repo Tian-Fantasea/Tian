@@ -125,6 +125,49 @@ def fetch_issue(number: int, token: str = "") -> dict | None:
     return resp.json()
 
 
+def fetch_first_response(number: int, creator_login: str, token: str = "") -> str:
+    """Fetch the first non-creator comment's creation time. Returns ISO datetime or empty."""
+    headers = {"Accept": "application/vnd.github+json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    url = f"{GITHUB_API_BASE}/repos/{GITHUB_REPO}/issues/{number}/comments"
+    params = {"per_page": 100, "sort": "created", "direction": "asc"}
+    resp = _gh_request(url, headers, params)
+    if resp.status_code == 404:
+        return ""
+    resp.raise_for_status()
+    data = resp.json()
+    for comment in data:
+        if comment.get("user", {}).get("login", "") != creator_login:
+            return comment.get("created_at", "")
+    return ""
+
+
+def calculate_duration(created_at_str: str, response_at_str: str) -> str:
+    """Calculate human-readable duration between two ISO datetimes."""
+    if not created_at_str or not response_at_str:
+        return ""
+    try:
+        created = datetime.datetime.fromisoformat(created_at_str.replace("Z", "+00:00"))
+        response = datetime.datetime.fromisoformat(response_at_str.replace("Z", "+00:00"))
+        diff = response - created
+        total_seconds = int(diff.total_seconds())
+        if total_seconds < 0:
+            return ""
+        days = total_seconds // 86400
+        hours = (total_seconds % 86400) // 3600
+        minutes = (total_seconds % 3600) // 60
+        if days > 0:
+            return f"{days}天{hours}小时{minutes}分钟"
+        elif hours > 0:
+            return f"{hours}小时{minutes}分钟"
+        else:
+            return f"{minutes}分钟"
+    except Exception:
+        return ""
+
+
 def fetch_latest_reply(number: int, token: str = "") -> str:
     """Fetch the latest comment content for an issue. Returns comment body or empty."""
     headers = {"Accept": "application/vnd.github+json"}
@@ -148,7 +191,7 @@ def fetch_latest_reply(number: int, token: str = "") -> str:
 
 # ==================== Format issue data ====================
 
-def format_issue(issue, latest_reply=""):
+def format_issue(issue, latest_reply="", first_response=""):
     """Format GitHub issue data for Apps Script."""
     labels = [l["name"] for l in issue["labels"]]
     status_label, type_label = categorize_labels(labels)
@@ -157,6 +200,9 @@ def format_issue(issue, latest_reply=""):
     creator = ""
     if issue.get("user"):
         creator = issue["user"].get("login", "")
+    created_at = issue.get("created_at", "")
+    first_response_time = format_datetime(first_response) if first_response else ""
+    first_response_duration = calculate_duration(created_at, first_response) if first_response else ""
     return {
         "number": issue["number"],
         "title": issue["title"],
@@ -173,6 +219,8 @@ def format_issue(issue, latest_reply=""):
         "creator": creator,
         "latest_reply": latest_reply,
         "last_updated": format_datetime(issue.get("updated_at", "")),
+        "first_response_time": first_response_time,
+        "first_response_duration": first_response_duration,
     }
 
 
@@ -222,9 +270,12 @@ def sync_sheet(apps_script_url, spreadsheet_id, sheet_gid, formatted, github_tok
             issue = fetch_issue(num, github_token)
             if issue:
                 reply = ""
+                first_resp = ""
+                creator_login = issue.get("user", {}).get("login", "")
                 if issue.get("comments", 0) > 0:
                     reply = fetch_latest_reply(issue["number"], github_token)
-                closed_formatted.append(format_issue(issue, reply))
+                    first_resp = fetch_first_response(issue["number"], creator_login, github_token)
+                closed_formatted.append(format_issue(issue, reply, first_resp))
 
         if closed_formatted:
             closed_result = send_to_apps_script(apps_script_url, {
@@ -254,10 +305,10 @@ def main():
 
     github_token = os.environ.get("GITHUB_TOKEN", "")
 
-    # Sheet configs
+    # Sheet configs (调试期间只同步 Sheet1)
     sheets = [
         ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),
-        ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),
+        # ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),  # 调试完成后再放开
     ]
 
     # --- Fetch OPEN issues from GitHub (once for all sheets) ---
@@ -266,13 +317,16 @@ def main():
     print(f"Found {len(open_issues)} open issues (excluding PRs)")
 
     # --- Build formatted issue data (once for all sheets) ---
-    print("Fetching latest replies...")
+    print("Fetching latest replies and first responses...")
     formatted = []
     for issue in open_issues:
         reply = ""
+        first_resp = ""
+        creator_login = issue.get("user", {}).get("login", "")
         if issue.get("comments", 0) > 0:
             reply = fetch_latest_reply(issue["number"], github_token)
-        formatted.append(format_issue(issue, reply))
+            first_resp = fetch_first_response(issue["number"], creator_login, github_token)
+        formatted.append(format_issue(issue, reply, first_resp))
 
     # --- Sync each sheet ---
     for label, sid, gid in sheets:
