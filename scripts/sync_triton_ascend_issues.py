@@ -145,25 +145,18 @@ def fetch_first_response(number: int, creator_login: str, token: str = "") -> st
 
 
 def calculate_duration(created_at_str: str, response_at_str: str) -> str:
-    """Calculate human-readable duration between two ISO datetimes."""
+    """Calculate duration in days (2 decimal places) between two ISO datetimes."""
     if not created_at_str or not response_at_str:
         return ""
     try:
         created = datetime.datetime.fromisoformat(created_at_str.replace("Z", "+00:00"))
         response = datetime.datetime.fromisoformat(response_at_str.replace("Z", "+00:00"))
         diff = response - created
-        total_seconds = int(diff.total_seconds())
+        total_seconds = diff.total_seconds()
         if total_seconds < 0:
             return ""
-        days = total_seconds // 86400
-        hours = (total_seconds % 86400) // 3600
-        minutes = (total_seconds % 3600) // 60
-        if days > 0:
-            return f"{days}天{hours}小时{minutes}分钟"
-        elif hours > 0:
-            return f"{hours}小时{minutes}分钟"
-        else:
-            return f"{minutes}分钟"
+        days = total_seconds / 86400
+        return f"{days:.2f}天"
     except Exception:
         return ""
 
