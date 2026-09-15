@@ -82,7 +82,7 @@ def _gh_request(url: str, headers: dict, params: dict | None = None) -> requests
 
 
 def fetch_open_issues(token: str = "") -> list[dict]:
-    """Fetch all OPEN issues (excluding PRs) from triton-ascend."""
+    """Fetch all issues (excluding PRs) from triton-ascend. state=all for one-time historical sync."""
     headers = {"Accept": "application/vnd.github+json"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -92,7 +92,7 @@ def fetch_open_issues(token: str = "") -> list[dict]:
     while True:
         url = f"{GITHUB_API_BASE}/repos/{GITHUB_REPO}/issues"
         params = {
-            "state": "open",
+            "state": "all",
             "per_page": 100,
             "page": page,
             "sort": "created",
@@ -298,9 +298,9 @@ def main():
 
     github_token = os.environ.get("GITHUB_TOKEN", "")
 
-    # Sheet configs
+    # Sheet configs (Sheet2历史同步，只跑Sheet2)
     sheets = [
-        ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),
+        # ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),  # 已同步完成
         ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),
     ]
 
