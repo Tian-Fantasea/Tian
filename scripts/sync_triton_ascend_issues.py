@@ -82,7 +82,7 @@ def _gh_request(url: str, headers: dict, params: dict | None = None) -> requests
 
 
 def fetch_open_issues(token: str = "") -> list[dict]:
-    """Fetch all issues (excluding PRs) from triton-ascend. state=all for one-time historical sync."""
+    """Fetch all OPEN issues (excluding PRs) from triton-ascend."""
     headers = {"Accept": "application/vnd.github+json"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -92,7 +92,7 @@ def fetch_open_issues(token: str = "") -> list[dict]:
     while True:
         url = f"{GITHUB_API_BASE}/repos/{GITHUB_REPO}/issues"
         params = {
-            "state": "all",
+            "state": "open",
             "per_page": 100,
             "page": page,
             "sort": "created",
@@ -301,7 +301,7 @@ def main():
     # Sheet configs
     sheets = [
         ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),
-        # ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),  # 临时注释，历史同步完成后放开
+        ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),
     ]
 
     # --- Fetch OPEN issues from GitHub (once for all sheets) ---
