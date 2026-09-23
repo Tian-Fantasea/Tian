@@ -92,7 +92,7 @@ def fetch_open_issues(token: str = "") -> list[dict]:
     while True:
         url = f"{GITHUB_API_BASE}/repos/{GITHUB_REPO}/issues"
         params = {
-            "state": "open",
+            "state": "all",
             "per_page": 100,
             "page": page,
             "sort": "created",
@@ -300,7 +300,7 @@ def main():
 
     # Sheet configs
     sheets = [
-        ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),
+        # ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),
         ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),
     ]
 
