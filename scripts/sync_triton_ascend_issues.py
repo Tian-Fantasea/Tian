@@ -300,7 +300,7 @@ def main():
 
     # Sheet configs
     sheets = [
-        ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),
+        # ("Sheet1", DEFAULT_SPREADSHEET_ID, DEFAULT_SHEET_GID),
         ("Sheet2", SPREADSHEET_ID_2, SHEET_GID_2),
     ]
 
